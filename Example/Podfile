@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'Seam3_Example' do
+  pod 'Seam3', :path => '../'
+
+  target 'Seam3_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
