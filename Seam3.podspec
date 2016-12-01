@@ -21,16 +21,16 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/<GITHUB_USERNAME>/Seam3'
+  s.homepage         = 'https://github.com/paulw11/Seam3'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'paulw' => 'paulw@wilko.me' }
-  s.source           = { :git => 'https://github.com/<GITHUB_USERNAME>/Seam3.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/paulw11/Seam3.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '10.0'
 
-  s.source_files = 'Seam3/Classes/**/*'
+  s.source_files = 'Sources/Classes/**/*'
   
   # s.resource_bundles = {
   #   'Seam3' => ['Seam3/Assets/*.png']

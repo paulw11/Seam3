@@ -29,12 +29,9 @@ import CloudKit
 
 extension NSManagedObject {
     fileprivate func setAttributesValues(ofCKRecord ckRecord:CKRecord, withValuesOfAttributeWithKeys keys: [String]?) {
-        var attributes: [String] = [String]()
-        if keys != nil {
-            attributes = keys!
-        } else {
-            attributes = Array(self.entity.attributesByNameByRemovingBackingStoreAttributes().keys)
-        }
+        
+        let attributes = keys ?? Array(self.entity.attributesByNameByRemovingBackingStoreAttributes().keys)
+        
         let valuesDictionary = self.dictionaryWithValues(forKeys: attributes)
         for (key,_) in valuesDictionary {
             let attributeDescription = self.entity.attributesByName[key]
@@ -77,10 +74,10 @@ extension NSManagedObject {
             relationships = Array(self.entity.toOneRelationshipsByName().keys)
         }
         for relationship in relationships {
-            let relationshipManagedObject = self.value(forKey: relationship)
-            if relationshipManagedObject != nil {
-                let recordIDString: String = self.value(forKey: SMLocalStoreRecordIDAttributeName) as! String
-                let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+            if let relationshipManagedObject = self.value(forKey: relationship) as? NSManagedObject {
+                // let recordIDString: String = self.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
+                let recordIDString: String = relationshipManagedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
+                let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
                 let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
                 let ckReference: CKReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.deleteSelf)
                 ckRecord.setObject(ckReference, forKey: relationship)
@@ -89,13 +86,13 @@ extension NSManagedObject {
     }
     
     public func createOrUpdateCKRecord(usingValuesOfChangedKeys keys: [String]?) -> CKRecord? {
-        let encodedFields: Data? = self.value(forKey: SMLocalStoreRecordEncodedValuesAttributeName) as? Data
+        let encodedFields: Data? = self.value(forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName) as? Data
         var ckRecord: CKRecord?
         if encodedFields != nil {
             ckRecord = CKRecord.recordWithEncodedFields(encodedFields!)
         } else {
-            let recordIDString = self.value(forKey: SMLocalStoreRecordIDAttributeName) as! String
-            let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+            let recordIDString = self.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
+            let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
             let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
             ckRecord = CKRecord(recordType: self.entity.name!, recordID: ckRecordID)
         }

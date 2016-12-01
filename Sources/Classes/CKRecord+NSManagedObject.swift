@@ -57,35 +57,40 @@ extension CKRecord {
     }
     
     fileprivate func allAttributeValuesAsManagedObjectAttributeValues(usingContext context: NSManagedObjectContext) -> [String:AnyObject]? {
-        let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
-        return self.dictionaryWithValues(forKeys: self.allAttributeKeys(usingAttributesByNameFromEntity: entity!.attributesByName)) as [String : AnyObject]?
+        if let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType] {
+            return self.dictionaryWithValues(forKeys: self.allAttributeKeys(usingAttributesByNameFromEntity: entity.attributesByName)) as [String : AnyObject]?
+        } else {
+            return nil
+        }
     }
     
     fileprivate func allCKReferencesAsManagedObjects(usingContext context: NSManagedObjectContext) -> [String:AnyObject]? {
-        // Fix it : Need to fix relationships. No relationships are being saved at the moment
-        let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
-        if entity != nil {
-            let referencesValuesDictionary = self.dictionaryWithValues(forKeys: self.allReferencesKeys(usingRelationshipsByNameFromEntity: entity!.relationshipsByName))
+        // TODO: Need to fix relationships. No relationships are being saved at the moment
+        if let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType] {
+            let referencesValuesDictionary = self.dictionaryWithValues(forKeys: self.allReferencesKeys(usingRelationshipsByNameFromEntity: entity.relationshipsByName))
             var managedObjectsDictionary: Dictionary<String,AnyObject> = Dictionary<String,AnyObject>()
             for (key,value) in referencesValuesDictionary {
-                if (value as? String) != nil && (value as! String) == SMCloudRecordNilValue {
-                    managedObjectsDictionary[key] = SMCloudRecordNilValue as AnyObject?
+               /* if (value as? String) != nil && (value as! String) == SMStore.SMCloudRecordNilValue {
+                    managedObjectsDictionary[key] = SMStore.SMCloudRecordNilValue as AnyObject?
                     continue
-                }
-                let relationshipDescription = entity!.relationshipsByName[key]
-                if relationshipDescription?.destinationEntity?.name != nil {
-                    let recordIDString = (value as! CKReference).recordID.recordName
-                    let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: relationshipDescription!.destinationEntity!.name!)
-                    fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,recordIDString)
-                    fetchRequest.fetchLimit = 1
-                    do {
-                        let results = try context.fetch(fetchRequest)
-                        if results.count > 0 {
-                            let relationshipManagedObject: NSManagedObject = results.last as! NSManagedObject
-                            managedObjectsDictionary[key] = relationshipManagedObject
+                }*/
+                if let relationshipDescription = entity.relationshipsByName[key] {
+                    if let destinationEntity = relationshipDescription.destinationEntity {
+                        if let name = destinationEntity.name  {
+                            let recordIDString = (value as! CKReference).recordID.recordName
+                            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: name)
+                            fetchRequest.predicate = NSPredicate(format: "%K == %@", SMStore.SMLocalStoreRecordIDAttributeName,recordIDString)
+                            fetchRequest.fetchLimit = 1
+                            do {
+                                let results = try context.fetch(fetchRequest)
+                                if !results.isEmpty {
+                                    let relationshipManagedObject: NSManagedObject = results.last as! NSManagedObject
+                                    managedObjectsDictionary[key] = relationshipManagedObject
+                                }
+                            } catch {
+                                print("Failed to find relationship managed object for Key \(key) RecordID \(recordIDString)", terminator: "\n")
+                            }
                         }
-                    } catch {
-                        print("Failed to find relationship managed object for Key \(key) RecordID \(recordIDString)", terminator: "\n")
                     }
                 }
             }
@@ -96,70 +101,45 @@ extension CKRecord {
     
     public func createOrUpdateManagedObjectFromRecord(usingContext context: NSManagedObjectContext) throws -> NSManagedObject? {
         
-        let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
-        if entity?.name != nil {
-            var managedObject: NSManagedObject?
-            let recordIDString = self.recordID.recordName
-            let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entity!.name!)
-            fetchRequest.fetchLimit = 1
-            fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName, recordIDString)
-            let results = try context.fetch(fetchRequest)
-            if results.count > 0 {
-                managedObject = results.last as? NSManagedObject
-                if managedObject != nil {
-                    managedObject!.setValue(self.encodedSystemFields(), forKey: SMLocalStoreRecordEncodedValuesAttributeName)
-                    let attributeValuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)
-                    if let valuesDictionary = attributeValuesDictionary  {
-                        managedObject!.setValuesForKeys(valuesDictionary)
-                        for (key,value) in valuesDictionary {
-                            if let stringValue = value as? String {
-                                if stringValue == SMCloudRecordNilValue {
-                                    managedObject!.setValue(nil, forKey: key)
-                                }
-                            }
-                        }
-                    }
-                    let referencesValuesDictionary = self.allCKReferencesAsManagedObjects(usingContext: context)
-                    if referencesValuesDictionary != nil {
-                        for (key,value) in referencesValuesDictionary! {
-                            if (value as? String) != nil && (value as! String) == SMCloudRecordNilValue {
-                                managedObject!.setValue(nil, forKey: key)
-                            } else {
-                                managedObject!.setValue(value, forKey: key)
-                            }
-                        }
-                    }
+        if let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType] {
+            if let entityName = entity.name  {
+                var managedObject: NSManagedObject?
+                let recordIDString = self.recordID.recordName
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+                fetchRequest.fetchLimit = 1
+                fetchRequest.predicate = NSPredicate(format: "%K == %@", SMStore.SMLocalStoreRecordIDAttributeName, recordIDString)
+                let results = try context.fetch(fetchRequest)
+                if !results.isEmpty {
+                    managedObject = results.last as? NSManagedObject
                 }
-            } else {
-                managedObject = NSEntityDescription.insertNewObject(forEntityName: entity!.name!, into: context)
-                if managedObject != nil {
-                    managedObject!.setValue(recordIDString, forKey: SMLocalStoreRecordIDAttributeName)
-                    managedObject!.setValue(self.encodedSystemFields(), forKey: SMLocalStoreRecordEncodedValuesAttributeName)
-                    let attributeValuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)
-                    if let valuesDictionary = attributeValuesDictionary  {
-                        managedObject!.setValuesForKeys(valuesDictionary)
-                        for (key,value) in valuesDictionary {
-                            if let stringValue = value as? String {
-                                if stringValue == SMCloudRecordNilValue {
-                                    managedObject!.setValue(nil, forKey: key)
-                                }
-                            }
-                        }
-                    }
-                    let referencesValuesDictionary = self.allCKReferencesAsManagedObjects(usingContext: context)
-                    if referencesValuesDictionary != nil {
-                        for (key,value) in referencesValuesDictionary! {
-                            if (value as? String) != nil && (value as! String) == SMCloudRecordNilValue {
-                                managedObject!.setValue(nil, forKey: key)
-                            } else {
-                                managedObject!.setValue(value, forKey: key)
-                            }
-                        }
-                    }
+                
+                if managedObject == nil {
+                    managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: context)
+                    managedObject!.setValue(recordIDString, forKey: SMStore.SMLocalStoreRecordIDAttributeName)
                 }
+                
+                self.setValuesOn(managedObject!, inContext:context)
+                
+                return managedObject
             }
-            return managedObject
         }
-        return nil
+        throw SMStoreError.backingStoreUpdateError
+    }
+    
+                
+      
+    private func setValuesOn(_ managedObject: NSManagedObject, inContext context: NSManagedObjectContext ) {
+        managedObject.setValue(self.encodedSystemFields(), forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName)
+        let attributeValuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)
+        if let valuesDictionary = attributeValuesDictionary  {
+            managedObject.setValuesForKeys(valuesDictionary)
+        }
+        let referencesValuesDictionary = self.allCKReferencesAsManagedObjects(usingContext: context)
+        if referencesValuesDictionary != nil {
+            for (key,value) in referencesValuesDictionary! {
+                    managedObject.setValue(value, forKey: key)
+            }
+        }
+        
     }
 }

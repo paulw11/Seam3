@@ -29,7 +29,7 @@ import CloudKit
 extension CKRecordZoneID {
     
     class func smCloudStoreCustomZoneID() -> CKRecordZoneID {
-        let zoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+        let zoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
         return zoneID
     }
 }

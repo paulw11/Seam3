@@ -26,8 +26,7 @@
 import Foundation
 import CloudKit
 
-let SMStoreCloudStoreCustomZoneName = "SMStoreCloudStore_CustomZone"
-let SMStoreCloudStoreSubscriptionName = "SM_CloudStore_Subscription"
+
 
 class SMServerStoreSetupOperation:Operation {
     
@@ -41,18 +40,18 @@ class SMServerStoreSetupOperation:Operation {
     
     override func main() {
         let operationQueue = OperationQueue()
-        let zone = CKRecordZone(zoneName: SMStoreCloudStoreCustomZoneName)
+        let zone = CKRecordZone(zoneName: SMStore.SMStoreCloudStoreCustomZoneName)
         var error: NSError?
         let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
         modifyRecordZonesOperation.database = self.database
         modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = ({(savedRecordZones, deletedRecordZonesIDs, operationError) -> Void in
             error = operationError as NSError?
-            let customZoneWasCreated:AnyObject? = UserDefaults.standard.object(forKey: SMStoreCloudStoreCustomZoneName) as AnyObject?
-            let customZoneSubscriptionWasCreated:AnyObject? = UserDefaults.standard.object(forKey: SMStoreCloudStoreSubscriptionName) as AnyObject?
+            let customZoneWasCreated:AnyObject? = UserDefaults.standard.object(forKey: SMStore.SMStoreCloudStoreCustomZoneName) as AnyObject?
+            let customZoneSubscriptionWasCreated:AnyObject? = UserDefaults.standard.object(forKey: SMStore.SMStoreCloudStoreSubscriptionName) as AnyObject?
             if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil) {
-                UserDefaults.standard.set(true, forKey: SMStoreCloudStoreCustomZoneName)
-                let recordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
-                let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
+                UserDefaults.standard.set(true, forKey: SMStore.SMStoreCloudStoreCustomZoneName)
+                let recordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+                let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStore.SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
                 let subscriptionNotificationInfo = CKNotificationInfo()
                 subscriptionNotificationInfo.alertBody = ""
                 subscriptionNotificationInfo.shouldSendContentAvailable = true
@@ -62,7 +61,7 @@ class SMServerStoreSetupOperation:Operation {
                 subscriptionsOperation.database = self.database
                 subscriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
                     if operationError == nil {
-                        UserDefaults.standard.set(true, forKey: SMStoreCloudStoreSubscriptionName)
+                        UserDefaults.standard.set(true, forKey: SMStore.SMStoreCloudStoreSubscriptionName)
                     }
                     error = operationError as NSError?
                 })
@@ -75,7 +74,7 @@ class SMServerStoreSetupOperation:Operation {
             if error == nil {
                 self.setupOperationCompletionBlock!(true, true)
             } else {
-                if UserDefaults.standard.object(forKey: SMStoreCloudStoreCustomZoneName) == nil {
+                if UserDefaults.standard.object(forKey: SMStore.SMStoreCloudStoreCustomZoneName) == nil {
                     self.setupOperationCompletionBlock!(false, false)
                 } else {
                     self.setupOperationCompletionBlock!(true, false)

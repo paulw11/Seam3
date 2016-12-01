@@ -8,13 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
-		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		626242F17523025254B1D67D /* Pods_Seam3_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB108AD779E69CD9E4528863 /* Pods_Seam3_Tests.framework */; };
 		7D91ACA8F42C802579042510 /* Pods_Seam3_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E25FB0A228E32DC36741C4A /* Pods_Seam3_Example.framework */; };
+		BB02C4271DEF986D0021375F /* Seam3Demo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BB02C4251DEF986D0021375F /* Seam3Demo.xcdatamodeld */; };
+		BB02C42A1DEF999C0021375F /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB02C4291DEF999C0021375F /* CloudKit.framework */; };
+		BB02C4501DEF9BEB0021375F /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB02C44E1DEF9BEB0021375F /* DetailViewController.swift */; };
+		BB02C4511DEF9BEB0021375F /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB02C44F1DEF9BEB0021375F /* MasterViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,7 +36,6 @@
 		607FACD01AFB9204008FA782 /* Seam3_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Seam3_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		607FACD71AFB9204008FA782 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		607FACDA1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		607FACDC1AFB9204008FA782 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -44,6 +46,11 @@
 		93144DDDA2D4F2283DEC3115 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		982ADD5C28B585F5F534480D /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		B5B20B29F0DB774105D4FD6D /* Pods-Seam3_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Seam3_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Seam3_Tests/Pods-Seam3_Tests.release.xcconfig"; sourceTree = "<group>"; };
+		BB02C4261DEF986D0021375F /* Seam3Demo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Seam3Demo.xcdatamodel; sourceTree = "<group>"; };
+		BB02C4281DEF99970021375F /* Seam3_Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Seam3_Example.entitlements; sourceTree = "<group>"; };
+		BB02C4291DEF999C0021375F /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		BB02C44E1DEF9BEB0021375F /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		BB02C44F1DEF9BEB0021375F /* MasterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
 		BB108AD779E69CD9E4528863 /* Pods_Seam3_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Seam3_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6DFA1354567D6965A366287 /* Pods-Seam3_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Seam3_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Seam3_Example/Pods-Seam3_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		D5C4E8D6AE3EDFFFC4DC0B8B /* Seam3.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Seam3.podspec; path = ../Seam3.podspec; sourceTree = "<group>"; };
@@ -55,6 +62,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D91ACA8F42C802579042510 /* Pods_Seam3_Example.framework in Frameworks */,
+				BB02C42A1DEF999C0021375F /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +91,7 @@
 		607FACC71AFB9204008FA782 = {
 			isa = PBXGroup;
 			children = (
+				BB02C4281DEF99970021375F /* Seam3_Example.entitlements */,
 				607FACF51AFB993E008FA782 /* Podspec Metadata */,
 				607FACD21AFB9204008FA782 /* Example for Seam3 */,
 				607FACE81AFB9204008FA782 /* Tests */,
@@ -105,7 +114,8 @@
 			isa = PBXGroup;
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
-				607FACD71AFB9204008FA782 /* ViewController.swift */,
+				BB02C44E1DEF9BEB0021375F /* DetailViewController.swift */,
+				BB02C44F1DEF9BEB0021375F /* MasterViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
@@ -119,6 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				607FACD41AFB9204008FA782 /* Info.plist */,
+				BB02C4251DEF986D0021375F /* Seam3Demo.xcdatamodeld */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -153,6 +164,7 @@
 		9F59CF4C37B9421AB8216220 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BB02C4291DEF999C0021375F /* CloudKit.framework */,
 				1E25FB0A228E32DC36741C4A /* Pods_Seam3_Example.framework */,
 				BB108AD779E69CD9E4528863 /* Pods_Seam3_Tests.framework */,
 			);
@@ -215,10 +227,23 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = UPP93EJ3U2;
 						LastSwiftMigration = 0810;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = UPP93EJ3U2;
 						LastSwiftMigration = 0810;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
@@ -361,8 +386,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				BB02C4511DEF9BEB0021375F /* MasterViewController.swift in Sources */,
+				BB02C4271DEF986D0021375F /* Seam3Demo.xcdatamodeld in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				BB02C4501DEF9BEB0021375F /* DetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -441,7 +468,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -479,7 +506,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -491,6 +518,8 @@
 			baseConfigurationReference = C6DFA1354567D6965A366287 /* Pods-Seam3_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Seam3_Example.entitlements;
+				DEVELOPMENT_TEAM = UPP93EJ3U2;
 				INFOPLIST_FILE = Seam3/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -505,6 +534,8 @@
 			baseConfigurationReference = 7C070A0B5200D73DD91C1FC9 /* Pods-Seam3_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Seam3_Example.entitlements;
+				DEVELOPMENT_TEAM = UPP93EJ3U2;
 				INFOPLIST_FILE = Seam3/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -518,6 +549,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1869198D3CB5ED89E8C758BF /* Pods-Seam3_Tests.debug.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = UPP93EJ3U2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -538,6 +570,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B5B20B29F0DB774105D4FD6D /* Pods-Seam3_Tests.release.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = UPP93EJ3U2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -581,6 +614,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		BB02C4251DEF986D0021375F /* Seam3Demo.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				BB02C4261DEF986D0021375F /* Seam3Demo.xcdatamodel */,
+			);
+			currentVersion = BB02C4261DEF986D0021375F /* Seam3Demo.xcdatamodel */;
+			path = Seam3Demo.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 607FACC81AFB9204008FA782 /* Project object */;
 }

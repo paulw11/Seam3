@@ -30,8 +30,8 @@ extension NSEntityDescription {
     
     func attributesByNameByRemovingBackingStoreAttributes() -> [String:NSAttributeDescription] {
         var attributesByName = self.attributesByName
-        attributesByName.removeValue(forKey: SMLocalStoreRecordIDAttributeName)
-        attributesByName.removeValue(forKey: SMLocalStoreRecordEncodedValuesAttributeName)
+        attributesByName.removeValue(forKey: SMStore.SMLocalStoreRecordIDAttributeName)
+        attributesByName.removeValue(forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName)
         return attributesByName
     }
     
