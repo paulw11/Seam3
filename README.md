@@ -10,7 +10,7 @@ All you have to do is use it as a store type for your CoreData store.
 Local caching and sync is taken care of. 
 It builds and exposes different features to facilitate and give control to the developer where it is demanded and required.
 
-Seam3 is based on [![Seam]https://github.com/nofelmahmood/Seam] by  nofelmahmood
+Seam3 is based on [Seam](https://github.com/nofelmahmood/Seam) by [nofelmahmood](https://github.com/nofelmahmood)
 
 Changes in Seam3 include:
 
