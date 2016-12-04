@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'Seam3'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of Seam3.'
+  s.summary          = 'A CoreData store backed by CloudKit.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,7 +18,19 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+Seam3 is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle. 
+All you have to do is use it as a store type for your CoreData store. 
+Local caching and sync is taken care of. 
+It builds and exposes different features to facilitate and give control to the developer where it is demanded and required.
+
+Seam3 is based on [Seam](https://github.com/nofelmahmood/Seam) by [nofelmahmood](https://github.com/nofelmahmood/)
+
+Changes in Seam3 include:
+
+* Corrects one-to-many and many-to-one relationship mapping between CoreData and CloudKit
+* Adds mapping between binary attributes in CoreData and CKAssets in CloudKit
+* Code updates for Swift 3.0
+* Restructures code to eliminate the use of global variables
                        DESC
 
   s.homepage         = 'https://github.com/paulw11/Seam3'
@@ -26,7 +38,7 @@ TODO: Add long description of the pod here.
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'paulw' => 'paulw@wilko.me' }
   s.source           = { :git => 'https://github.com/paulw11/Seam3.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.social_media_url = 'https://twitter.com/paulwilko'
 
   s.ios.deployment_target = '10.0'
 
@@ -35,8 +47,4 @@ TODO: Add long description of the pod here.
   # s.resource_bundles = {
   #   'Seam3' => ['Seam3/Assets/*.png']
   # }
-
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
 end
