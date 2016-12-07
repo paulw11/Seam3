@@ -31,8 +31,6 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
-
-
 enum SMStoreRecordChangeType: Int16 {
     case recordNoChange = 0
     case recordUpdated = 1
@@ -321,9 +319,11 @@ open class SMStore: NSIncrementalStore {
     
     // MARK : SaveChanges Request
     fileprivate func executeInResponseToSaveChangesRequest(_ saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext) throws -> Array<AnyObject> {
+        
+        try self.deleteObjectsFromBackingStore(objectsToDelete: context.deletedObjects, mainContext: context)
         try self.insertObjectsInBackingStore(objectsToInsert: context.insertedObjects, mainContext: context)
         try self.updateObjectsInBackingStore(objectsToUpdate: context.updatedObjects)
-        try self.deleteObjectsFromBackingStore(objectsToDelete: context.deletedObjects, mainContext: context)
+        
         try self.backingMOC.saveIfHasChanges()
         print("Saved")
         self.triggerSync()
