@@ -58,6 +58,7 @@ enum SMStoreError: Error {
     case backingStoreCreationFailed
     case backingStoreUpdateError
     case missingInverseRelationship
+    case manyToManyUnsupported
 }
 
 open class SMStore: NSIncrementalStore {
@@ -265,6 +266,10 @@ open class SMStore: NSIncrementalStore {
                 throw SMStoreError.missingInverseRelationship
             }
             toOneRelationship = targetRelationship
+        }
+        
+        guard toOneRelationship.isToMany == false else {
+            throw SMStoreError.manyToManyUnsupported
         }
         
         let recordID:String = self.referenceObject(for: objectID) as! String
