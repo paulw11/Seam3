@@ -2,16 +2,17 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11542" systemVersion="16B2555" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Device" representedClassName="Device" syncable="YES" codeGenerationType="class">
         <attribute name="deviceID" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="events" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Event" inverseName="creatingDevice" inverseEntity="Event" syncable="YES"/>
     </entity>
     <entity name="Event" representedClassName="Event" syncable="YES" codeGenerationType="class">
         <attribute name="binaryAttribute" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="intAttribute" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="stringAttribute" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <relationship name="creatingDevice" maxCount="1" deletionRule="Nullify" destinationEntity="Device" syncable="YES"/>
+        <relationship name="creatingDevice" maxCount="1" deletionRule="Nullify" destinationEntity="Device" inverseName="events" inverseEntity="Device" syncable="YES"/>
     </entity>
     <elements>
+        <element name="Device" positionX="-63" positionY="9" width="128" height="75"/>
         <element name="Event" positionX="-63" positionY="-18" width="128" height="120"/>
-        <element name="Device" positionX="-63" positionY="9" width="128" height="60"/>
     </elements>
 </model>

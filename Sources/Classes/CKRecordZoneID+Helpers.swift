@@ -2,7 +2,11 @@
 //
 //    The MIT License (MIT)
 //
-//    Copyright (c) 2015 Nofel Mahmood ( https://twitter.com/NofelMahmood )
+//    Copyright (c) 2016 Paul Wilkinson ( https://github.com/paulw11 )
+//
+//    Based on work by Nofel Mahmood
+//
+//    Portions copyright (c) 2015 Nofel Mahmood ( https://twitter.com/NofelMahmood )
 //
 //    Permission is hereby granted, free of charge, to any person obtaining a copy
 //    of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +25,6 @@
 //    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //    SOFTWARE.
-
 
 import CloudKit
 
