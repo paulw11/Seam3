@@ -5,9 +5,6 @@
 //
 //    Copyright (c) 2016 Paul Wilkinson ( https://github.com/paulw11 )
 //
-//    Based on work by Nofel Mahmood
-//
-//    Portions copyright (c) 2015 Nofel Mahmood ( https://twitter.com/NofelMahmood )
 //
 //    Permission is hereby granted, free of charge, to any person obtaining a copy
 //    of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +34,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     var managedObjectContext: NSManagedObjectContext? = nil
     var device: Device?
     var events = [Event]()
+    var devices = [Device]()
 
 
     override func viewDidLoad() {
@@ -52,12 +50,17 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             self.detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: nil, queue: nil) {_ in
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: nil, queue: nil) { notification in
             //    NSFetchedResultsController<NSFetchRequestResult>.deleteCache(withName: nil)
             // try! self.fetchedResultsController.performFetch()
+            
+            if notification.userInfo != nil {
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                appDelegate.smStore?.triggerSync()
+            }
+            
             DispatchQueue.main.async {
                 self.loadData()
-                // self.tableView.reloadData()
             }
         }
     }
@@ -77,6 +80,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     func loadData() {
         
         
+        let deviceFetchRequest = Device.fetchRequest() as NSFetchRequest<Device>
+        
+        
         let fetchRequest = Event.fetchRequest() as NSFetchRequest<Event>
         
         let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
@@ -84,10 +90,17 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         fetchRequest.sortDescriptors = [sortDescriptor]
         
         do {
+            if let devices = try self.managedObjectContext?.fetch(deviceFetchRequest) {
+                self.devices = devices
+            }
+            
             if let events = try self.managedObjectContext?.fetch(fetchRequest){
                 self.events = events
-                self.tableView.reloadData()
+               
             }
+            
+            self.tableView.reloadData()
+            
         } catch {}
     }
     
@@ -114,15 +127,22 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     // MARK: - Segues
 
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        if let indexPath = self.tableView.indexPathForSelectedRow {
+            if indexPath.section == 0 {
+                return true
+            }
+        }
+        
+        return false
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow {
             let object = self.events[indexPath.row]
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
-                print("Device - \(object.managedObjectContext)")
-                print("This device moc -\(self.device!.managedObjectContext)")
-                print("Object device -\(object.creatingDevice!) \(object.creatingDevice?.managedObjectContext!)")
                 controller.managedObjectContext = self.managedObjectContext!
                 controller.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
@@ -133,23 +153,32 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     // MARK: - Table View
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.events.count
+        if section == 0 {
+            return self.events.count
+        } else {
+            return self.devices.count
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        let event = self.events[indexPath.row]
-        self.configureCell(cell, withEvent: event)
+        if indexPath.section == 0 {
+            let event = self.events[indexPath.row]
+            self.configureCell(cell, withEvent: event)
+        } else {
+            let device = self.devices[indexPath.row]
+            self.configureCell(cell, withDevice: device)
+        }
         return cell
     }
 
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
-        return true
+        return indexPath.section == 0
     }
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
@@ -159,15 +188,23 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
                 
                 do {
                     try context.save()
-                    self.events.remove(at: indexPath.row)
-                    tableView.deleteRows(at: [indexPath], with: .automatic)
                 } catch {
                     // Replace this implementation with code to handle the error appropriately.
                     // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                     let nserror = error as NSError
                     fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
                 }
+                self.events.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .automatic)
             }
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 0 {
+            return "Events"
+        } else {
+            return "Devices"
         }
     }
 
@@ -178,6 +215,12 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             cell.textLabel!.text = "Missing timestamp!"
         }
     }
+    
+    func configureCell(_ cell: UITableViewCell, withDevice device: Device) {
+        cell.textLabel!.text = device.deviceID ?? "Missing device id"
+    }
+    
+    
 
     // MARK: - Fetched results controller
 

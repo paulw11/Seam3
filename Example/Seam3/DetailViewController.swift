@@ -46,7 +46,12 @@ class DetailViewController: UIViewController {
             self.integerTextField.text = String(detail.intAttribute)
             self.stringTextField.text = detail.stringAttribute ?? ""
             self.creatingDeviceField.text = detail.creatingDevice?.deviceID
-            print("EVents owned=\(detail.creatingDevice!.events!)")
+            if let events = detail.creatingDevice?.events?.allObjects as? [Event] {
+                for event in events {
+                    print("Event time = \(event.timestamp!.description)")
+                }
+                
+            }
         }
     }
 
