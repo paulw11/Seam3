@@ -283,7 +283,7 @@ open class SMStore: NSIncrementalStore {
                 if !targetResults.isEmpty {
                     let retValues = targetResults.map {
                         let reference = $0.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName)
-                        return self.newObjectID(for: toOneRelationship.entity, referenceObject: reference as! Any)
+                        return self.newObjectID(for: toOneRelationship.entity, referenceObject: reference as Any)
                         
                     } as [NSManagedObjectID]
                     return retValues
