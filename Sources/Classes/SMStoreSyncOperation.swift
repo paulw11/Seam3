@@ -36,7 +36,6 @@ enum SMSyncConflictResolutionPolicy: Int16 {
     case clientTellsWhichWins = 0
     case serverRecordWins = 1
     case clientRecordWins = 2
-    case keepBoth = 4
 }
 
 enum SMSyncOperationError: Error {
@@ -54,11 +53,11 @@ class SMStoreSyncOperation: Operation {
     fileprivate var localStoreMOC: NSManagedObjectContext!
     fileprivate var persistentStoreCoordinator: NSPersistentStoreCoordinator?
     fileprivate var entities: Array<NSEntityDescription>
-    var syncConflictPolicy: SMSyncConflictResolutionPolicy?
+    var syncConflictPolicy: SMSyncConflictResolutionPolicy
     var syncCompletionBlock: ((_ syncError:NSError?) -> ())?
     var syncConflictResolutionBlock: ((_ clientRecord:CKRecord,_ serverRecord:CKRecord)->CKRecord)?
     
-    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy?) {
+    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy = .serverRecordWins) {
         self.persistentStoreCoordinator = persistentStoreCoordinator
         self.entities = entities
         self.syncConflictPolicy = conflictPolicy
@@ -108,7 +107,8 @@ class SMStoreSyncOperation: Operation {
             SMServerTokenHandler.defaultHandler.commit()
             try SMStoreChangeSetHandler.defaultHandler.removeAllQueuedChangeSets(backingContext: self.localStoreMOC!)
         } catch {
-            throw SMSyncOperationError.unknownError
+            //throw SMSyncOperationError.unknownError
+            throw error
         }
     }
     
@@ -205,19 +205,22 @@ class SMStoreSyncOperation: Operation {
             for key in Array(conflictedRecordsWithStringRecordIDs.keys) {
                 let value = conflictedRecordsWithStringRecordIDs[key]!
                 var clientServerCKRecord = value as (clientRecord:CKRecord?,serverRecord:CKRecord?)
-                if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.clientTellsWhichWins {
+                
+                switch self.syncConflictPolicy {
+                    
+                case .clientTellsWhichWins:
                     if self.syncConflictResolutionBlock != nil {
                         clientServerCKRecord.serverRecord = self.syncConflictResolutionBlock!(clientServerCKRecord.clientRecord!,clientServerCKRecord.serverRecord!)
                     } else {
-                        print("ClientTellsWhichWins conflict resolution policy requires to set syncConflictResolutionBlock on the instance of SMStore")
+                        print("ClientTellsWhichWins conflict resolution policy requires to set syncConflictResolutionBlock on the instance of SMStore.  Defaulting to serverRecordWins")
                     }
-                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.clientRecordWins {
+                    
+                case .clientRecordWins:
+                    
                     clientServerCKRecord.serverRecord = clientServerCKRecord.clientRecord
                     
-                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.serverRecordWins {
+                case .serverRecordWins:
                     print("Resolving conflict in favour of server")
-                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.keepBoth {
-                    
                 }
                 if let serverRecord = clientServerCKRecord.serverRecord {
                     finalCKRecords.append(serverRecord)
@@ -225,6 +228,7 @@ class SMStoreSyncOperation: Operation {
                     finalCKRecords.append(clientRecord)
                 }
             }
+            
         }
         return finalCKRecords
     }
@@ -250,7 +254,6 @@ class SMStoreSyncOperation: Operation {
         }
         fetchRecordChangesOperation.recordChangedBlock = { record in
             let ckRecord:CKRecord = record as CKRecord
-            print("Updated record=\(record)")
             insertedOrUpdatedCKRecords.append(ckRecord)
         }
         fetchRecordChangesOperation.recordWithIDWasDeletedBlock = { recordID in
@@ -292,7 +295,7 @@ class SMStoreSyncOperation: Operation {
             }
             self.operationQueue.addOperation(fetchRecordsOperation)
             self.operationQueue.waitUntilAllOperationsAreFinished()
-            for record in insertedOrUpdatedCKRecords {
+            /*for record in insertedOrUpdatedCKRecords {
                 let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[record.recordType]
                 if entity != nil {
                    /* for key in Array(entity!.propertiesByName.keys) {
@@ -301,7 +304,7 @@ class SMStoreSyncOperation: Operation {
                         }
                     }*/
                 }
-            }
+            }*/
         }
         if fetchRecordChangesOperation.moreComing {
             print("More records coming", terminator: "\n")
@@ -311,10 +314,23 @@ class SMStoreSyncOperation: Operation {
         return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,fetchRecordChangesOperation.moreComing)
     }
     
-    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>) throws {
+    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>, retry: Bool = true) throws {
+        var deferredRecords = [CKRecord]()
         for record in ckRecords {
-            try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
-            try self.localStoreMOC.saveIfHasChanges()
+            var success = false
+            do {
+                try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
+                success = true
+            } catch SMStoreError.missingRelatedObject {
+                deferredRecords.append(record)
+            }
+            if success {
+                try self.localStoreMOC.saveIfHasChanges()
+            }
+        }
+        
+        if retry && !deferredRecords.isEmpty {
+            try self.insertOrUpdateManagedObjects(fromCKRecords: deferredRecords, retry:true)
         }
     }
     

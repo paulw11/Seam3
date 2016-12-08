@@ -57,6 +57,7 @@ enum SMStoreError: Error {
     case backingStoreUpdateError
     case missingInverseRelationship
     case manyToManyUnsupported
+    case missingRelatedObject
 }
 
 open class SMStore: NSIncrementalStore {
@@ -243,10 +244,9 @@ open class SMStore: NSIncrementalStore {
         for (key,value) in backingObjectValues {
             if let managedObjectID = value as? NSManagedObjectID {
                 let managedObject = try self.backingMOC.existingObject(with: managedObjectID)
-                print("Retrieved an object: \(managedObject)")
                 if let identifier = managedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String {
                     let objID = self.newObjectID(for: managedObject.entity, referenceObject:identifier)
-                        backingObjectValues[key] = objID
+                    backingObjectValues[key] = objID
                 }
             }
         }
@@ -286,11 +286,14 @@ open class SMStore: NSIncrementalStore {
                         return self.newObjectID(for: toOneRelationship.entity, referenceObject: reference)
                     } as [NSManagedObjectID]
                     return retValues
-                }
+                } 
             }
         }
-        
-        return []
+        if toOneRelationship.isOptional {
+            return NSNull()
+        } else {
+            throw SMStoreError.missingRelatedObject
+        }
     }
 
     override open func obtainPermanentIDs(for array: [NSManagedObject]) throws -> [NSManagedObjectID] {
