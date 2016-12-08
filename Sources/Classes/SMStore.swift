@@ -125,10 +125,10 @@ open class SMStore: NSIncrementalStore {
             NSStoreTypeKey: type(of: self).type
         ]
         let storeURL=self.url
-        guard let backingMOM: NSManagedObjectModel? = self.backingModel() else {
+        guard let backingMOM = self.backingModel() else {
             throw SMStoreError.backingStoreCreationFailed
         }
-            self.backingPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: backingMOM!)
+            self.backingPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: backingMOM)
             do {
                 
                 let options = [NSMigratePersistentStoresAutomaticallyOption: self.automaticStoreMigration, NSInferMappingModelAutomaticallyOption: self.inferMappingModel]

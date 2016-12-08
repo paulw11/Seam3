@@ -319,7 +319,7 @@ class SMStoreSyncOperation: Operation {
         for record in ckRecords {
             var success = false
             do {
-                try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
+                let _ = try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
                 success = true
             } catch SMStoreError.missingRelatedObject {
                 deferredRecords.append(record)
