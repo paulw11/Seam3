@@ -32,7 +32,13 @@ import CloudKit
 extension CKRecordZone {
     
     class func smCloudStoreCustomZone() -> CKRecordZone {
-        let zoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+        
+        var zoneID: CKRecordZoneID
+        if #available(iOS 10.0, *) {
+            zoneID =  CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
+        } else {
+            zoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+        }
         return CKRecordZone(zoneID: zoneID)
     }
 }

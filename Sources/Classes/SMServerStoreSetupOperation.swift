@@ -54,7 +54,7 @@ class SMServerStoreSetupOperation:Operation {
             let customZoneSubscriptionWasCreated:AnyObject? = UserDefaults.standard.object(forKey: SMStore.SMStoreCloudStoreSubscriptionName) as AnyObject?
             if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil) {
                 UserDefaults.standard.set(true, forKey: SMStore.SMStoreCloudStoreCustomZoneName)
-                let recordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+                let recordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
                 let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStore.SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
                 let subscriptionNotificationInfo = CKNotificationInfo()
                 subscriptionNotificationInfo.alertBody = ""

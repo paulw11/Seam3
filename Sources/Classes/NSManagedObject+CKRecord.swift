@@ -81,7 +81,7 @@ extension NSManagedObject {
             if let relationshipManagedObject = self.value(forKey: relationship) as? NSManagedObject {
                 // let recordIDString: String = self.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
                 let recordIDString: String = relationshipManagedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
-                let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+                let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
                 let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
                 let ckReference: CKReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.deleteSelf)
                 ckRecord.setObject(ckReference, forKey: relationship)
@@ -96,7 +96,7 @@ extension NSManagedObject {
             ckRecord = CKRecord.recordWithEncodedFields(encodedFields!)
         } else {
             let recordIDString = self.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
-            let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+            let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
             let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
             ckRecord = CKRecord(recordType: self.entity.name!, recordID: ckRecordID)
         }
