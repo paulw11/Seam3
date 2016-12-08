@@ -68,7 +68,7 @@ extension CKRecord {
         }
     }
     
-    fileprivate func allCKReferencesAsManagedObjects(usingContext context: NSManagedObjectContext) -> [String:AnyObject]? {
+    fileprivate func allCKReferencesAsManagedObjects(usingContext context: NSManagedObjectContext, forManagedObject managedObject: NSManagedObject) throws -> [String:AnyObject]? {
         // TODO: Need to fix relationships. No relationships are being saved at the moment
         if let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType] {
             let referencesValuesDictionary = self.dictionaryWithValues(forKeys: self.allReferencesKeys(usingRelationshipsByNameFromEntity: entity.relationshipsByName))
@@ -85,15 +85,15 @@ extension CKRecord {
                             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: name)
                             fetchRequest.predicate = NSPredicate(format: "%K == %@", SMStore.SMLocalStoreRecordIDAttributeName,recordIDString)
                             fetchRequest.fetchLimit = 1
-                            do {
-                                let results = try context.fetch(fetchRequest)
+                            let results = try context.fetch(fetchRequest)
                                 if !results.isEmpty {
                                     let relationshipManagedObject: NSManagedObject = results.last as! NSManagedObject
                                     managedObjectsDictionary[key] = relationshipManagedObject
+                                } else {
+                                    print("No matching related object for \(recordIDString)")
+                                    context.refresh(managedObject, mergeChanges: false)
+                                    throw SMStoreError.missingRelatedObject
                                 }
-                            } catch {
-                                print("Failed to find relationship managed object for Key \(key) RecordID \(recordIDString)", terminator: "\n")
-                            }
                         }
                     }
                 }
@@ -122,7 +122,7 @@ extension CKRecord {
                     managedObject!.setValue(recordIDString, forKey: SMStore.SMLocalStoreRecordIDAttributeName)
                 }
                 
-                self.setValuesOn(managedObject!, inContext:context)
+                try self.setValuesOn(managedObject!, inContext:context)
                 
                 return managedObject
             }
@@ -132,18 +132,17 @@ extension CKRecord {
     
                 
       
-    private func setValuesOn(_ managedObject: NSManagedObject, inContext context: NSManagedObjectContext ) {
+    private func setValuesOn(_ managedObject: NSManagedObject, inContext context: NSManagedObjectContext ) throws {
         managedObject.setValue(self.encodedSystemFields(), forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName)
         let attributeValuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)
         if let valuesDictionary = attributeValuesDictionary  {
             managedObject.setValuesForKeys(valuesDictionary)
         }
-        let referencesValuesDictionary = self.allCKReferencesAsManagedObjects(usingContext: context)
+        let referencesValuesDictionary = try self.allCKReferencesAsManagedObjects(usingContext: context, forManagedObject: managedObject)
         if referencesValuesDictionary != nil {
             for (key,value) in referencesValuesDictionary! {
                     managedObject.setValue(value, forKey: key)
             }
         }
-        
     }
 }
