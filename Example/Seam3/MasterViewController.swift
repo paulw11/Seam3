@@ -51,12 +51,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: nil, queue: nil) { notification in
-            //    NSFetchedResultsController<NSFetchRequestResult>.deleteCache(withName: nil)
-            // try! self.fetchedResultsController.performFetch()
             
             if notification.userInfo != nil {
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                appDelegate.smStore?.triggerSync()
+                appDelegate.smStore?.triggerSync(complete: true)
             }
             
             DispatchQueue.main.async {
