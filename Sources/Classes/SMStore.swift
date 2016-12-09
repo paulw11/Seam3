@@ -171,10 +171,14 @@ open class SMStore: NSIncrementalStore {
         }
     }
     
-    open func triggerSync() {
+    open func triggerSync(complete: Bool = false) {
         
         guard self.operationQueue?.operationCount == 0 else {
             return
+        }
+        
+        if complete {
+            SMServerTokenHandler.defaultHandler.delete()
         }
         
         let syncOperationBlock = {
