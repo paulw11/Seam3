@@ -8,15 +8,14 @@
 Seam3 is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle. 
 All you have to do is use it as a store type for your CoreData store. 
 Local caching and sync is taken care of. 
-It builds and exposes different features to facilitate and give control to the developer where it is demanded and required.
 
 Seam3 is based on [Seam](https://github.com/nofelmahmood/Seam) by [nofelmahmood](https://github.com/nofelmahmood)
 
 Changes in Seam3 include:
 
 * Corrects one-to-many and many-to-one relationship mapping between CoreData and CloudKit
-* Adds mapping between binary attributes in CoreData and CKAssets in CloudKit
-* Code updates for Swift 3.0
+* Adds mapping between binary attributes in CoreData and CKAssets in CloudKit (Not yet :( )
+* Code updates for Swift 3.0 and iOS 10
 * Restructures code to eliminate the use of global variables
 
 ## CoreData to CloudKit
@@ -46,7 +45,7 @@ to represent them in CoreData Models. `NSManagedObject` refers to a `to-one rela
 | To - one    | To one relationships are translated as CKReferences on the CloudKit Servers.|
 | To - many    | To many relationships are not explicitly created. Seam only creates and manages to-one relationships on the CloudKit Servers. <br/> <strong>Example</strong> -> If an Employee has a to-one relationship to Department and Department has a to-many relationship to Employee than Seam will only create the former on the CloudKit Servers. It will fullfil the later by using the to-one relationship. If all employees of a department are accessed Seam will fulfil it by fetching all the employees that belong to that particular department.|
 
-<strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and curroption of data can possibly occur.
+<strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and corruption of data can possibly occur.
 
 ## Sync
 
@@ -68,10 +67,6 @@ This is the default. It considers the server record as the true record.
 - ClientRecordWins
 
 This considers the client record as the true record.
-
-- KeepBoth
-
-This saves both versions of the record.
 
 ## How to use
 
@@ -144,11 +139,12 @@ self.smStore = container.persistentStoreCoordinator.persistentStores.first as? S
 
 ## Migrating from Seam to Seam3
 
+Migration should be quite straight-forward, as the format used to store data in CloudKit and in the local backing store haven't changed.
+Change the import statement to `import Seam3` and you should be good to go.
+
 ## Example
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
-
-## Requirements
+To run the example project, clone the repo, and run `pod install` from the Example directory first.  If you are running on the simulator, make sure that you log in to iCloud using the settings app in the simulator.
 
 ## Installation
 
