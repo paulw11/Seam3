@@ -150,7 +150,7 @@ class SMStoreSyncOperation: Operation {
             if error != nil && error!.code == CKError.serverRecordChanged.rawValue
             {
                 print("Conflicted Record \(error!)", terminator: "\n")
-                conflictedRecords.append(ckRecord!)
+                conflictedRecords.append(ckRecord)
             }
         })
         self.operationQueue.addOperation(ckModifyRecordsOperation)
