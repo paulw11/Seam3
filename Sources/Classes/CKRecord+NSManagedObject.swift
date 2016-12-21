@@ -134,8 +134,8 @@ extension CKRecord {
       
     private func setValuesOn(_ managedObject: NSManagedObject, inContext context: NSManagedObjectContext ) throws {
         managedObject.setValue(self.encodedSystemFields(), forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName)
-        let attributeValuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)
-        if let valuesDictionary = attributeValuesDictionary  {
+        if var valuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)  {
+            valuesDictionary = self.replaceAssets(in:valuesDictionary)
             managedObject.setValuesForKeys(valuesDictionary)
         }
         let referencesValuesDictionary = try self.allCKReferencesAsManagedObjects(usingContext: context, forManagedObject: managedObject)
@@ -144,5 +144,21 @@ extension CKRecord {
                     managedObject.setValue(value, forKey: key)
             }
         }
+    }
+    
+    private func replaceAssets(in dictionary: [String:AnyObject]) -> [String:AnyObject] {
+        var returnDict = [String:AnyObject]()
+        for (key,value) in dictionary {
+            if let val = value as? CKAsset {
+                if let assetData = NSData(contentsOfFile: val.fileURL.path) {
+                    returnDict[key] = assetData
+                }
+            } else {
+                returnDict[key] = value
+            }
+        }
+        
+        return returnDict
+        
     }
 }
