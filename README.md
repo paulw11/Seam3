@@ -25,7 +25,7 @@ Changes in Seam3 include:
 | CoreData  | CloudKit |
 | ------------- | ------------- |
 | NSDate    | Date/Time
-| NSData | Bytes
+| Binary Data | Bytes or CKAsset (See below) |
 | NSString  | String   |
 | Integer16 | Int(64) |
 | Integer32 | Int(64) |
@@ -37,6 +37,8 @@ Changes in Seam3 include:
 
 **In the table above :** `Integer16`, `Integer32`, `Integer64`, `Decimal`, `Float` and `Boolean` are referring to the instance of `NSNumber` used 
 to represent them in CoreData Models. `NSManagedObject` refers to a `to-one relationship` in a CoreData Model.
+
+If a `Binary Data` attribute has the *Allows External Storage* option selected, it will be stored as a `CKAsset` in Cloud Kit, otherwise it will be stored as `Bytes` in the `CKRecord` itself.
 
 ### Relationships
 
