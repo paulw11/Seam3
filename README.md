@@ -14,7 +14,7 @@ Seam3 is based on [Seam](https://github.com/nofelmahmood/Seam) by [nofelmahmood]
 Changes in Seam3 include:
 
 * Corrects one-to-many and many-to-one relationship mapping between CoreData and CloudKit
-* Adds mapping between binary attributes in CoreData and CKAssets in CloudKit (Not yet :( )
+* Adds mapping between binary attributes in CoreData and CKAssets in CloudKit
 * Code updates for Swift 3.0 and iOS 10
 * Restructures code to eliminate the use of global variables
 
