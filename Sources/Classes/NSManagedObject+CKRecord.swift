@@ -38,36 +38,71 @@ extension NSManagedObject {
         
         let valuesDictionary = self.dictionaryWithValues(forKeys: attributes)
         for (key,_) in valuesDictionary {
-            let attributeDescription = self.entity.attributesByName[key]
-            if attributeDescription != nil && self.value(forKey: attributeDescription!.name) != nil {
-                switch(attributeDescription!.attributeType) {
+            if let attributeDescription = self.entity.attributesByName[key] {
+                let attrName = attributeDescription.name
+            if  self.value(forKey: attributeDescription.name) != nil {
+                switch(attributeDescription.attributeType) {
                 case .stringAttributeType:
-                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! String as CKRecordValue?, forKey: attributeDescription!.name)
+                    ckRecord.setObject(self.value(forKey: attrName) as! String as CKRecordValue?, forKey: attrName)
                 case .dateAttributeType:
-                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! Date as CKRecordValue?, forKey: attributeDescription!.name)
-                case .binaryDataAttributeType:
-                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! Data as CKRecordValue?, forKey: attributeDescription!.name)
+                    ckRecord.setObject(self.value(forKey: attrName) as! Date as CKRecordValue?, forKey: attrName)
+                    // case .binaryDataAttributeType:
+                // ckRecord.setObject(self.value(forKey: attrName) as! Data as CKRecordValue?, forKey: attrName)
                 case .booleanAttributeType:
-                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                    ckRecord.setObject(self.value(forKey: attrName) as! NSNumber, forKey: attrName)
                 case .decimalAttributeType:
-                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                    ckRecord.setObject(self.value(forKey: attrName) as! NSNumber, forKey: attrName)
                 case .doubleAttributeType:
-                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                    ckRecord.setObject(self.value(forKey: attrName) as! NSNumber, forKey: attrName)
                 case .floatAttributeType:
-                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                    ckRecord.setObject(self.value(forKey: attrName) as! NSNumber, forKey: attrName)
                 case .integer16AttributeType:
-                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                    ckRecord.setObject(self.value(forKey: attrName) as! NSNumber, forKey:attrName)
                 case .integer32AttributeType:
-                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                    ckRecord.setObject(self.value(forKey: attrName) as! NSNumber, forKey: attrName)
                 case .integer64AttributeType:
-                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                    ckRecord.setObject(self.value(forKey: attrName) as! NSNumber, forKey: attrName)
+                case .binaryDataAttributeType:
+                    if attributeDescription.allowsExternalBinaryDataStorage {
+                        if let asset = self.createAsset(data: self.value(forKey: attrName) as! Data) {
+                            ckRecord.setObject(asset, forKey:attrName)
+                        }
+                    } else {
+                        ckRecord.setObject(self.value(forKey: attrName) as! Data as CKRecordValue?, forKey: attrName)
+                    }
                 default:
                     break
                 }
-            } else if attributeDescription != nil && self.value(forKey: attributeDescription!.name) == nil {
-                ckRecord.setObject(nil, forKey: attributeDescription!.name)
+            } else {
+                ckRecord.setObject(nil, forKey: attrName)
+            }
             }
         }
+    }
+    
+    fileprivate func createAsset(data: Data) -> CKAsset? {
+        
+        var returnAsset: CKAsset? = nil
+        
+        let tempStr = ProcessInfo.processInfo.globallyUniqueString
+        
+        let filename = "\(tempStr)_file.bin"
+        
+        let baseURL = URL(fileURLWithPath: NSTemporaryDirectory())
+        
+        let fileURL = baseURL.appendingPathComponent(filename, isDirectory: false)
+        
+        do {
+            try data.write(to: fileURL, options: [.atomicWrite])
+            
+            returnAsset = CKAsset(fileURL: fileURL)
+            
+        } catch {
+            print("Error creating asset: \(error)")
+        }
+        
+        return returnAsset
+        
     }
     
     fileprivate func setRelationshipValues(ofCKRecord ckRecord:CKRecord, withValuesOfRelationshipWithKeys keys: [String]?) {
