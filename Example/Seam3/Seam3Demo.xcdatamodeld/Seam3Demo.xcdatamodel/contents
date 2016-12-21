@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11542" systemVersion="16B2555" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16B2555" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Device" representedClassName="Device" syncable="YES" codeGenerationType="class">
         <attribute name="deviceID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
         <relationship name="events" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Event" inverseName="creatingDevice" inverseEntity="Event" syncable="YES"/>
     </entity>
     <entity name="Event" representedClassName="Event" syncable="YES" codeGenerationType="class">
@@ -12,7 +13,7 @@
         <relationship name="creatingDevice" maxCount="1" deletionRule="Nullify" destinationEntity="Device" inverseName="events" inverseEntity="Device" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Device" positionX="-63" positionY="9" width="128" height="75"/>
+        <element name="Device" positionX="-63" positionY="9" width="128" height="90"/>
         <element name="Event" positionX="-63" positionY="-18" width="128" height="120"/>
     </elements>
 </model>
