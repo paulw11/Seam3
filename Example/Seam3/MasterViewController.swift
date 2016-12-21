@@ -163,13 +163,18 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        
+        var cell: UITableViewCell
+        
         if indexPath.section == 0 {
+            cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
             let event = self.events[indexPath.row]
             self.configureCell(cell, withEvent: event)
         } else {
+            let deviceCell = tableView.dequeueReusableCell(withIdentifier: "DeviceCell", for: indexPath) as! DeviceTableViewCell
             let device = self.devices[indexPath.row]
-            self.configureCell(cell, withDevice: device)
+            self.configureCell(deviceCell, withDevice: device)
+            cell = deviceCell
         }
         return cell
     }
@@ -214,8 +219,13 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         }
     }
     
-    func configureCell(_ cell: UITableViewCell, withDevice device: Device) {
-        cell.textLabel!.text = device.deviceID ?? "Missing device id"
+    func configureCell(_ cell: DeviceTableViewCell, withDevice device: Device) {
+        cell.deviceLabel!.text = device.deviceID ?? "Missing device id"
+        if let imageData = device.image {
+            cell.deviceImage.image = UIImage(data: imageData as Data)
+        } else {
+            cell.deviceImage.image = nil
+        }
     }
     
     
