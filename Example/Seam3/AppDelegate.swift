@@ -131,6 +131,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         if fetchedDevice == nil {
             fetchedDevice = NSEntityDescription.insertNewObject(forEntityName: "Device", into: moc) as? Device
             fetchedDevice!.deviceID = deviceID
+            let 🐱 = #imageLiteral(resourceName: "kitten")
+            if let data = UIImageJPEGRepresentation(🐱, 0.5) {
+                fetchedDevice!.image = data as NSData
+            }
             do {
                 try moc.save()
                 print("Created device id \(fetchedDevice!.deviceID!)")               
