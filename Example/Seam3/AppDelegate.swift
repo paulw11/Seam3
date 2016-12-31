@@ -61,9 +61,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         self.smStore = container.persistentStoreCoordinator.persistentStores.first as? SMStore
         
-        self.smStore?.triggerSync()
+        self.validateCloudKitAndSync()
         
         return true
+    }
+    
+    func validateCloudKitAndSync() {
+        self.smStore?.verifyCloudKitConnection() { (status, error) in
+            guard status == .available else {
+                NSLog("Unable to verify CloudKit Connection")
+                return
+            }
+            
+            self.smStore?.triggerSync()
+        }
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
