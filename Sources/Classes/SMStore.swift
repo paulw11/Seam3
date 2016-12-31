@@ -78,7 +78,7 @@ Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you kn
 - SMStoreDidStartSyncOperationNotification
 - SMStoreDidFinishSyncOperationNotification
 
-#### Conflict Resolution Policies
+#### Resolution Policies
 In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
 
 - ClientTellsWhichWins
@@ -195,13 +195,19 @@ enum SMStoreError: Error {
     case missingRelatedObject
 }
 
+public enum SMSyncConflictResolutionPolicy: Int16 {
+    case clientTellsWhichWins = 0
+    case serverRecordWins = 1
+    case clientRecordWins = 2
+}
+
 open class SMStore: NSIncrementalStore {
     
     var syncAutomatically: Bool = true
     var recordConflictResolutionBlock:((_ clientRecord:CKRecord,_ serverRecord:CKRecord)->CKRecord)?
     
-    static let SMStoreSyncConflictResolutionPolicyOption = "SMStoreSyncConflictResolutionPolicyOption"
-    static let SMStoreErrorDomain = "SMStoreErrorDomain"
+    public static let SMStoreSyncConflictResolutionPolicyOption = "SMStoreSyncConflictResolutionPolicyOption"
+    public static let SMStoreErrorDomain = "SMStoreErrorDomain"
     static let SMStoreCloudStoreCustomZoneName = "SMStoreCloudStore_CustomZone"
     static let SMStoreCloudStoreSubscriptionName = "SM_CloudStore_Subscription"
     static let SMLocalStoreRecordIDAttributeName="sm_LocalStore_RecordID"
@@ -236,8 +242,10 @@ open class SMStore: NSIncrementalStore {
     override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator?, configurationName name: String?, at url: URL, options: [AnyHashable: Any]?) {
         self.database = CKContainer.default().privateCloudDatabase
         if let opts = options {
-            if let syncConflictPolicy = opts[SMStore.SMStoreSyncConflictResolutionPolicyOption] as? SMSyncConflictResolutionPolicy {
-                self.cksStoresSyncConflictPolicy = syncConflictPolicy
+            if let syncConflictPolicyRawValue = opts[SMStore.SMStoreSyncConflictResolutionPolicyOption] as? NSNumber {
+                if let syncConflictPolicy = SMSyncConflictResolutionPolicy(rawValue: syncConflictPolicyRawValue.int16Value) {
+                    self.cksStoresSyncConflictPolicy = syncConflictPolicy
+                }
             }
             
             if let migrationPolicy = opts[NSMigratePersistentStoresAutomaticallyOption] as? Bool {
