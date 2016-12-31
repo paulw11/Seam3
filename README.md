@@ -128,6 +128,17 @@ You can access the `SMStore` instance using:
 ```
 self.smStore = container.persistentStoreCoordinator.persistentStores.first as? SMStore
 ```
+Before triggering a sync, you should check the Cloud Kit authentication status:
+```
+self.smStore?.verifyCloudKitConnection() { (status, error) in
+    guard status == .available else {
+        NSLog("Unable to verify CloudKit Connection")
+        return
+    }
+
+    self.smStore?.triggerSync()
+}
+```
 - Enable Push Notifications for your app.
 ![](http://s29.postimg.org/rb9vj0egn/Screen_Shot_2015_08_23_at_5_44_59_pm.png)
 - Implement didReceiveRemoteNotification Method in your AppDelegate and call `handlePush` on the instance of SMStore created earlier.
