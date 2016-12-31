@@ -220,6 +220,8 @@ open class SMStore: NSIncrementalStore {
     fileprivate var automaticStoreMigration = false
     fileprivate var inferMappingModel = false
     
+    fileprivate var cloudKitValid = false
+    
     fileprivate lazy var backingMOC: NSManagedObjectContext = {
         var moc = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.privateQueueConcurrencyType)
         moc.persistentStoreCoordinator = self.backingPersistentStoreCoordinator
@@ -306,7 +308,24 @@ open class SMStore: NSIncrementalStore {
         }
     }
     
+    open func verifyCloudKitConnection(_ completionHandler: ((CKAccountStatus, Error?) -> Void )?) -> Void {
+        CKContainer.default().accountStatus { (status, error) in
+            
+            if status == CKAccountStatus.available {
+                self.cloudKitValid = true
+            } else {
+                self.cloudKitValid = false
+            }
+            completionHandler?(status, error)
+        }
+    }
+    
     open func triggerSync(complete: Bool = false) {
+        
+        guard self.cloudKitValid else {
+            NSLog("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
+            return
+        }
         
         guard self.operationQueue?.operationCount == 0 else {
             return
