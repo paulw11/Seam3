@@ -1,6 +1,9 @@
 Seam3 Changelog
 ===============
 
+# [master]
+ - Check for Cloud Kit login before syncing; fix #3
+ - Check for deleted record when resolving conflicts #4
 
 # [1.0.5]
 
