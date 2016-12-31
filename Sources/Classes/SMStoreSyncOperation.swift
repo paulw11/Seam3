@@ -32,12 +32,6 @@ import CloudKit
 import CoreData
 
 
-enum SMSyncConflictResolutionPolicy: Int16 {
-    case clientTellsWhichWins = 0
-    case serverRecordWins = 1
-    case clientRecordWins = 2
-}
-
 enum SMSyncOperationError: Error {
     case localChangesFetchError
     case conflictsDetected(conflictedRecords: [CKRecord])
@@ -217,10 +211,22 @@ class SMStoreSyncOperation: Operation {
                     
                 case .clientRecordWins:
                     
-                    clientServerCKRecord.serverRecord = clientServerCKRecord.clientRecord
+                    if let clientRecord = clientServerCKRecord.clientRecord {
+                        clientServerCKRecord.serverRecord = clientRecord
+                    } 
                     
                 case .serverRecordWins:
                     print("Resolving conflict in favour of server")
+                    if clientServerCKRecord.serverRecord == nil {
+                        if let clientRecord = clientServerCKRecord.clientRecord {
+                            do {
+                                try deleteManagedObjects(fromCKRecordIDs: [clientRecord.recordID])
+                            } catch {
+                                NSLog("Error deleting client record \(error)")
+                            }
+                            clientServerCKRecord.clientRecord = nil
+                        }
+                    }
                 }
                 if let serverRecord = clientServerCKRecord.serverRecord {
                     finalCKRecords.append(serverRecord)
