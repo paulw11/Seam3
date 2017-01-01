@@ -18,6 +18,7 @@
 		BB02C42A1DEF999C0021375F /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB02C4291DEF999C0021375F /* CloudKit.framework */; };
 		BB02C4501DEF9BEB0021375F /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB02C44E1DEF9BEB0021375F /* DetailViewController.swift */; };
 		BB02C4511DEF9BEB0021375F /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB02C44F1DEF9BEB0021375F /* MasterViewController.swift */; };
+		BB1B5C941E174E4500B4F890 /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1B5C931E174E4500B4F890 /* DeviceTableViewCell.swift */; };
 		BB889F5D1DFA6957009AC097 /* changelog.md in Sources */ = {isa = PBXBuildFile; fileRef = BB889F5C1DFA6957009AC097 /* changelog.md */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 		BB02C44E1DEF9BEB0021375F /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		BB02C44F1DEF9BEB0021375F /* MasterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
 		BB108AD779E69CD9E4528863 /* Pods_Seam3_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Seam3_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB1B5C931E174E4500B4F890 /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceTableViewCell.swift; sourceTree = "<group>"; };
 		BB889F5C1DFA6957009AC097 /* changelog.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = changelog.md; sourceTree = "<group>"; };
 		C6DFA1354567D6965A366287 /* Pods-Seam3_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Seam3_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Seam3_Example/Pods-Seam3_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		D5C4E8D6AE3EDFFFC4DC0B8B /* Seam3.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Seam3.podspec; path = ../Seam3.podspec; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 		607FACD21AFB9204008FA782 /* Example for Seam3 */ = {
 			isa = PBXGroup;
 			children = (
+				BB1B5C931E174E4500B4F890 /* DeviceTableViewCell.swift */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				BB02C44E1DEF9BEB0021375F /* DetailViewController.swift */,
 				BB02C44F1DEF9BEB0021375F /* MasterViewController.swift */,
@@ -390,6 +393,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB889F5D1DFA6957009AC097 /* changelog.md in Sources */,
+				BB1B5C941E174E4500B4F890 /* DeviceTableViewCell.swift in Sources */,
 				BB02C4511DEF9BEB0021375F /* MasterViewController.swift in Sources */,
 				BB02C4271DEF986D0021375F /* Seam3Demo.xcdatamodeld in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
