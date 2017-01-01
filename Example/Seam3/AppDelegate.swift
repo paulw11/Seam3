@@ -188,9 +188,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             let storeDescription = NSPersistentStoreDescription(url: url)
             
             storeDescription.type = SMStore.type
+     
+           // Uncomment next line for "client wins" conflict resolution policy
+   //         storeDescription.setOption(NSNumber(value:SMSyncConflictResolutionPolicy.clientRecordWins.rawValue), forKey:SMStore.SMStoreSyncConflictResolutionPolicyOption)
             
             container.persistentStoreDescriptions=[storeDescription]
-            
+
             container.loadPersistentStores(completionHandler: { (storeDescription, error) in
                 if let error = error as NSError? {
                     // Replace this implementation with code to handle the error appropriately.
