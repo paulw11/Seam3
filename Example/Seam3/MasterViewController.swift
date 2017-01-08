@@ -57,6 +57,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
                 appDelegate.smStore?.triggerSync(complete: true)
             }
             
+            self.managedObjectContext?.refreshAllObjects()
+            
             DispatchQueue.main.async {
                 self.loadData()
             }
