@@ -4,6 +4,7 @@
 [![Version](https://img.shields.io/cocoapods/v/Seam3.svg?style=flat)](http://cocoapods.org/pods/Seam3)
 [![License](https://img.shields.io/cocoapods/l/Seam3.svg?style=flat)](http://cocoapods.org/pods/Seam3)
 [![Platform](https://img.shields.io/cocoapods/p/Seam3.svg?style=flat)](http://cocoapods.org/pods/Seam3)
+[![GitHub stars](https://img.shields.io/github/stars/paulw11/Seam3.svg)](https://github.com/paulw11/Seame3/stargazers)
 
 Seam3 is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle. 
 All you have to do is use it as a store type for your CoreData store. 
@@ -130,7 +131,7 @@ self.smStore = container.persistentStoreCoordinator.persistentStores.first as? S
 ```
 Before triggering a sync, you should check the Cloud Kit authentication status and check for a changed Cloud Kit user:
 ```
-self.smStore?.verifyCloudKitConnection() { (status, user, error) in
+self.smStore?.verifyCloudKitConnectionAndUser() { (status, user, error) in
     guard status == .available, error == nil else {
         NSLog("Unable to verify CloudKit Connection \(error)")
         return  
