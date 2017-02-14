@@ -101,7 +101,6 @@ class SMStoreSyncOperation: Operation {
             SMServerTokenHandler.defaultHandler.commit()
             try SMStoreChangeSetHandler.defaultHandler.removeAllQueuedChangeSets(backingContext: self.localStoreMOC!)
         } catch {
-            //throw SMSyncOperationError.unknownError
             throw error
         }
     }
@@ -247,6 +246,10 @@ class SMStoreSyncOperation: Operation {
     }
     
     func fetchRecordChangesFromServer() -> (insertedOrUpdatedCKRecords:Array<CKRecord>,deletedRecordIDs:Array<CKRecordID>,moreComing:Bool) {
+        
+        var syncOperationError: Error? = nil
+        var moreComing = false
+        
         let token = SMServerTokenHandler.defaultHandler.token()
         let recordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
         let fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: recordZoneID, previousServerChangeToken: token)
@@ -256,6 +259,8 @@ class SMStoreSyncOperation: Operation {
             if operationError == nil {
                 SMServerTokenHandler.defaultHandler.save(serverChangeToken: serverChangeToken!)
                 SMServerTokenHandler.defaultHandler.commit()
+            } else {
+                syncOperationError = operationError
             }
         }
         fetchRecordChangesOperation.recordChangedBlock = { record in
@@ -267,57 +272,51 @@ class SMStoreSyncOperation: Operation {
         }
         self.operationQueue!.addOperation(fetchRecordChangesOperation)
         self.operationQueue!.waitUntilAllOperationsAreFinished()
-        if !insertedOrUpdatedCKRecords.isEmpty {
-            let recordIDs: [CKRecordID] = insertedOrUpdatedCKRecords.map { record in
-                return record.recordID
-            }
-            var recordTypes: Set<String> = Set<String>()
-            for record in insertedOrUpdatedCKRecords {
-                recordTypes.insert(record.recordType)
-            }
-            var desiredKeys: [String]?
-            for recordType in recordTypes {
-                if desiredKeys == nil {
-                    desiredKeys = [String]()
+        if syncOperationError == nil {
+            
+            if !insertedOrUpdatedCKRecords.isEmpty {
+                let recordIDs: [CKRecordID] = insertedOrUpdatedCKRecords.map { record in
+                    return record.recordID
                 }
-                let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[recordType]
-                if entity != nil {
-                    let properties = Array(entity!.propertiesByName.keys).filter {  key in
-                        if key == SMStore.SMLocalStoreRecordIDAttributeName || key == SMStore.SMLocalStoreRecordEncodedValuesAttributeName {
-                            return false
-                        }
-                        return true
+                var recordTypes: Set<String> = Set<String>()
+                for record in insertedOrUpdatedCKRecords {
+                    recordTypes.insert(record.recordType)
+                }
+                var desiredKeys: [String]?
+                for recordType in recordTypes {
+                    if desiredKeys == nil {
+                        desiredKeys = [String]()
                     }
-                    desiredKeys!.append(contentsOf: properties)
-                }
-            }
-            insertedOrUpdatedCKRecords.removeAll()
-            let fetchRecordsOperation: CKFetchRecordsOperation = CKFetchRecordsOperation(recordIDs: recordIDs)
-            fetchRecordsOperation.desiredKeys = desiredKeys
-            fetchRecordsOperation.fetchRecordsCompletionBlock =  { recordsByRecordID,operationError in
-                if operationError == nil && recordsByRecordID != nil {
-                    insertedOrUpdatedCKRecords = Array(recordsByRecordID!.values)
-                }
-            }
-            self.operationQueue.addOperation(fetchRecordsOperation)
-            self.operationQueue.waitUntilAllOperationsAreFinished()
-            /*for record in insertedOrUpdatedCKRecords {
-                let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[record.recordType]
-                if entity != nil {
-                   /* for key in Array(entity!.propertiesByName.keys) {
-                        if record[key] == nil && key != SMStore.SMLocalStoreRecordIDAttributeName && key != SMStore.SMLocalStoreRecordEncodedValuesAttributeName {
-                            record[key] =
+                    let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[recordType]
+                    if entity != nil {
+                        let properties = Array(entity!.propertiesByName.keys).filter {  key in
+                            if key == SMStore.SMLocalStoreRecordIDAttributeName || key == SMStore.SMLocalStoreRecordEncodedValuesAttributeName {
+                                return false
+                            }
+                            return true
                         }
-                    }*/
+                        desiredKeys!.append(contentsOf: properties)
+                    }
                 }
-            }*/
+                insertedOrUpdatedCKRecords.removeAll()
+                let fetchRecordsOperation: CKFetchRecordsOperation = CKFetchRecordsOperation(recordIDs: recordIDs)
+                fetchRecordsOperation.desiredKeys = desiredKeys
+                fetchRecordsOperation.fetchRecordsCompletionBlock =  { recordsByRecordID,operationError in
+                    if operationError == nil && recordsByRecordID != nil {
+                        insertedOrUpdatedCKRecords = Array(recordsByRecordID!.values)
+                    }
+                }
+                self.operationQueue.addOperation(fetchRecordsOperation)
+                self.operationQueue.waitUntilAllOperationsAreFinished()
+            }
+            if fetchRecordChangesOperation.moreComing {
+                print("More records coming", terminator: "\n")
+            } else {
+                print("No more records coming", terminator: "\n")
+            }
+            moreComing = fetchRecordChangesOperation.moreComing
         }
-        if fetchRecordChangesOperation.moreComing {
-            print("More records coming", terminator: "\n")
-        } else {
-            print("No more records coming", terminator: "\n")
-        }
-        return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,fetchRecordChangesOperation.moreComing)
+        return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,moreComing)
     }
     
     func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>, retry: Bool = true) throws {
