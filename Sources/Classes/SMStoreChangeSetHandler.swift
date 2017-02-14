@@ -32,7 +32,12 @@ import CoreData
 import CloudKit
 
 
-
+enum SMLocalStoreRecordChangeType: Int16 {
+    case recordNoChange = 0
+    case recordUpdated  = 1
+    case recordDeleted  = 2
+    case recordInserted = 3
+}
 
 class SMStoreChangeSetHandler {
     
