@@ -57,7 +57,7 @@ Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you kn
 - SMStoreDidFinishSyncOperationNotification
 
 #### Conflict Resolution Policies
-In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
+In case of any sync conflicts, Seam exposes 3 conflict resolution policies.
 
 - ClientTellsWhichWins
 
