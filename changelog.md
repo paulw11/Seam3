@@ -3,7 +3,8 @@ Seam3 Changelog
 
 # [1.0.7]
  - Return current user identifier from CloudKit check
- = Provide ability to remove all existing data from the local store
+ - Provide ability to remove all existing data from the local store
+ - Add user id check to `verifyCloudKitConnection`
 
 # [1.0.6]
  - Check for Cloud Kit login before syncing; fix #3
