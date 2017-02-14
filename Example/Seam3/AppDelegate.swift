@@ -67,7 +67,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
     
     func validateCloudKitAndSync() {
-        self.smStore?.verifyCloudKitConnection() { (status, user, error) in
+        
+        self.smStore?.verifyCloudKitConnectionAndUser() { (status, user, error) in
             guard status == .available, error == nil else {
                 NSLog("Unable to verify CloudKit Connection \(error)")
                 return
