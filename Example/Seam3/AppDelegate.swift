@@ -67,14 +67,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
     
     func validateCloudKitAndSync() {
-        self.smStore?.verifyCloudKitConnection() { (status, error) in
-            guard status == .available else {
-                NSLog("Unable to verify CloudKit Connection")
+        self.smStore?.verifyCloudKitConnection() { (status, user, error) in
+            guard status == .available, error == nil else {
+                NSLog("Unable to verify CloudKit Connection \(error)")
                 return
             }
             
-            self.smStore?.triggerSync()
+            guard let currentUser = user else {
+                NSLog("No current CloudKit user")
+                return
+            }
+            
+            var completeSync = false
+            
+            let previousUser = UserDefaults.standard.string(forKey: "CloudKitUser")
+            if  previousUser != currentUser {
+                do {
+                    print("New user")
+                    try self.smStore?.resetBackingStore()
+                    completeSync = true
+                } catch {
+                    NSLog("Error resetting backing store - \(error.localizedDescription)")
+                    return
+                }
+            }
+            
+            UserDefaults.standard.set(currentUser, forKey:"CloudKitUser")
+            
+            self.smStore?.triggerSync(complete: completeSync)
         }
+        
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
@@ -148,7 +170,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             }
             do {
                 try moc.save()
-                print("Created device id \(fetchedDevice!.deviceID!)")               
+                print("Created device id \(fetchedDevice!.deviceID!)")
             } catch {}
         }
         
@@ -188,12 +210,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             let storeDescription = NSPersistentStoreDescription(url: url)
             
             storeDescription.type = SMStore.type
-     
-           // Uncomment next line for "client wins" conflict resolution policy
-   //         storeDescription.setOption(NSNumber(value:SMSyncConflictResolutionPolicy.clientRecordWins.rawValue), forKey:SMStore.SMStoreSyncConflictResolutionPolicyOption)
+            
+            // Uncomment next line for "client wins" conflict resolution policy
+            //         storeDescription.setOption(NSNumber(value:SMSyncConflictResolutionPolicy.clientRecordWins.rawValue), forKey:SMStore.SMStoreSyncConflictResolutionPolicyOption)
             
             container.persistentStoreDescriptions=[storeDescription]
-
+            
             container.loadPersistentStores(completionHandler: { (storeDescription, error) in
                 if let error = error as NSError? {
                     // Replace this implementation with code to handle the error appropriately.
