@@ -323,13 +323,33 @@ open class SMStore: NSIncrementalStore {
         defaults.set(false, forKey:SMStore.SMStoreCloudStoreSubscriptionName)
     }
     
+    /// Verify that Cloud Kit is connected and return a connection status
+    /// - SeeAlso: `verifyCloudKitConnectionAndUser(_)`
+    /// - parameter completionHandler: A closure to be invoked with the result of the Cloud Kit operations
+    /// - parameter status: The current Cloud Kit authentication status
+    /// - parameter error: Any error that resulted from the operation
+
+    
+    @available(*,deprecated:1.0.7, message:"Use verifyCloudKitConnectionAndUser")
+    open func verifyCloudKitConnection(_ completionHandler: ((_ status: CKAccountStatus, _ error: Error?) -> Void )?) -> Void {
+        CKContainer.default().accountStatus { (status, error) in
+            
+            if status == CKAccountStatus.available {
+                self.cloudKitValid = true
+            } else {
+                self.cloudKitValid = false
+            }
+            completionHandler?(status, error)
+        }
+    }
+    
     /// Verify that Cloud Kit is connected and return a user identifier for the current Cloud Kit user
     /// - parameter completionHandler: A closure to be invoked with the result of the Cloud Kit operations
     /// - parameter status: The current Cloud Kit authentication status
     /// - parameter userIdentifier: An identifier for the current Cloud Kit user.  Note that this is not a userid or email address, merely a unique identifier
     /// - parameter error: Any error that resulted from the operation
     
-    open func verifyCloudKitConnection(_ completionHandler: ((_ status: CKAccountStatus, _ userIdentifier: String?, _ error: Error?) -> Void )?) -> Void {
+    open func verifyCloudKitConnectionAndUser(_ completionHandler: ((_ status: CKAccountStatus, _ userIdentifier: String?, _ error: Error?) -> Void )?) -> Void {
         CKContainer.default().accountStatus { (status, error) in
             
             if status == CKAccountStatus.available {
