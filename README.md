@@ -128,15 +128,36 @@ You can access the `SMStore` instance using:
 ```
 self.smStore = container.persistentStoreCoordinator.persistentStores.first as? SMStore
 ```
-Before triggering a sync, you should check the Cloud Kit authentication status:
+Before triggering a sync, you should check the Cloud Kit authentication status and check for a changed Cloud Kit user:
 ```
-self.smStore?.verifyCloudKitConnection() { (status, error) in
-    guard status == .available else {
-        NSLog("Unable to verify CloudKit Connection")
+self.smStore?.verifyCloudKitConnection() { (status, user, error) in
+    guard status == .available, error == nil else {
+        NSLog("Unable to verify CloudKit Connection \(error)")
+        return  
+    } 
+
+    guard let currentUser = user else {
+        NSLog("No current CloudKit user")
         return
     }
 
-    self.smStore?.triggerSync()
+    var completeSync = false
+
+    let previousUser = UserDefaults.standard.string(forKey: "CloudKitUser")
+    if  previousUser != currentUser {
+        do {
+            print("New user")
+            try self.smStore?.resetBackingStore()
+            completeSync = true
+        } catch {
+            NSLog("Error resetting backing store - \(error.localizedDescription)")
+            return
+        }
+    }
+
+    UserDefaults.standard.set(currentUser, forKey:"CloudKitUser")
+
+    self.smStore?.triggerSync(complete: completeSync)
 }
 ```
 - Enable Push Notifications for your app.
