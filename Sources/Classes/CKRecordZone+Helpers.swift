@@ -34,8 +34,8 @@ extension CKRecordZone {
     class func smCloudStoreCustomZone() -> CKRecordZone {
         
         var zoneID: CKRecordZoneID
-        if #available(iOS 10.0, *) {
-            zoneID =  CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
+        if #available(iOS 10.0, macOS 10.12, *) {
+                zoneID =  CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
         } else {
             zoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
         }
