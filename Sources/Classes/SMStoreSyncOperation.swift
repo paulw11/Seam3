@@ -47,13 +47,15 @@ class SMStoreSyncOperation: Operation {
     fileprivate var localStoreMOC: NSManagedObjectContext!
     fileprivate var persistentStoreCoordinator: NSPersistentStoreCoordinator?
     fileprivate var entities: Array<NSEntityDescription>
+    fileprivate var database: CKDatabase?
     var syncConflictPolicy: SMSyncConflictResolutionPolicy
     var syncCompletionBlock: ((_ syncError:NSError?) -> ())?
     var syncConflictResolutionBlock: ((_ clientRecord:CKRecord,_ serverRecord:CKRecord)->CKRecord)?
     
-    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy = .serverRecordWins) {
+    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy = .serverRecordWins, database: CKDatabase?) {
         self.persistentStoreCoordinator = persistentStoreCoordinator
         self.entities = entities
+        self.database = database
         self.syncConflictPolicy = conflictPolicy
         super.init()
     }
@@ -130,6 +132,7 @@ class SMStoreSyncOperation: Operation {
             return
         }
         let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
+        ckModifyRecordsOperation.database = self.database
         let savedRecords: [CKRecord] = [CKRecord]()
         var conflictedRecords: [CKRecord] = [CKRecord]()
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
@@ -182,6 +185,8 @@ class SMStoreSyncOperation: Operation {
                 let ckRecord:CKRecord = object as CKRecord
                 return ckRecord.recordID
             }))
+            
+            ckFetchRecordsOperation.database = database
             
             ckFetchRecordsOperation.perRecordCompletionBlock = ({(record,recordID,error)->Void in
                 if error == nil {
@@ -253,6 +258,7 @@ class SMStoreSyncOperation: Operation {
         let token = SMServerTokenHandler.defaultHandler.token()
         let recordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
         let fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: recordZoneID, previousServerChangeToken: token)
+        fetchRecordChangesOperation.database = self.database
         var insertedOrUpdatedCKRecords: [CKRecord] = [CKRecord]()
         var deletedCKRecordIDs: [CKRecordID] = [CKRecordID]()
         fetchRecordChangesOperation.fetchRecordChangesCompletionBlock = { serverChangeToken,clientChangeToken,operationError in
@@ -301,6 +307,7 @@ class SMStoreSyncOperation: Operation {
                 insertedOrUpdatedCKRecords.removeAll()
                 let fetchRecordsOperation: CKFetchRecordsOperation = CKFetchRecordsOperation(recordIDs: recordIDs)
                 fetchRecordsOperation.desiredKeys = desiredKeys
+                fetchRecordsOperation.database = self.database
                 fetchRecordsOperation.fetchRecordsCompletionBlock =  { recordsByRecordID,operationError in
                     if operationError == nil && recordsByRecordID != nil {
                         insertedOrUpdatedCKRecords = Array(recordsByRecordID!.values)
