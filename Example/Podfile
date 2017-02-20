@@ -7,3 +7,7 @@ target 'Seam3_Example' do
     inherit! :search_paths
   end
 end
+
+target 'Seam3_Example_OSX' do
+  pod 'Seam3', :path => '../'
+end
