@@ -55,18 +55,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         application.registerForRemoteNotifications()
         
-        let device = self.setupDeviceRecord()
-        
-        controller.device = device
-        
         self.smStore = container.persistentStoreCoordinator.persistentStores.first as? SMStore
         
-        self.validateCloudKitAndSync()
+        self.validateCloudKitAndSync() {
+            let device = self.setupDeviceRecord()
+            
+            controller.device = device
+        }
         
         return true
     }
     
-    func validateCloudKitAndSync() {
+    func validateCloudKitAndSync(_ completion:@escaping (() -> Void)) {
         
         self.smStore?.verifyCloudKitConnectionAndUser() { (status, user, error) in
             guard status == .available, error == nil else {
@@ -96,6 +96,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             UserDefaults.standard.set(currentUser, forKey:"CloudKitUser")
             
             self.smStore?.triggerSync(complete: completeSync)
+            
+            completion()
         }
         
     }
@@ -211,6 +213,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             let storeDescription = NSPersistentStoreDescription(url: url)
             
             storeDescription.type = SMStore.type
+            
+            storeDescription.setOption("iCloud.org.cocoapods.demo.Seam3-Example" as NSString, forKey: SMStore.SMStoreContainerOption)
             
             // Uncomment next line for "client wins" conflict resolution policy
             //         storeDescription.setOption(NSNumber(value:SMSyncConflictResolutionPolicy.clientRecordWins.rawValue), forKey:SMStore.SMStoreSyncConflictResolutionPolicyOption)
