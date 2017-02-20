@@ -218,12 +218,16 @@ open class SMStore: NSIncrementalStore {
     public static let SMStoreSyncConflictResolutionPolicyOption = "SMStoreSyncConflictResolutionPolicyOption"
     public static let SMStoreErrorDomain = "SMStoreErrorDomain"
     
+    public static let SMStoreContainerOption = "SMStoreContainerOption"
+    
     static let SMStoreCloudStoreCustomZoneName = "SMStoreCloudStore_CustomZone"
     static let SMStoreCloudStoreSubscriptionName = "SM_CloudStore_Subscription"
     static let SMLocalStoreRecordIDAttributeName="sm_LocalStore_RecordID"
     static let SMLocalStoreRecordChangedPropertiesAttributeName = "sm_LocalStore_ChangedProperties"
     static let SMLocalStoreRecordEncodedValuesAttributeName = "sm_LocalStore_EncodedValues"
     static let SMLocalStoreChangeSetEntityName = "SM_LocalStore_ChangeSetEntity"
+    
+    
     
     fileprivate var syncOperation: SMStoreSyncOperation?
     fileprivate var cloudStoreSetupOperation: SMServerStoreSetupOperation?
@@ -232,6 +236,7 @@ open class SMStore: NSIncrementalStore {
     fileprivate var operationQueue: OperationQueue?
     fileprivate var backingPersistentStoreCoordinator: NSPersistentStoreCoordinator?
     fileprivate var backingPersistentStore: NSPersistentStore?
+    fileprivate var ckContainer: CKContainer?
     
     fileprivate var automaticStoreMigration = false
     fileprivate var inferMappingModel = false
@@ -255,12 +260,17 @@ open class SMStore: NSIncrementalStore {
     /// - parameter persistentStoreCoordinator: A persistent store coordinator
     /// - parameter configurationName: The name of the managed object model configuration to use. Pass nil if you do not want to specify a configuration.
     /// - parameter url: The URL of the store to load.
-    /// - parameter options: A dictionary containing configuration options. See `NSPersistentStoreCoordinator` for a list of key names for options in this dictionary. `SMStoreSyncConflictResolutionPolicyOption` can also be specified in this dictionary.
+    /// - parameter options: A dictionary containing configuration options. See `NSPersistentStoreCoordinator` for a list of key names for options in this dictionary. `SMStoreSyncConflictResolutionPolicyOption` can also be specified in this dictionary.  `SMStoreContainerOption` can be used to specify a specific cloudkit container
     /// - returns: A new store object, associated with coordinator, that represents a persistent store at url using the options in options and—if it is not nil—the managed object model configuration configurationName.
     
     override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator?, configurationName name: String?, at url: URL, options: [AnyHashable: Any]?) {
-        self.database = CKContainer.default().privateCloudDatabase
+       
         if let opts = options {
+            
+            if let containerIdentifier = opts[SMStore.SMStoreContainerOption] as? String {
+                self.ckContainer = CKContainer(identifier: containerIdentifier)
+            }
+            
             if let syncConflictPolicyRawValue = opts[SMStore.SMStoreSyncConflictResolutionPolicyOption] as? NSNumber {
                 if let syncConflictPolicy = SMSyncConflictResolutionPolicy(rawValue: syncConflictPolicyRawValue.int16Value) {
                     self.cksStoresSyncConflictPolicy = syncConflictPolicy
@@ -276,6 +286,15 @@ open class SMStore: NSIncrementalStore {
             }
             
         }
+        
+        if self.ckContainer == nil {
+            self.ckContainer = CKContainer.default()
+        }
+        
+        print("Using container \(self.ckContainer!)")
+        
+        self.database = self.ckContainer!.privateCloudDatabase
+        
         super.init(persistentStoreCoordinator: root, configurationName: name, at: url, options: options)
     }
     
@@ -350,7 +369,11 @@ open class SMStore: NSIncrementalStore {
     /// - parameter error: Any error that resulted from the operation
     
     open func verifyCloudKitConnectionAndUser(_ completionHandler: ((_ status: CKAccountStatus, _ userIdentifier: String?, _ error: Error?) -> Void )?) -> Void {
-        CKContainer.default().accountStatus { (status, error) in
+        guard let container = self.ckContainer else {
+            completionHandler?(CKAccountStatus.couldNotDetermine ,nil,SMStoreError.invalidRequest)
+            return
+        }
+        container.accountStatus { (status, error) in
             
             if status == CKAccountStatus.available {
                 self.cloudKitValid = true
@@ -360,7 +383,7 @@ open class SMStore: NSIncrementalStore {
             if error != nil  {
                 completionHandler?(status, nil, error)
             } else {
-                CKContainer.default().fetchUserRecordID { (recordid, error) in
+                container.fetchUserRecordID { (recordid, error) in
                     completionHandler?(status, recordid?.recordName, error)
                 }
             }
@@ -386,8 +409,9 @@ open class SMStore: NSIncrementalStore {
         }
         
         let syncOperationBlock = {
-            self.syncOperation = SMStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, entitiesToSync: self.entitiesToParticipateInSync()!, conflictPolicy: self.cksStoresSyncConflictPolicy)
+            self.syncOperation = SMStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, entitiesToSync: self.entitiesToParticipateInSync()!, conflictPolicy: self.cksStoresSyncConflictPolicy, database: self.database)
             self.syncOperation!.syncConflictResolutionBlock = self.recordConflictResolutionBlock
+    
             self.syncOperation!.syncCompletionBlock =  { error in
                 if let error = error {
                     print("Sync unsuccessful \(error)")
