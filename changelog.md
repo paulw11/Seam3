@@ -1,6 +1,11 @@
 Seam3 Changelog
 ===============
 
+# [1.0.8]
+ - Add option to specify a CloudKit container - This allows sharing containers between targets (e.g. iOS and Mac OS)
+ - Add Mac OS 10.11 (and later) support
+ - Include sample Mac OS app
+
 # [1.0.7]
  - Return current user identifier from CloudKit check
  - Provide ability to remove all existing data from the local store
