@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Seam3'
-  s.version          = '1.0.7'
+  s.version          = '1.0.8'
   s.summary          = 'A CoreData store backed by CloudKit.'
 
 # This description is used to generate tags and improve search results.
@@ -41,6 +41,7 @@ Changes in Seam3 include:
   s.social_media_url = 'https://twitter.com/paulwilko'
 
   s.ios.deployment_target = '9.0'
+  s.osx.deployment_target = '10.11'
 
   s.source_files = 'Sources/Classes/**/*'
   
