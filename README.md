@@ -77,7 +77,7 @@ This considers the client record as the true record.
 ```swift
 var smStore: SMStore
 ```
-- For iOS9 and earlier, add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
+- For iOS9 and earlier or macOS, add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
 ```swift
 do 
 {
@@ -171,6 +171,25 @@ self.smStore?.verifyCloudKitConnectionAndUser() { (status, user, error) in
  }
 ```
 - Enjoy
+
+## Cross-platform considerations
+The default Cloud Kit container is named using your app or application's *bundle identifier*.  If you want to share Cloud Kit data between apps on different platforms (e.g. iOS and macOS) then you need to use a named Cloud Kit container.  You can specify a cloud kit container when you create your SMStore instance.
+
+On iOS10, specify the `SMStore.SMStoreContainerOption` using the `NSPersistentStoreDescription` object
+
+```let storeDescription = NSPersistentStoreDescription(url: url)
+
+storeDescription.type = SMStore.type
+
+storeDescription.setOption("iCloud.org.cocoapods.demo.Seam3-Example" as NSString, forKey: SMStore.SMStoreContainerOption)
+```
+
+On iOS9 and macOS specify an options dictionary to the persistent store coordinator
+
+```let options:[String:Any] = [SMStore.SMStoreContainerOption:"iCloud.org.cocoapods.demo.Seam3-Example"]
+self.smStore = try coordinator!.addPersistentStore(ofType: SMStore.type, configurationName: nil, at: url, options: options) as? SMStore
+```
+Ensure that you specify the Cloud Kit container on the *capabilities* tab for your app in Xcode.
 
 ## Migrating from Seam to Seam3
 
