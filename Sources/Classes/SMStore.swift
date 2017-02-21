@@ -217,7 +217,25 @@ open class SMStore: NSIncrementalStore {
     
     public static let SMStoreSyncConflictResolutionPolicyOption = "SMStoreSyncConflictResolutionPolicyOption"
     public static let SMStoreErrorDomain = "SMStoreErrorDomain"
+ 
+    /**
+    The default Cloud Kit container is named using your app or application's *bundle identifier*.  If you want to share Cloud Kit data between apps on different platforms (e.g. iOS and macOS) then you need to use a named Cloud Kit container.  You can specify a cloud kit container when you create your SMStore instance.
     
+    On iOS10, specify the `SMStore.SMStoreContainerOption` using the `NSPersistentStoreDescription` object
+    
+    ```
+    let storeDescription = NSPersistentStoreDescription(url: url)
+    storeDescription.type = SMStore.type
+    storeDescription.setOption("iCloud.org.cocoapods.demo.Seam3-Example" as NSString, forKey: SMStore.SMStoreContainerOption)
+    ```
+    
+    On iOS9 and macOS specify an options dictionary to the persistent store coordinator
+    
+    ```
+    let options:[String:Any] = [SMStore.SMStoreContainerOption:"iCloud.org.cocoapods.demo.Seam3-Example"]
+    self.smStore = try coordinator!.addPersistentStore(ofType: SMStore.type, configurationName: nil, at: url, options: options) as? SMStore
+    ```
+    */
     public static let SMStoreContainerOption = "SMStoreContainerOption"
     
     static let SMStoreCloudStoreCustomZoneName = "SMStoreCloudStore_CustomZone"
@@ -362,10 +380,12 @@ open class SMStore: NSIncrementalStore {
         }
     }
     
-    /// Verify that Cloud Kit is connected and return a user identifier for the current Cloud Kit user
+    /// Verify that Cloud Kit is connected and return a user identifier for the current Cloud 
+    /// Kit user
     /// - parameter completionHandler: A closure to be invoked with the result of the Cloud Kit operations
     /// - parameter status: The current Cloud Kit authentication status
-    /// - parameter userIdentifier: An identifier for the current Cloud Kit user.  Note that this is not a userid or email address, merely a unique identifier
+    /// - parameter userIdentifier: An identifier for the current Cloud Kit user.  
+    ///   Note that this is not a userid or email address, merely a unique identifier
     /// - parameter error: Any error that resulted from the operation
     
     open func verifyCloudKitConnectionAndUser(_ completionHandler: ((_ status: CKAccountStatus, _ userIdentifier: String?, _ error: Error?) -> Void )?) -> Void {
