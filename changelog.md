@@ -1,7 +1,7 @@
 Seam3 Changelog
 ===============
 
-# [1.0.8]
+# [1.1.0]
  - Add option to specify a CloudKit container - This allows sharing containers between targets (e.g. iOS and Mac OS)
  - Add Mac OS 10.11 (and later) support
  - Include sample Mac OS app
