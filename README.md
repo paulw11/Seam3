@@ -179,9 +179,7 @@ On iOS10, specify the `SMStore.SMStoreContainerOption` using the `NSPersistentSt
 
 ```
 let storeDescription = NSPersistentStoreDescription(url: url)
-
 storeDescription.type = SMStore.type
-
 storeDescription.setOption("iCloud.org.cocoapods.demo.Seam3-Example" as NSString, forKey: SMStore.SMStoreContainerOption)
 ```
 
