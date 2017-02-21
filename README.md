@@ -177,7 +177,8 @@ The default Cloud Kit container is named using your app or application's *bundle
 
 On iOS10, specify the `SMStore.SMStoreContainerOption` using the `NSPersistentStoreDescription` object
 
-```let storeDescription = NSPersistentStoreDescription(url: url)
+```
+let storeDescription = NSPersistentStoreDescription(url: url)
 
 storeDescription.type = SMStore.type
 
@@ -186,7 +187,8 @@ storeDescription.setOption("iCloud.org.cocoapods.demo.Seam3-Example" as NSString
 
 On iOS9 and macOS specify an options dictionary to the persistent store coordinator
 
-```let options:[String:Any] = [SMStore.SMStoreContainerOption:"iCloud.org.cocoapods.demo.Seam3-Example"]
+```
+let options:[String:Any] = [SMStore.SMStoreContainerOption:"iCloud.org.cocoapods.demo.Seam3-Example"]
 self.smStore = try coordinator!.addPersistentStore(ofType: SMStore.type, configurationName: nil, at: url, options: options) as? SMStore
 ```
 Ensure that you specify the Cloud Kit container on the *capabilities* tab for your app in Xcode.
