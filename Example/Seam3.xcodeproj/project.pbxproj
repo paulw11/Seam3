@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		34F5F3464F66C24DDA3A5391 /* Pods_Seam3_Example_TVOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDF8FA189379E0C04D50777A /* Pods_Seam3_Example_TVOS.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
@@ -21,6 +22,12 @@
 		BB1B5C941E174E4500B4F890 /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1B5C931E174E4500B4F890 /* DeviceTableViewCell.swift */; };
 		BB7BB26D1E5AAC25000ECBCB /* DeviceTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BB26C1E5AAC25000ECBCB /* DeviceTableViewController.swift */; };
 		BB7BB2701E5AAC37000ECBCB /* EventTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BB26E1E5AAC37000ECBCB /* EventTableViewController.swift */; };
+		BB7BB2791E5BCC93000ECBCB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BB2781E5BCC93000ECBCB /* AppDelegate.swift */; };
+		BB7BB27B1E5BCC93000ECBCB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BB27A1E5BCC93000ECBCB /* ViewController.swift */; };
+		BB7BB2811E5BCC93000ECBCB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BB7BB27F1E5BCC93000ECBCB /* Main.storyboard */; };
+		BB7BB2831E5BCC93000ECBCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB7BB2821E5BCC93000ECBCB /* Assets.xcassets */; };
+		BB7BB28A1E5C5AEF000ECBCB /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7BB2891E5C5AEF000ECBCB /* CloudKit.framework */; };
+		BB7BB28B1E5C6815000ECBCB /* Seam3Demo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BB02C4251DEF986D0021375F /* Seam3Demo.xcdatamodeld */; };
 		BB9341501E57ECC500A0A63A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB93414F1E57ECC500A0A63A /* AppDelegate.swift */; };
 		BB93415A1E57ECC500A0A63A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BB9341581E57ECC500A0A63A /* Main.storyboard */; };
 		BB9341621E5A52C000A0A63A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB9341611E5A52C000A0A63A /* Assets.xcassets */; };
@@ -42,6 +49,7 @@
 /* Begin PBXFileReference section */
 		1869198D3CB5ED89E8C758BF /* Pods-Seam3_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Seam3_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Seam3_Tests/Pods-Seam3_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		1E25FB0A228E32DC36741C4A /* Pods_Seam3_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Seam3_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		530C7ABFE647FCDD734E9F50 /* Pods-Seam3_Example_TVOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Seam3_Example_TVOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-Seam3_Example_TVOS/Pods-Seam3_Example_TVOS.release.xcconfig"; sourceTree = "<group>"; };
 		57B291CDD8C9EF4F0422D925 /* Pods_Seam3_Example_OSX.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Seam3_Example_OSX.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD01AFB9204008FA782 /* Seam3_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Seam3_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -65,6 +73,14 @@
 		BB1B5C931E174E4500B4F890 /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceTableViewCell.swift; sourceTree = "<group>"; };
 		BB7BB26C1E5AAC25000ECBCB /* DeviceTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceTableViewController.swift; sourceTree = "<group>"; };
 		BB7BB26E1E5AAC37000ECBCB /* EventTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventTableViewController.swift; sourceTree = "<group>"; };
+		BB7BB2761E5BCC93000ECBCB /* Seam3_Example_TVOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Seam3_Example_TVOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB7BB2781E5BCC93000ECBCB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		BB7BB27A1E5BCC93000ECBCB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		BB7BB2801E5BCC93000ECBCB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		BB7BB2821E5BCC93000ECBCB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../Seam3_Example_TVOS/Assets.xcassets; sourceTree = "<group>"; };
+		BB7BB2841E5BCC93000ECBCB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BB7BB2881E5C5AEA000ECBCB /* Seam3_Example_TVOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Seam3_Example_TVOS.entitlements; sourceTree = "<group>"; };
+		BB7BB2891E5C5AEF000ECBCB /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS10.1.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
 		BB889F5C1DFA6957009AC097 /* changelog.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = changelog.md; sourceTree = "<group>"; };
 		BB93414D1E57ECC500A0A63A /* Seam3_Example_OSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Seam3_Example_OSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB93414F1E57ECC500A0A63A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -76,8 +92,10 @@
 		BB9341631E5A538100A0A63A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
 		C6DFA1354567D6965A366287 /* Pods-Seam3_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Seam3_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Seam3_Example/Pods-Seam3_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		D5C4E8D6AE3EDFFFC4DC0B8B /* Seam3.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Seam3.podspec; path = ../Seam3.podspec; sourceTree = "<group>"; };
+		E336BFDF4A21BF975FB8156D /* Pods-Seam3_Example_TVOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Seam3_Example_TVOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Seam3_Example_TVOS/Pods-Seam3_Example_TVOS.debug.xcconfig"; sourceTree = "<group>"; };
 		E58C37E8E69937F8ECB6E3D9 /* Pods-Seam3_Example_OSX.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Seam3_Example_OSX.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Seam3_Example_OSX/Pods-Seam3_Example_OSX.debug.xcconfig"; sourceTree = "<group>"; };
 		F6C1DF1517B5ED1CA75B0270 /* Pods-Seam3_Example_OSX.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Seam3_Example_OSX.release.xcconfig"; path = "Pods/Target Support Files/Pods-Seam3_Example_OSX/Pods-Seam3_Example_OSX.release.xcconfig"; sourceTree = "<group>"; };
+		FDF8FA189379E0C04D50777A /* Pods_Seam3_Example_TVOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Seam3_Example_TVOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +113,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				626242F17523025254B1D67D /* Pods_Seam3_Tests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB7BB2731E5BCC93000ECBCB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34F5F3464F66C24DDA3A5391 /* Pods_Seam3_Example_TVOS.framework in Frameworks */,
+				BB7BB28A1E5C5AEF000ECBCB /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +146,8 @@
 				B5B20B29F0DB774105D4FD6D /* Pods-Seam3_Tests.release.xcconfig */,
 				E58C37E8E69937F8ECB6E3D9 /* Pods-Seam3_Example_OSX.debug.xcconfig */,
 				F6C1DF1517B5ED1CA75B0270 /* Pods-Seam3_Example_OSX.release.xcconfig */,
+				E336BFDF4A21BF975FB8156D /* Pods-Seam3_Example_TVOS.debug.xcconfig */,
+				530C7ABFE647FCDD734E9F50 /* Pods-Seam3_Example_TVOS.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -131,6 +160,7 @@
 				607FACD21AFB9204008FA782 /* Example for Seam3 */,
 				607FACE81AFB9204008FA782 /* Tests */,
 				BB93414E1E57ECC500A0A63A /* Seam3_Example_OSX */,
+				BB7BB2771E5BCC93000ECBCB /* Seam3_Example_TVOS */,
 				607FACD11AFB9204008FA782 /* Products */,
 				165F11D0344CB4927E30B612 /* Pods */,
 				9F59CF4C37B9421AB8216220 /* Frameworks */,
@@ -143,6 +173,7 @@
 				607FACD01AFB9204008FA782 /* Seam3_Example.app */,
 				607FACE51AFB9204008FA782 /* Seam3_Tests.xctest */,
 				BB93414D1E57ECC500A0A63A /* Seam3_Example_OSX.app */,
+				BB7BB2761E5BCC93000ECBCB /* Seam3_Example_TVOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -203,13 +234,28 @@
 		9F59CF4C37B9421AB8216220 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BB7BB2891E5C5AEF000ECBCB /* CloudKit.framework */,
 				BB9341631E5A538100A0A63A /* CloudKit.framework */,
 				BB02C4291DEF999C0021375F /* CloudKit.framework */,
 				1E25FB0A228E32DC36741C4A /* Pods_Seam3_Example.framework */,
 				BB108AD779E69CD9E4528863 /* Pods_Seam3_Tests.framework */,
 				57B291CDD8C9EF4F0422D925 /* Pods_Seam3_Example_OSX.framework */,
+				FDF8FA189379E0C04D50777A /* Pods_Seam3_Example_TVOS.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BB7BB2771E5BCC93000ECBCB /* Seam3_Example_TVOS */ = {
+			isa = PBXGroup;
+			children = (
+				BB7BB2881E5C5AEA000ECBCB /* Seam3_Example_TVOS.entitlements */,
+				BB7BB2781E5BCC93000ECBCB /* AppDelegate.swift */,
+				BB7BB27A1E5BCC93000ECBCB /* ViewController.swift */,
+				BB7BB27F1E5BCC93000ECBCB /* Main.storyboard */,
+				BB7BB2821E5BCC93000ECBCB /* Assets.xcassets */,
+				BB7BB2841E5BCC93000ECBCB /* Info.plist */,
+			);
+			path = Seam3_Example_TVOS;
 			sourceTree = "<group>";
 		};
 		BB93414E1E57ECC500A0A63A /* Seam3_Example_OSX */ = {
@@ -271,6 +317,26 @@
 			productReference = 607FACE51AFB9204008FA782 /* Seam3_Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		BB7BB2751E5BCC93000ECBCB /* Seam3_Example_TVOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB7BB2851E5BCC93000ECBCB /* Build configuration list for PBXNativeTarget "Seam3_Example_TVOS" */;
+			buildPhases = (
+				4BD6828B15F10D51BCFDE28D /* [CP] Check Pods Manifest.lock */,
+				BB7BB2721E5BCC93000ECBCB /* Sources */,
+				BB7BB2731E5BCC93000ECBCB /* Frameworks */,
+				BB7BB2741E5BCC93000ECBCB /* Resources */,
+				CBEB772B2040A70DCD0B1CCD /* [CP] Embed Pods Frameworks */,
+				F1B20E6F22A5FFFE3516183C /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Seam3_Example_TVOS;
+			productName = Seam_Example_TVOS;
+			productReference = BB7BB2761E5BCC93000ECBCB /* Seam3_Example_TVOS.app */;
+			productType = "com.apple.product-type.application";
+		};
 		BB93414C1E57ECC500A0A63A /* Seam3_Example_OSX */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BB93415E1E57ECC500A0A63A /* Build configuration list for PBXNativeTarget "Seam3_Example_OSX" */;
@@ -323,6 +389,22 @@
 						LastSwiftMigration = 0810;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
+					BB7BB2751E5BCC93000ECBCB = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = UPP93EJ3U2;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes.appletvos = {
+								enabled = 0;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
+					};
 					BB93414C1E57ECC500A0A63A = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = UPP93EJ3U2;
@@ -354,6 +436,7 @@
 				607FACCF1AFB9204008FA782 /* Seam3_Example */,
 				607FACE41AFB9204008FA782 /* Seam3_Tests */,
 				BB93414C1E57ECC500A0A63A /* Seam3_Example_OSX */,
+				BB7BB2751E5BCC93000ECBCB /* Seam3_Example_TVOS */,
 			);
 		};
 /* End PBXProject section */
@@ -373,6 +456,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB7BB2741E5BCC93000ECBCB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB7BB2831E5BCC93000ECBCB /* Assets.xcassets in Resources */,
+				BB7BB2811E5BCC93000ECBCB /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -446,6 +538,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Seam3_Example_OSX/Pods-Seam3_Example_OSX-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4BD6828B15F10D51BCFDE28D /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		84901C07EFD92F51B65242A3 /* [CP] Copy Pods Resources */ = {
@@ -523,6 +630,36 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
+		CBEB772B2040A70DCD0B1CCD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Seam3_Example_TVOS/Pods-Seam3_Example_TVOS-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F1B20E6F22A5FFFE3516183C /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Seam3_Example_TVOS/Pods-Seam3_Example_TVOS-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -543,6 +680,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB7BB2721E5BCC93000ECBCB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB7BB28B1E5C6815000ECBCB /* Seam3Demo.xcdatamodeld in Sources */,
+				BB7BB27B1E5BCC93000ECBCB /* ViewController.swift in Sources */,
+				BB7BB2791E5BCC93000ECBCB /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -582,6 +729,15 @@
 				607FACDF1AFB9204008FA782 /* Base */,
 			);
 			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+		BB7BB27F1E5BCC93000ECBCB /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BB7BB2801E5BCC93000ECBCB /* Base */,
+			);
+			name = Main.storyboard;
+			path = ../Seam3_Example_TVOS;
 			sourceTree = "<group>";
 		};
 		BB9341581E57ECC500A0A63A /* Main.storyboard */ = {
@@ -756,6 +912,52 @@
 			};
 			name = Release;
 		};
+		BB7BB2861E5BCC93000ECBCB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E336BFDF4A21BF975FB8156D /* Pods-Seam3_Example_TVOS.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_ENTITLEMENTS = Seam3_Example_TVOS/Seam3_Example_TVOS.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = UPP93EJ3U2;
+				INFOPLIST_FILE = "$(SRCROOT)/Seam3_Example_TVOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = me.wilko.tvos.Seam3.Example;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		BB7BB2871E5BCC93000ECBCB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 530C7ABFE647FCDD734E9F50 /* Pods-Seam3_Example_TVOS.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_ENTITLEMENTS = Seam3_Example_TVOS/Seam3_Example_TVOS.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = UPP93EJ3U2;
+				INFOPLIST_FILE = "$(SRCROOT)/Seam3_Example_TVOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = me.wilko.tvos.Seam3.Example;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 		BB93415C1E57ECC500A0A63A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E58C37E8E69937F8ECB6E3D9 /* Pods-Seam3_Example_OSX.debug.xcconfig */;
@@ -826,6 +1028,15 @@
 			buildConfigurations = (
 				607FACF31AFB9204008FA782 /* Debug */,
 				607FACF41AFB9204008FA782 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BB7BB2851E5BCC93000ECBCB /* Build configuration list for PBXNativeTarget "Seam3_Example_TVOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB7BB2861E5BCC93000ECBCB /* Debug */,
+				BB7BB2871E5BCC93000ECBCB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
