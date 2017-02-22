@@ -191,7 +191,7 @@ On iOS9 and macOS specify an options dictionary to the persistent store coordina
 let options:[String:Any] = [SMStore.SMStoreContainerOption:"iCloud.org.cocoapods.demo.Seam3-Example"]
 self.smStore = try coordinator!.addPersistentStore(ofType: SMStore.type, configurationName: nil, at: url, options: options) as? SMStore
 ```
-Ensure that you specify the Cloud Kit container on the *capabilities* tab for your app in Xcode.
+Ensure that you specify the value you specify is selected under *iCloud containers* on the *capabilities* tab for your app in Xcode.
 
 ## Migrating from Seam to Seam3
 
