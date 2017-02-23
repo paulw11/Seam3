@@ -15,7 +15,6 @@
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		626242F17523025254B1D67D /* Pods_Seam3_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB108AD779E69CD9E4528863 /* Pods_Seam3_Tests.framework */; };
 		7D91ACA8F42C802579042510 /* Pods_Seam3_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E25FB0A228E32DC36741C4A /* Pods_Seam3_Example.framework */; };
-		BB02C4271DEF986D0021375F /* Seam3Demo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BB02C4251DEF986D0021375F /* Seam3Demo.xcdatamodeld */; };
 		BB02C42A1DEF999C0021375F /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB02C4291DEF999C0021375F /* CloudKit.framework */; };
 		BB02C4501DEF9BEB0021375F /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB02C44E1DEF9BEB0021375F /* DetailViewController.swift */; };
 		BB02C4511DEF9BEB0021375F /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB02C44F1DEF9BEB0021375F /* MasterViewController.swift */; };
@@ -26,13 +25,16 @@
 		BB7BB27B1E5BCC93000ECBCB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BB27A1E5BCC93000ECBCB /* ViewController.swift */; };
 		BB7BB2811E5BCC93000ECBCB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BB7BB27F1E5BCC93000ECBCB /* Main.storyboard */; };
 		BB7BB2831E5BCC93000ECBCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB7BB2821E5BCC93000ECBCB /* Assets.xcassets */; };
-		BB7BB28A1E5C5AEF000ECBCB /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7BB2891E5C5AEF000ECBCB /* CloudKit.framework */; };
-		BB7BB28B1E5C6815000ECBCB /* Seam3Demo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BB02C4251DEF986D0021375F /* Seam3Demo.xcdatamodeld */; };
+		BB7BB28D1E5D18A4000ECBCB /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BB28C1E5D18A4000ECBCB /* DeviceTableViewCell.swift */; };
+		BB7BB28F1E5D18B0000ECBCB /* EventTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BB28E1E5D18B0000ECBCB /* EventTableViewCell.swift */; };
+		BB7BB2911E5E80E4000ECBCB /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7BB2901E5E80E4000ECBCB /* CloudKit.framework */; };
+		BB7BB2941E5E851D000ECBCB /* Seam3Demo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BB7BB2921E5E851D000ECBCB /* Seam3Demo.xcdatamodeld */; };
+		BB7BB2951E5E8521000ECBCB /* Seam3Demo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BB7BB2921E5E851D000ECBCB /* Seam3Demo.xcdatamodeld */; };
+		BB7BB2961E5E8522000ECBCB /* Seam3Demo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BB7BB2921E5E851D000ECBCB /* Seam3Demo.xcdatamodeld */; };
 		BB9341501E57ECC500A0A63A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB93414F1E57ECC500A0A63A /* AppDelegate.swift */; };
 		BB93415A1E57ECC500A0A63A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BB9341581E57ECC500A0A63A /* Main.storyboard */; };
 		BB9341621E5A52C000A0A63A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB9341611E5A52C000A0A63A /* Assets.xcassets */; };
 		BB9341641E5A538100A0A63A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB9341631E5A538100A0A63A /* CloudKit.framework */; };
-		BB9341651E5A5B6200A0A63A /* Seam3Demo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BB02C4251DEF986D0021375F /* Seam3Demo.xcdatamodeld */; };
 		DC4EBD9BEFEB963DBBB3DC00 /* Pods_Seam3_Example_OSX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57B291CDD8C9EF4F0422D925 /* Pods_Seam3_Example_OSX.framework */; };
 /* End PBXBuildFile section */
 
@@ -64,7 +66,6 @@
 		93144DDDA2D4F2283DEC3115 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		982ADD5C28B585F5F534480D /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		B5B20B29F0DB774105D4FD6D /* Pods-Seam3_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Seam3_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Seam3_Tests/Pods-Seam3_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		BB02C4261DEF986D0021375F /* Seam3Demo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Seam3Demo.xcdatamodel; sourceTree = "<group>"; };
 		BB02C4281DEF99970021375F /* Seam3_Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Seam3_Example.entitlements; sourceTree = "<group>"; };
 		BB02C4291DEF999C0021375F /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		BB02C44E1DEF9BEB0021375F /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
@@ -80,7 +81,10 @@
 		BB7BB2821E5BCC93000ECBCB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../Seam3_Example_TVOS/Assets.xcassets; sourceTree = "<group>"; };
 		BB7BB2841E5BCC93000ECBCB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BB7BB2881E5C5AEA000ECBCB /* Seam3_Example_TVOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Seam3_Example_TVOS.entitlements; sourceTree = "<group>"; };
-		BB7BB2891E5C5AEF000ECBCB /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS10.1.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
+		BB7BB28C1E5D18A4000ECBCB /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceTableViewCell.swift; sourceTree = "<group>"; };
+		BB7BB28E1E5D18B0000ECBCB /* EventTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventTableViewCell.swift; sourceTree = "<group>"; };
+		BB7BB2901E5E80E4000ECBCB /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS10.1.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
+		BB7BB2931E5E851D000ECBCB /* Seam3Demo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Seam3Demo.xcdatamodel; sourceTree = "<group>"; };
 		BB889F5C1DFA6957009AC097 /* changelog.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = changelog.md; sourceTree = "<group>"; };
 		BB93414D1E57ECC500A0A63A /* Seam3_Example_OSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Seam3_Example_OSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB93414F1E57ECC500A0A63A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -121,7 +125,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				34F5F3464F66C24DDA3A5391 /* Pods_Seam3_Example_TVOS.framework in Frameworks */,
-				BB7BB28A1E5C5AEF000ECBCB /* CloudKit.framework in Frameworks */,
+				BB7BB2911E5E80E4000ECBCB /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -198,8 +202,8 @@
 		607FACD31AFB9204008FA782 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				BB7BB2921E5E851D000ECBCB /* Seam3Demo.xcdatamodeld */,
 				607FACD41AFB9204008FA782 /* Info.plist */,
-				BB02C4251DEF986D0021375F /* Seam3Demo.xcdatamodeld */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -234,7 +238,7 @@
 		9F59CF4C37B9421AB8216220 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BB7BB2891E5C5AEF000ECBCB /* CloudKit.framework */,
+				BB7BB2901E5E80E4000ECBCB /* CloudKit.framework */,
 				BB9341631E5A538100A0A63A /* CloudKit.framework */,
 				BB02C4291DEF999C0021375F /* CloudKit.framework */,
 				1E25FB0A228E32DC36741C4A /* Pods_Seam3_Example.framework */,
@@ -251,6 +255,8 @@
 				BB7BB2881E5C5AEA000ECBCB /* Seam3_Example_TVOS.entitlements */,
 				BB7BB2781E5BCC93000ECBCB /* AppDelegate.swift */,
 				BB7BB27A1E5BCC93000ECBCB /* ViewController.swift */,
+				BB7BB28C1E5D18A4000ECBCB /* DeviceTableViewCell.swift */,
+				BB7BB28E1E5D18B0000ECBCB /* EventTableViewCell.swift */,
 				BB7BB27F1E5BCC93000ECBCB /* Main.storyboard */,
 				BB7BB2821E5BCC93000ECBCB /* Assets.xcassets */,
 				BB7BB2841E5BCC93000ECBCB /* Info.plist */,
@@ -668,8 +674,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB1B5C941E174E4500B4F890 /* DeviceTableViewCell.swift in Sources */,
+				BB7BB2961E5E8522000ECBCB /* Seam3Demo.xcdatamodeld in Sources */,
 				BB02C4511DEF9BEB0021375F /* MasterViewController.swift in Sources */,
-				BB02C4271DEF986D0021375F /* Seam3Demo.xcdatamodeld in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				BB02C4501DEF9BEB0021375F /* DetailViewController.swift in Sources */,
 			);
@@ -687,9 +693,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB7BB28B1E5C6815000ECBCB /* Seam3Demo.xcdatamodeld in Sources */,
 				BB7BB27B1E5BCC93000ECBCB /* ViewController.swift in Sources */,
+				BB7BB2941E5E851D000ECBCB /* Seam3Demo.xcdatamodeld in Sources */,
 				BB7BB2791E5BCC93000ECBCB /* AppDelegate.swift in Sources */,
+				BB7BB28F1E5D18B0000ECBCB /* EventTableViewCell.swift in Sources */,
+				BB7BB28D1E5D18A4000ECBCB /* DeviceTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -697,7 +705,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB9341651E5A5B6200A0A63A /* Seam3Demo.xcdatamodeld in Sources */,
+				BB7BB2951E5E8521000ECBCB /* Seam3Demo.xcdatamodeld in Sources */,
 				BB7BB26D1E5AAC25000ECBCB /* DeviceTableViewController.swift in Sources */,
 				BB7BB2701E5AAC37000ECBCB /* EventTableViewController.swift in Sources */,
 				BB9341501E57ECC500A0A63A /* AppDelegate.swift in Sources */,
@@ -1053,12 +1061,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		BB02C4251DEF986D0021375F /* Seam3Demo.xcdatamodeld */ = {
+		BB7BB2921E5E851D000ECBCB /* Seam3Demo.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				BB02C4261DEF986D0021375F /* Seam3Demo.xcdatamodel */,
+				BB7BB2931E5E851D000ECBCB /* Seam3Demo.xcdatamodel */,
 			);
-			currentVersion = BB02C4261DEF986D0021375F /* Seam3Demo.xcdatamodel */;
+			currentVersion = BB7BB2931E5E851D000ECBCB /* Seam3Demo.xcdatamodel */;
 			path = Seam3Demo.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
