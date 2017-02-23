@@ -57,10 +57,14 @@ class SMServerStoreSetupOperation:Operation {
                 let recordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
                 let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStore.SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
                 let subscriptionNotificationInfo = CKNotificationInfo()
-                subscriptionNotificationInfo.alertBody = ""
+                #if os(iOS) || os(macOS)
+                    subscriptionNotificationInfo.alertBody = ""
+                #endif
                 subscriptionNotificationInfo.shouldSendContentAvailable = true
                 subscription.notificationInfo = subscriptionNotificationInfo
-                subscriptionNotificationInfo.shouldBadge = false
+                if #available(iOS 9.0, tvOS 10.0, *) {
+                    subscriptionNotificationInfo.shouldBadge = false
+                }
                 let subscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
                 subscriptionsOperation.database = self.database
                 subscriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
