@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-Seam3 is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle. 
+Seam3 is a framework built to bridge gaps between CoreData and CloudKit. It handles almost all of the CloudKit hassle.
 All you have to do is use it as a store type for your CoreData store. 
 Local caching and sync is taken care of. 
 It builds and exposes different features to facilitate and give control to the developer where it is demanded and required.
@@ -42,6 +42,7 @@ Changes in Seam3 include:
 
   s.ios.deployment_target = '9.0'
   s.osx.deployment_target = '10.11'
+  s.tvos.deployment_target = '9.0'
 
   s.source_files = 'Sources/Classes/**/*'
   
