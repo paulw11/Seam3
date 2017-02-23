@@ -16,19 +16,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     var smStore: SMStore?
+    
+    var device: Device?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
         let container = self.persistentContainer
         
-        
         application.registerForRemoteNotifications()
         
         self.smStore = container.persistentStoreCoordinator.persistentStores.first as? SMStore
         
         self.validateCloudKitAndSync() {
-            let _ = self.setupDeviceRecord()            
+            self.device = self.setupDeviceRecord()
         }
         
         return true
@@ -56,6 +57,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
+    }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        print("Registered for remote notifications")
+    }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Failed to register for remote notifications \(error)")
     }
     
     func validateCloudKitAndSync(_ completion:@escaping (() -> Void)) {
@@ -105,7 +114,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         */
         let container = NSPersistentContainer(name: "Seam3Demo")
         
-        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let urls = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
         
         if let applicationDocumentsDirectory = urls.last {
             
@@ -206,10 +215,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // MARK: - Remote notifications
     
-    
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         print("Recieved push")
         self.smStore?.handlePush(userInfo: userInfo)
+        completionHandler(.newData)
     }
     
 }
