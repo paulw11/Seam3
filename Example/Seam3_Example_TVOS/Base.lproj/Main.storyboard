@@ -23,14 +23,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="LG8-Lu-d8N">
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="LG8-Lu-d8N">
                                 <rect key="frame" x="20" y="0.0" width="1880" height="1080"/>
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="66" sectionHeaderHeight="66" sectionFooterHeight="66" translatesAutoresizingMaskIntoConstraints="NO" id="ynl-yj-8Xt">
                                         <rect key="frame" x="0.0" y="0.0" width="1880" height="540"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <prototypes>
-                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="DeviceCell" id="lo7-oR-Xpf" customClass="DeviceTableViewCell" customModule="Seam3_Example_TVOS" customModuleProvider="target">
+                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="DeviceCell" id="lo7-oR-Xpf" customClass="DeviceTableViewCell" customModule="Seam3_Example_TVOS" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="66" width="1880" height="66"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lo7-oR-Xpf" id="TT6-fU-QsO">
@@ -38,13 +38,13 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1WS-ba-mA8">
-                                                            <rect key="frame" x="1765" y="4" width="103" height="58"/>
+                                                            <rect key="frame" x="1749" y="4" width="103" height="58"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" secondItem="1WS-ba-mA8" secondAttribute="height" multiplier="16:9" id="Xi3-q0-s5j"/>
                                                             </constraints>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QWY-Xo-MhY">
-                                                            <rect key="frame" x="20" y="14" width="1737" height="39"/>
+                                                            <rect key="frame" x="20" y="14" width="1721" height="39"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="32"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
@@ -69,11 +69,19 @@
                                             <outlet property="dataSource" destination="BYZ-38-t0r" id="V7e-73-3Yg"/>
                                         </connections>
                                     </tableView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gKY-sE-3KP">
+                                        <rect key="frame" x="809" y="540" width="263" height="0.0"/>
+                                        <inset key="contentEdgeInsets" minX="40" minY="20" maxX="40" maxY="20"/>
+                                        <state key="normal" title="New Event"/>
+                                        <connections>
+                                            <action selector="insertNewObject:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="G5p-Un-Iuo"/>
+                                        </connections>
+                                    </button>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="66" sectionHeaderHeight="66" sectionFooterHeight="66" translatesAutoresizingMaskIntoConstraints="NO" id="d1M-98-LHj">
                                         <rect key="frame" x="0.0" y="540" width="1880" height="540"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <prototypes>
-                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="EventCell" id="1ZY-Z8-NgR" customClass="EventTableViewCell" customModule="Seam3_Example_TVOS" customModuleProvider="target">
+                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="EventCell" id="1ZY-Z8-NgR" customClass="EventTableViewCell" customModule="Seam3_Example_TVOS" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="66" width="1880" height="66"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="1ZY-Z8-NgR" id="lyY-kq-Hsd">
@@ -81,7 +89,7 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v8u-Nq-nDg">
-                                                            <rect key="frame" x="16" y="14" width="1832" height="39"/>
+                                                            <rect key="frame" x="16" y="14" width="1848" height="39"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="32"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
@@ -104,8 +112,12 @@
                                     </tableView>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="ynl-yj-8Xt" secondAttribute="trailing" id="0LM-g4-3RV"/>
                                     <constraint firstItem="ynl-yj-8Xt" firstAttribute="width" secondItem="d1M-98-LHj" secondAttribute="width" id="8DC-X9-Oao"/>
+                                    <constraint firstItem="d1M-98-LHj" firstAttribute="leading" secondItem="LG8-Lu-d8N" secondAttribute="leading" id="9Z0-SS-wCR"/>
                                     <constraint firstItem="ynl-yj-8Xt" firstAttribute="height" secondItem="d1M-98-LHj" secondAttribute="height" id="APp-dd-8g2"/>
+                                    <constraint firstItem="ynl-yj-8Xt" firstAttribute="leading" secondItem="LG8-Lu-d8N" secondAttribute="leading" id="fyw-Xi-aN8"/>
+                                    <constraint firstAttribute="trailing" secondItem="d1M-98-LHj" secondAttribute="trailing" id="iYX-tF-3MD"/>
                                 </constraints>
                             </stackView>
                         </subviews>

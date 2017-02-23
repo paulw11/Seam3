@@ -18,11 +18,12 @@ class ViewController: UIViewController {
     var events: [Event]?
     var devices: [Device]?
     var managedObjectContext: NSManagedObjectContext?
+    var appDelegate: AppDelegate!
     
     let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .short
+        dateFormatter.timeStyle = .medium
         return dateFormatter
     }()
     
@@ -35,8 +36,8 @@ class ViewController: UIViewController {
         self.tableTitles[eventsTableView] = "Events"
         self.tableTitles[devicesTableView] = "Devices"
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        self.managedObjectContext = appDelegate.persistentContainer.viewContext
+        self.appDelegate = UIApplication.shared.delegate as! AppDelegate
+        self.managedObjectContext = self.appDelegate.persistentContainer.viewContext
         
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: nil, queue: nil) { notification in
             
@@ -86,6 +87,28 @@ class ViewController: UIViewController {
             
         } catch {}
     }
+    
+    @IBAction func insertNewObject(_ sender: UIButton) {
+        if let context = self.managedObjectContext,
+            let device = self.appDelegate.device {
+            let newEvent = Event(context: context)
+            
+            // If appropriate, configure the new managed object.
+            newEvent.timestamp = NSDate()
+            newEvent.creatingDevice = device
+            // Save the context.
+            do {
+                try context.save()
+                self.loadData()
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        }
+    }
+
 
 }
 
