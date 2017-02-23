@@ -85,7 +85,6 @@
 		BB7BB28E1E5D18B0000ECBCB /* EventTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventTableViewCell.swift; sourceTree = "<group>"; };
 		BB7BB2901E5E80E4000ECBCB /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS10.1.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
 		BB7BB2931E5E851D000ECBCB /* Seam3Demo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Seam3Demo.xcdatamodel; sourceTree = "<group>"; };
-		BB889F5C1DFA6957009AC097 /* changelog.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = changelog.md; sourceTree = "<group>"; };
 		BB93414D1E57ECC500A0A63A /* Seam3_Example_OSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Seam3_Example_OSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB93414F1E57ECC500A0A63A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BB9341541E57ECC500A0A63A /* Seam3_Example_OSX.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Seam3_Example_OSX.xcdatamodel; sourceTree = "<group>"; };
@@ -189,7 +188,6 @@
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				BB02C44E1DEF9BEB0021375F /* DetailViewController.swift */,
 				BB02C44F1DEF9BEB0021375F /* MasterViewController.swift */,
-				BB889F5C1DFA6957009AC097 /* changelog.md */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
