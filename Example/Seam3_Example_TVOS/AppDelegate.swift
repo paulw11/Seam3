@@ -80,7 +80,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return
             }
             
-            var completeSync = false
+            var completeSync = true
             
             let previousUser = UserDefaults.standard.string(forKey: "CloudKitUser")
             if  previousUser != currentUser {
