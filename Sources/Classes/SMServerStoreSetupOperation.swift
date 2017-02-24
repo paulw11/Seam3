@@ -30,12 +30,10 @@
 import Foundation
 import CloudKit
 
-
-
 class SMServerStoreSetupOperation:Operation {
     
     var database:CKDatabase?
-    var setupOperationCompletionBlock:((_ customZoneCreated:Bool,_ customZoneSubscriptionCreated:Bool)->Void)?
+    var setupOperationCompletionBlock:((_ customZoneCreated:Bool,_ customZoneSubscriptionCreated:Bool,_ error: Error?)->Void)?
     
     init(cloudDatabase:CKDatabase?) {
         self.database = cloudDatabase
@@ -45,49 +43,90 @@ class SMServerStoreSetupOperation:Operation {
     override func main() {
         let operationQueue = OperationQueue()
         let zone = CKRecordZone(zoneName: SMStore.SMStoreCloudStoreCustomZoneName)
-        var error: NSError?
-        let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
-        modifyRecordZonesOperation.database = self.database
-        modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = ({(savedRecordZones, deletedRecordZonesIDs, operationError) -> Void in
-            error = operationError as NSError?
-            let customZoneWasCreated:AnyObject? = UserDefaults.standard.object(forKey: SMStore.SMStoreCloudStoreCustomZoneName) as AnyObject?
-            let customZoneSubscriptionWasCreated:AnyObject? = UserDefaults.standard.object(forKey: SMStore.SMStoreCloudStoreSubscriptionName) as AnyObject?
-            if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil) {
-                UserDefaults.standard.set(true, forKey: SMStore.SMStoreCloudStoreCustomZoneName)
-                let recordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
-                let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStore.SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
-                let subscriptionNotificationInfo = CKNotificationInfo()
-                #if os(iOS) || os(macOS)
-                    subscriptionNotificationInfo.alertBody = ""
-                #endif
-                subscriptionNotificationInfo.shouldSendContentAvailable = true
-                subscription.notificationInfo = subscriptionNotificationInfo
-                if #available(iOS 9.0, tvOS 10.0, *) {
-                    subscriptionNotificationInfo.shouldBadge = false
+        var error: Error?
+        var customZoneCreated = false
+        var subscriptionCreated = false
+        
+        let defaults = UserDefaults.standard
+        
+        let fetchRecordZonesOperation = CKFetchRecordZonesOperation(recordZoneIDs: [zone.zoneID])
+        
+        fetchRecordZonesOperation.database = self.database
+        
+        fetchRecordZonesOperation.fetchRecordZonesCompletionBlock = ({(zones,operationError) -> Void in
+            
+            error = operationError
+            
+            if error == nil {
+                if zones?.first == nil {
+                    
+                    let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
+                    modifyRecordZonesOperation.database = self.database
+                    modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = ({(savedRecordZones, deletedRecordZonesIDs, operationError) -> Void in
+                        error = operationError
+                        
+                        if operationError == nil {
+                            customZoneCreated = true
+                            defaults.set(true, forKey: SMStore.SMStoreCloudStoreCustomZoneName)
+                        }
+                    })
+                    operationQueue.addOperation(modifyRecordZonesOperation)
+                } else {
+                    customZoneCreated = true
+                    defaults.set(true, forKey: SMStore.SMStoreCloudStoreCustomZoneName)
                 }
-                let subscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
-                subscriptionsOperation.database = self.database
-                subscriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
-                    if operationError == nil {
-                        UserDefaults.standard.set(true, forKey: SMStore.SMStoreCloudStoreSubscriptionName)
-                    }
-                    error = operationError as NSError?
-                })
-                operationQueue.addOperation(subscriptionsOperation)
             }
         })
-        operationQueue.addOperation(modifyRecordZonesOperation)
+        
+        operationQueue.addOperation(fetchRecordZonesOperation)
         operationQueue.waitUntilAllOperationsAreFinished()
-        if self.setupOperationCompletionBlock != nil {
-            if error == nil {
-                self.setupOperationCompletionBlock!(true, true)
-            } else {
-                if UserDefaults.standard.object(forKey: SMStore.SMStoreCloudStoreCustomZoneName) == nil {
-                    self.setupOperationCompletionBlock!(false, false)
-                } else {
-                    self.setupOperationCompletionBlock!(true, false)
+        
+        if error == nil {
+            
+            let fetchSubscription = CKFetchSubscriptionsOperation(subscriptionIDs: [SMStore.SMStoreCloudStoreSubscriptionName])
+            
+            fetchSubscription.database = self.database
+            
+            fetchSubscription.fetchSubscriptionCompletionBlock = ({(subscriptions,operationError)->Void in
+                error = operationError
+                if operationError == nil {
+                    if subscriptions?.first == nil {
+                        let recordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
+                        let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStore.SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
+                        
+                        let subscriptionNotificationInfo = CKNotificationInfo()
+                        #if os(iOS) || os(macOS)
+                            subscriptionNotificationInfo.alertBody = ""
+                        #endif
+                        subscriptionNotificationInfo.shouldSendContentAvailable = true
+                        subscription.notificationInfo = subscriptionNotificationInfo
+                        if #available(iOS 9.0, tvOS 10.0, *) {
+                            subscriptionNotificationInfo.shouldBadge = false
+                        }
+                        
+                        let subscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
+                        subscriptionsOperation.database = self.database
+                        subscriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
+                            if operationError == nil {
+                                UserDefaults.standard.set(true, forKey: SMStore.SMStoreCloudStoreSubscriptionName)
+                                subscriptionCreated = true
+                            }
+                            error = operationError
+                        })
+                        operationQueue.addOperation(subscriptionsOperation)
+                    } else {
+                        subscriptionCreated = true
+                        defaults.set(true, forKey: SMStore.SMStoreCloudStoreSubscriptionName)
+                    }
                 }
-            }
+            })
+            
+            operationQueue.addOperation(fetchSubscription)
+            operationQueue.waitUntilAllOperationsAreFinished()
+        }
+        
+        if let completionBlock = self.setupOperationCompletionBlock {
+            completionBlock(customZoneCreated,subscriptionCreated,error)
         }
     }
 }
