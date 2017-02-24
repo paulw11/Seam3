@@ -415,13 +415,22 @@ open class SMStore: NSIncrementalStore {
     
     open func triggerSync(complete: Bool = false) {
         
+        self.triggerSync(block: false, complete: complete)
+        
+    }
+    
+    private func triggerSync(block: Bool, complete: Bool = false) {
+    
         guard self.cloudKitValid else {
             NSLog("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
             return
         }
         
-        guard self.operationQueue?.operationCount == 0 else {
-            return
+        if block == false {
+            guard self.operationQueue?.operationCount == 0 else {
+                print("Aborting sync; operation in progress")
+                return
+            }
         }
         
         if complete {
@@ -453,8 +462,12 @@ open class SMStore: NSIncrementalStore {
         if defaults.bool(forKey: SMStore.SMStoreCloudStoreCustomZoneName) == false || defaults.bool(forKey: SMStore.SMStoreCloudStoreSubscriptionName) == false {
             
             self.cloudStoreSetupOperation = SMServerStoreSetupOperation(cloudDatabase: self.database)
-            self.cloudStoreSetupOperation!.setupOperationCompletionBlock = { customZoneWasCreated, customZoneSubscriptionWasCreated in
-                syncOperationBlock()
+            self.cloudStoreSetupOperation!.setupOperationCompletionBlock = { customZoneWasCreated, customZoneSubscriptionWasCreated, error in
+                if (error == nil) {
+                    syncOperationBlock()
+                } else {
+                    print("Error setting up cloudkit: \(error)")
+                }
             }
             self.operationQueue?.addOperation(self.cloudStoreSetupOperation!)
         } else {
@@ -473,7 +486,7 @@ open class SMStore: NSIncrementalStore {
             let recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: u)
             if let zoneID = recordZoneNotification.recordZoneID {
                 if zoneID.zoneName == SMStore.SMStoreCloudStoreCustomZoneName {
-                    self.triggerSync()
+                    self.triggerSync(block: true)
                 }
             }
         }
