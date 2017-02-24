@@ -79,14 +79,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                 return
             }
             
-            var completeSync = false
-            
             let previousUser = UserDefaults.standard.string(forKey: "CloudKitUser")
             if  previousUser != currentUser {
                 do {
                     print("New user")
                     try self.smStore?.resetBackingStore()
-                    completeSync = true
                 } catch {
                     NSLog("Error resetting backing store - \(error.localizedDescription)")
                     return
@@ -95,7 +92,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             
             UserDefaults.standard.set(currentUser, forKey:"CloudKitUser")
             
-            self.smStore?.triggerSync(complete: completeSync)
+            self.smStore?.triggerSync(complete: true)
             
             completion()
         }
@@ -184,6 +181,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         print("Registered for remote notifications")
+    }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Remote notification registration failed")
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
