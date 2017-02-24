@@ -1,6 +1,9 @@
 Seam3 Changelog
 ===============
 
+# [1.1.2]
+ - Improve sync when concurrent changes occur
+
 # [1.1.1]
  - Add TVOS support and example
 
