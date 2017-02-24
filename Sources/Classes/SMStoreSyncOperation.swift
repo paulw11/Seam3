@@ -131,7 +131,24 @@ class SMStoreSyncOperation: Operation {
         if insertedOrUpdatedCKRecords == nil && deletedCKRecordIDs == nil {
             return
         }
-        let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
+        
+        var changedRecords = [String:CKRecord]()
+        
+        for record in insertedOrUpdatedCKRecords ?? [] {
+            let recordName = record.recordID.recordName
+            if let currentRecord = changedRecords[recordName] {
+                if let currentDate = currentRecord.modificationDate,
+                    let newDate = record.modificationDate {
+                    if newDate > currentDate {
+                        changedRecords[recordName] = record
+                    }
+                }
+            } else {
+                changedRecords[recordName] = record
+            }
+        }
+        
+        let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: Array(changedRecords.values), recordIDsToDelete: deletedCKRecordIDs)
         ckModifyRecordsOperation.database = self.database
         let savedRecords: [CKRecord] = [CKRecord]()
         var conflictedRecords: [CKRecord] = [CKRecord]()
