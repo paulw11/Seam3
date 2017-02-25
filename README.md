@@ -16,7 +16,7 @@ Changes in Seam3 include:
 
 * Corrects one-to-many and many-to-one relationship mapping between CoreData and CloudKit
 * Adds mapping between binary attributes in CoreData and CKAssets in CloudKit
-* Code updates for Swift 3.0 and iOS 10
+* Code updates for Swift 3.0 on iOS 10, Mac OS 10.11 & tvOS 10
 * Restructures code to eliminate the use of global variables
 
 ## CoreData to CloudKit
