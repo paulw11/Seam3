@@ -59,7 +59,7 @@ class SMServerStoreSetupOperation:Operation {
             var ckError = operationError as? CKError
             
             if ckError?.partialErrorsByItemID != nil {
-                ckError = ckError?.partialErrorsByItemID!.values.first! as! CKError?
+                ckError = ckError?.partialErrorsByItemID?.values.first as? CKError
             }
             
             if error == nil || ckError?.code == .zoneNotFound {
@@ -95,7 +95,12 @@ class SMServerStoreSetupOperation:Operation {
             
             fetchSubscription.fetchSubscriptionCompletionBlock = ({(subscriptions,operationError)->Void in
                 error = operationError
-                if operationError == nil {
+                var ckError = operationError as? CKError
+                
+                if ckError?.partialErrorsByItemID != nil {
+                    ckError = ckError?.partialErrorsByItemID?.values.first as? CKError
+                }
+                if operationError == nil || ckError?.code == .unknownItem {
                     if subscriptions?.first == nil {
                         let recordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
                         let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStore.SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
