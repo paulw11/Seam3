@@ -56,8 +56,10 @@ class SMServerStoreSetupOperation:Operation {
         fetchRecordZonesOperation.fetchRecordZonesCompletionBlock = ({(zones,operationError) -> Void in
             
             error = operationError
+            let ckError = operationError as? CKError
             
-            if error == nil {
+            if error == nil || ckError?.code == .zoneNotFound {
+                error = nil
                 if zones?.first == nil {
                     
                     let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
