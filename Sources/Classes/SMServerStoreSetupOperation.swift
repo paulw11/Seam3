@@ -56,7 +56,11 @@ class SMServerStoreSetupOperation:Operation {
         fetchRecordZonesOperation.fetchRecordZonesCompletionBlock = ({(zones,operationError) -> Void in
             
             error = operationError
-            let ckError = operationError as? CKError
+            var ckError = operationError as? CKError
+            
+            if ckError?.partialErrorsByItemID != nil {
+                ckError = ckError?.partialErrorsByItemID!.values.first! as! CKError?
+            }
             
             if error == nil || ckError?.code == .zoneNotFound {
                 error = nil
