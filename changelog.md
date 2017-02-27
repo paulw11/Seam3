@@ -1,6 +1,9 @@
 Seam3 Changelog
 ===============
 
+# [1.1.3]
+ - Correctly create zone and subscription for new zone
+
 # [1.1.2]
  - Improve sync when concurrent changes occur
 
