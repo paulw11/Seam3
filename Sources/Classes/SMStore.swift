@@ -189,6 +189,8 @@ enum SMStoreError: Error {
     case manyToManyUnsupported
     /// The related object could not be found to satisfy a relationship
     case missingRelatedObject
+    /// More than one match was found for a 'to-one' relationship
+    case tooManyRelatedObjects
 }
 
 /// Sync conflict resolution policies
@@ -575,25 +577,58 @@ open class SMStore: NSIncrementalStore {
     
     override open func newValue(forRelationship relationship: NSRelationshipDescription, forObjectWith objectID: NSManagedObjectID, with context: NSManagedObjectContext?) throws -> Any {
         
-        var toOneRelationship = relationship
-        
         if relationship.isToMany {
             guard let targetRelationship = relationship.inverseRelationship else {
                 throw SMStoreError.missingInverseRelationship
             }
-            toOneRelationship = targetRelationship
+            guard targetRelationship.isToMany == false else {
+                throw SMStoreError.manyToManyUnsupported
+            }
+            
+            return try self.toManyValues(forRelationship: targetRelationship, forObjectWith: objectID, with: context)
+        } else {
+            return try self.toOneValue(forRelationship: relationship, forObjectWith: objectID, with: context)
         }
-        
-        guard toOneRelationship.isToMany == false else {
-            throw SMStoreError.manyToManyUnsupported
-        }
+    }
+    
+    fileprivate func toOneValue(forRelationship relationship: NSRelationshipDescription, forObjectWith objectID: NSManagedObjectID, with context: NSManagedObjectContext?) throws -> Any {
         
         let recordID:String = self.referenceObject(for: objectID) as! String
         
         if let targetObjectID = try self.objectIDForBackingObjectForEntity(objectID.entity.name!, withReferenceObject: recordID) {
             
-            let targetsFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: toOneRelationship.entity.name!)
-            let targetsPredicate = NSPredicate(format: "%K == %@", toOneRelationship.name,targetObjectID)
+            let targetsFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: relationship.entity.name!)
+            let targetsPredicate = NSPredicate(format: "%K == %@", relationship.name,targetObjectID)
+            targetsFetchRequest.predicate = targetsPredicate
+            targetsFetchRequest.resultType = .managedObjectResultType
+            targetsFetchRequest.propertiesToFetch = [SMStore.SMLocalStoreRecordIDAttributeName]
+            if let targetResults = try self.backingMOC.fetch(targetsFetchRequest) as? [NSManagedObject] {
+                if !targetResults.isEmpty {
+                    if targetResults.count == 1 {
+                        let reference = targetResults[0].value(forKey: SMStore.SMLocalStoreRecordIDAttributeName)
+                        return self.newObjectID(for: relationship.entity, referenceObject: reference as Any) as NSManagedObjectID
+                    } else {
+                        throw SMStoreError.tooManyRelatedObjects
+                    }
+                }
+            }
+        }
+        if relationship.isOptional {
+            return NSNull()
+        } else {
+            throw SMStoreError.missingRelatedObject
+        }
+    }
+    
+    
+    fileprivate func toManyValues(forRelationship relationship: NSRelationshipDescription, forObjectWith objectID: NSManagedObjectID, with context: NSManagedObjectContext?) throws -> [NSManagedObjectID] {
+        
+        let recordID:String = self.referenceObject(for: objectID) as! String
+        
+        if let targetObjectID = try self.objectIDForBackingObjectForEntity(objectID.entity.name!, withReferenceObject: recordID) {
+            
+            let targetsFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: relationship.entity.name!)
+            let targetsPredicate = NSPredicate(format: "%K == %@", relationship.name,targetObjectID)
             targetsFetchRequest.predicate = targetsPredicate
             targetsFetchRequest.resultType = .managedObjectResultType
             targetsFetchRequest.propertiesToFetch = [SMStore.SMLocalStoreRecordIDAttributeName]
@@ -601,19 +636,16 @@ open class SMStore: NSIncrementalStore {
                 if !targetResults.isEmpty {
                     let retValues = targetResults.map {
                         let reference = $0.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName)
-                        return self.newObjectID(for: toOneRelationship.entity, referenceObject: reference as Any)
+                        return self.newObjectID(for: relationship.entity, referenceObject: reference as Any)
                         
                         } as [NSManagedObjectID]
                     return retValues
                 }
             }
         }
-        if toOneRelationship.isOptional {
-            return NSNull()
-        } else {
-            throw SMStoreError.missingRelatedObject
-        }
+        return [NSManagedObjectID]()
     }
+    
 
     override open func obtainPermanentIDs(for array: [NSManagedObject]) throws -> [NSManagedObjectID] {
         return array.map { object in
