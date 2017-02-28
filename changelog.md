@@ -1,6 +1,9 @@
 Seam3 Changelog
 ===============
 
+# [1.1.4]
+ - Address an issue with the handling of empty relationships 
+
 # [1.1.3]
  - Correctly create zone and subscription for new zone
 
