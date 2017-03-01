@@ -1,6 +1,9 @@
 Seam3 Changelog
 ===============
 
+# [1.1.5]
+ - Fixed a bug with assigning the incorrect entity to to-one related objects
+
 # [1.1.4]
  - Address an issue with the handling of empty relationships 
 
