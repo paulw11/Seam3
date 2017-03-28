@@ -285,7 +285,7 @@ open class SMStore: NSIncrementalStore {
     /**
       You must call this function to register the SMStore class before attempting 
       to create a store 
-     **/
+     */
     
     public class func registerStoreClass() {
         if !storeRegistered {
