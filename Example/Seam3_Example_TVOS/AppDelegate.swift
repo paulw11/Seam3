@@ -113,7 +113,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
          error conditions that could cause the creation of the store to fail.
         */
         
-        SMStore.registerStore()
+        SMStore.registerStoreClass()
         
         let container = NSPersistentContainer(name: "Seam3Demo")
         

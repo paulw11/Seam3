@@ -198,7 +198,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     
     lazy var persistentContainer: NSPersistentContainer = {
         
-        SMStore.registerStore()
+        SMStore.registerStoreClass()
         
         /*
          The persistent container for the application. This implementation

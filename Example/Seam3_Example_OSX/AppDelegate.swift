@@ -165,7 +165,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         var shouldFail = false
         var failureReason = "There was an error creating or loading the application's saved data."
 
-        SMStore.registerStore()
+        SMStore.registerStoreClass()
         
         // Make sure the application files directory is there
         do {

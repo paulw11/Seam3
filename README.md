@@ -80,7 +80,7 @@ var smStore: SMStore
 - For iOS9 and earlier or macOS, add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
 ```swift
 
-SMStore.registerStore()
+SMStore.registerStoreClass()
 do 
 {
    self.smStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
@@ -91,7 +91,7 @@ do
 ```swift
 lazy var persistentContainer: NSPersistentContainer = {
 
-        SMStore.registerStore()
+        SMStore.registerStoreClass()
 
         let container = NSPersistentContainer(name: "Seam3Demo2")
         
