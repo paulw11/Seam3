@@ -79,6 +79,8 @@ var smStore: SMStore
 ```
 - For iOS9 and earlier or macOS, add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
 ```swift
+
+SMStore.registerStore()
 do 
 {
    self.smStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
@@ -88,6 +90,9 @@ do
 
 ```swift
 lazy var persistentContainer: NSPersistentContainer = {
+
+        SMStore.registerStore()
+
         let container = NSPersistentContainer(name: "Seam3Demo2")
         
         let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
