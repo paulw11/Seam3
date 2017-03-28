@@ -70,7 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         self.smStore?.verifyCloudKitConnectionAndUser() { (status, user, error) in
             guard status == .available, error == nil else {
-                NSLog("Unable to verify CloudKit Connection \(error)")
+                NSLog("Unable to verify CloudKit Connection \(error!)")
                 return
             }
             
@@ -197,6 +197,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     // MARK: - Core Data stack
     
     lazy var persistentContainer: NSPersistentContainer = {
+        
+        SMStore.registerStore()
+        
         /*
          The persistent container for the application. This implementation
          creates and returns a container, having loaded the store for the

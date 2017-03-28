@@ -142,7 +142,7 @@ extension ViewController: UITableViewDataSource {
         
         cell.idLabel.text = device.deviceID
         
-        if let data = device.image as? Data {
+        if let data = device.image as Data? {
         
             cell.deviceImage.image = UIImage(data: data)
         } else {
@@ -159,7 +159,7 @@ extension ViewController: UITableViewDataSource {
         
         let event = self.events![indexPath.row]
         
-        if let date = event.timestamp as? Date {
+        if let date = event.timestamp as Date? {
             cell.eventLabel.text = self.dateFormatter.string(from: date)
         } else {
             cell.eventLabel.text = ""

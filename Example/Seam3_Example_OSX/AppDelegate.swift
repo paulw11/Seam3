@@ -50,7 +50,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         self.smStore?.verifyCloudKitConnectionAndUser() { (status, user, error) in
             guard status == .available, error == nil else {
-                NSLog("Unable to verify CloudKit Connection \(error)")
+                NSLog("Unable to verify CloudKit Connection \(error!)")
                 return
             }
             
@@ -165,6 +165,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         var shouldFail = false
         var failureReason = "There was an error creating or loading the application's saved data."
 
+        SMStore.registerStore()
+        
         // Make sure the application files directory is there
         do {
             let properties = try self.applicationDocumentsDirectory.resourceValues(forKeys: [URLResourceKey.isDirectoryKey])

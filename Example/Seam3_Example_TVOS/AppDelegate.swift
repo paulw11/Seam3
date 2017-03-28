@@ -71,7 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         self.smStore?.verifyCloudKitConnectionAndUser() { (status, user, error) in
             guard status == .available, error == nil else {
-                NSLog("Unable to verify CloudKit Connection \(error)")
+                NSLog("Unable to verify CloudKit Connection \(error!)")
                 return
             }
             
@@ -112,6 +112,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
          application to it. This property is optional since there are legitimate
          error conditions that could cause the creation of the store to fail.
         */
+        
+        SMStore.registerStore()
+        
         let container = NSPersistentContainer(name: "Seam3Demo")
         
         let urls = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
