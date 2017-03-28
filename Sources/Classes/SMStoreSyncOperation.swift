@@ -72,7 +72,7 @@ class SMStoreSyncOperation: Operation {
                 try self.performSync()
                 print("Sync Performed", terminator: "\n")
                 completionBlock(nil)
-            } catch let error as NSError? {
+            } catch let error as NSError {
                 print("Sync Performed with Error", terminator: "\n")
                 completionBlock(error)
             }
