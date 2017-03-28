@@ -270,10 +270,24 @@ open class SMStore: NSIncrementalStore {
         moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         return moc     }()
     
+    fileprivate static var storeRegistered = false
+    
     /// Initialize this store
     /// -SeeAlso: `NSIncrementalStore.initialize`
-    override open class func initialize() {
+  /*  override open class func initialize() {
         NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: self.type)
+    }*/
+    
+    /**
+      You must call this function to register the SMStore class before attempting 
+      to create a store 
+     **/
+    
+    public class func registerStore() {
+        if !storeRegistered {
+            NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: self.type)
+            storeRegistered = true
+        }
     }
     
     /// Returns a store initialized with the given arguments
@@ -463,10 +477,10 @@ open class SMStore: NSIncrementalStore {
             
             self.cloudStoreSetupOperation = SMServerStoreSetupOperation(cloudDatabase: self.database)
             self.cloudStoreSetupOperation!.setupOperationCompletionBlock = { customZoneWasCreated, customZoneSubscriptionWasCreated, error in
-                if (error == nil) {
-                    syncOperationBlock()
-                } else {
+                if let error = error {
                     print("Error setting up cloudkit: \(error)")
+                } else {
+                    syncOperationBlock()
                 }
             }
             self.operationQueue?.addOperation(self.cloudStoreSetupOperation!)
