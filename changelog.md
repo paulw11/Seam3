@@ -1,6 +1,10 @@
 Seam3 Changelog
 ===============
 
+# [1.2.1]
+ - Fix warnings under Swift 3.1
+ - You must now call `SMStore.registerStore()` before attempting to create an SMStore
+
 # [1.1.5]
  - Fixed a bug with assigning the incorrect entity to to-one related objects
 
