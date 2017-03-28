@@ -1,6 +1,9 @@
 Seam3 Changelog
 ===============
 
+# [1.2.2]
+ - Change `registerStore()` to `registerStoreClass()`
+
 # [1.2.1]
  - Fix warnings under Swift 3.1
  - You must now call `SMStore.registerStore()` before attempting to create an SMStore
