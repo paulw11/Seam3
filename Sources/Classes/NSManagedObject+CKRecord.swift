@@ -112,7 +112,6 @@ extension NSManagedObject {
         }
         for relationship in relationships {
             if let relationshipManagedObject = self.value(forKey: relationship) as? NSManagedObject {
-                // let recordIDString: String = self.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
                 let recordIDString: String = relationshipManagedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
                 let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
                 let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
