@@ -46,8 +46,6 @@ extension NSManagedObject {
                     ckRecord.setObject(self.value(forKey: attrName) as! String as CKRecordValue?, forKey: attrName)
                 case .dateAttributeType:
                     ckRecord.setObject(self.value(forKey: attrName) as! Date as CKRecordValue?, forKey: attrName)
-                    // case .binaryDataAttributeType:
-                // ckRecord.setObject(self.value(forKey: attrName) as! Data as CKRecordValue?, forKey: attrName)
                 case .booleanAttributeType:
                     ckRecord.setObject(self.value(forKey: attrName) as! NSNumber, forKey: attrName)
                 case .decimalAttributeType:
