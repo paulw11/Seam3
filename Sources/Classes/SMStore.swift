@@ -554,7 +554,7 @@ open class SMStore: NSIncrementalStore {
                 return try self.executeInResponseToCountFetchRequest(fetchRequest, context: context!)
             } else {
                 return try self.executeInResponseToFetchRequest(fetchRequest, context: context!)
-          }
+            }
         } else if request.requestType == NSPersistentStoreRequestType.saveRequestType {
             let saveChangesRequest: NSSaveChangesRequest = request as! NSSaveChangesRequest
             return try self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context!)
@@ -583,20 +583,23 @@ open class SMStore: NSIncrementalStore {
         fetchRequest.resultType = NSFetchRequestResultType.dictionaryResultType
         fetchRequest.propertiesToFetch = propertiesToFetch
         let results = try self.backingMOC.fetch(fetchRequest)
-        var backingObjectValues = results.last as! Dictionary<String,NSObject>
-        for (key,value) in backingObjectValues {
-            if let managedObjectID = value as? NSManagedObjectID {
-                let managedObject = try self.backingMOC.existingObject(with: managedObjectID)
-                if let identifier = managedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String {
-                    if let targetEntity = targetEntities[managedObject.entity.name!] {
-                        let objID = self.newObjectID(for: targetEntity, referenceObject:identifier)
-                        
-                        backingObjectValues[key] = objID
+        var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: [:], version: 1)
+        if var backingObjectValues = results.last as? Dictionary<String,NSObject> {
+            for (key,value) in backingObjectValues {
+                if let managedObjectID = value as? NSManagedObjectID {
+                    let managedObject = try self.backingMOC.existingObject(with: managedObjectID)
+                    if let identifier = managedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String {
+                        if let targetEntity = targetEntities[managedObject.entity.name!] {
+                            let objID = self.newObjectID(for: targetEntity, referenceObject:identifier)
+                            
+                            backingObjectValues[key] = objID
+                        }
                     }
                 }
             }
+            
+            incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: backingObjectValues, version: 1)
         }
-        let incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: backingObjectValues, version: 1)
         return incrementalStoreNode
         
     }
