@@ -106,9 +106,6 @@ class SMServerStoreSetupOperation:Operation {
                         let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStore.SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
                         
                         let subscriptionNotificationInfo = CKNotificationInfo()
-                        #if os(iOS) || os(macOS)
-                            subscriptionNotificationInfo.alertBody = ""
-                        #endif
                         subscriptionNotificationInfo.shouldSendContentAvailable = true
                         subscription.notificationInfo = subscriptionNotificationInfo
                         if #available(iOS 9.0, tvOS 10.0, *) {
