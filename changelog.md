@@ -1,6 +1,9 @@
 Seam3 Changelog
 ===============
 
+# [1.2.3]
+ - Fix crash when `count` is invoked against a seam3 backed `NSManagedObjectContext` - #20
+ - Fix potential crash due to a race condition with a remotely deleted object #21
 # [1.2.2]
  - Change `registerStore()` to `registerStoreClass()`
 
