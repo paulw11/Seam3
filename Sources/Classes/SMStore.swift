@@ -26,145 +26,145 @@
 //    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //    SOFTWARE.
 
-/** 
+/**
  
-  # Seam3
-
-Seam3 is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle.
-All you have to do is use it as a store type for your CoreData store.
-Local caching and sync is taken care of.
-
-Seam3 is based on [Seam](https://github.com/nofelmahmood/Seam) by [nofelmahmood](https://github.com/nofelmahmood)
-
-Changes in Seam3 include:
-
-* Corrects one-to-many and many-to-one relationship mapping between CoreData and CloudKit
-* Adds mapping between binary attributes in CoreData and CKAssets in CloudKit (Not yet :( )
-* Code updates for Swift 3.0 and iOS 10
-* Restructures code to eliminate the use of global variables
-
-## CoreData to CloudKit
-
-### Attributes
-
-| CoreData  | CloudKit |
-| ------------- | ------------- |
-| NSDate    | Date/Time
-| NSData | Bytes
-| NSString  | String   |
-| Integer16 | Int(64) |
-| Integer32 | Int(64) |
-| Integer64 | Int(64) |
-| Decimal | Double |
-| Float | Double |
-| Boolean | Int(64) |
-| NSManagedObject | Reference |
-
-**In the table above :** `Integer16`, `Integer32`, `Integer64`, `Decimal`, `Float` and `Boolean` are referring to the instance of `NSNumber` used
-to represent them in CoreData Models. `NSManagedObject` refers to a `to-one relationship` in a CoreData Model.
-
-### Relationships
-
-| CoreData Relationship  | Translation on CloudKit |
-| ------------- | ------------- |
-| To - one    | To one relationships are translated as CKReferences on the CloudKit Servers.|
-| To - many    | To many relationships are not explicitly created. Seam only creates and manages to-one relationships on the CloudKit Servers. <br/> <strong>Example</strong> -> If an Employee has a to-one relationship to Department and Department has a to-many relationship to Employee than Seam will only create the former on the CloudKit Servers. It will fullfil the later by using the to-one relationship. If all employees of a department are accessed Seam will fulfil it by fetching all the employees that belong to that particular department.|
-
-<strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and corruption of data can possibly occur.
-
-## Sync
-
-Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing the following two notifications.
-- SMStoreDidStartSyncOperationNotification
-- SMStoreDidFinishSyncOperationNotification
-
-#### Resolution Policies
-In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
-
-- ClientTellsWhichWins
-
-This policy requires you to set syncConflictResolutionBlock block of SMStore. You get both versions of the record as arguments. You do whatever changes you want on the second argument and return it.
-    
-    - ServerRecordWins
-
-This is the default. It considers the server record as the true record.
-
-- ClientRecordWins
-
-This considers the client record as the true record.
-
-## How to use
-
-- Declare a SMStore type property in the class where your CoreData stack resides.
-```swift
-var smStore: SMStore
-```
-- For iOS9 and earlier, add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
-```swift
-SMStore.registerStoreClass()
-do
-{
-    self.smStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
-}
-```
-- For iOS10 using `NSPersistentContainer`:
-
-```swift
-lazy var persistentContainer: NSPersistentContainer = {
-    
-    SMStore.registerStoreClass()
+ # Seam3
  
-    let container = NSPersistentContainer(name: "Seam3Demo2")
-    
-    let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    
-    if let applicationDocumentsDirectory = urls.last {
-        
-        let url = applicationDocumentsDirectory.appendingPathComponent("SingleViewCoreData.sqlite")
-        
-        let storeDescription = NSPersistentStoreDescription(url: url)
-        
-        storeDescription.type = SMStore.type
-        
-        container.persistentStoreDescriptions=[storeDescription]
-        
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        return container
-    }
-    
-    fatalError("Unable to access documents directory")
-    
-}()
-```
-You can access the `SMStore` instance using:
-```
-self.smStore = container.persistentStoreCoordinator.persistentStores.first as? SMStore
-```
-- Enable Push Notifications for your app.
-    ![](http://s29.postimg.org/rb9vj0egn/Screen_Shot_2015_08_23_at_5_44_59_pm.png)
-    - Implement didReceiveRemoteNotification Method in your AppDelegate and call `handlePush` on the instance of SMStore created earlier.
-    ```swift
-func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject])
-{
-    self.smStore?.handlePush(userInfo: userInfo)
-}
-```
-*/
+ Seam3 is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle.
+ All you have to do is use it as a store type for your CoreData store.
+ Local caching and sync is taken care of.
+ 
+ Seam3 is based on [Seam](https://github.com/nofelmahmood/Seam) by [nofelmahmood](https://github.com/nofelmahmood)
+ 
+ Changes in Seam3 include:
+ 
+ * Corrects one-to-many and many-to-one relationship mapping between CoreData and CloudKit
+ * Adds mapping between binary attributes in CoreData and CKAssets in CloudKit (Not yet :( )
+ * Code updates for Swift 3.0 and iOS 10
+ * Restructures code to eliminate the use of global variables
+ 
+ ## CoreData to CloudKit
+ 
+ ### Attributes
+ 
+ | CoreData  | CloudKit |
+ | ------------- | ------------- |
+ | NSDate    | Date/Time
+ | NSData | Bytes
+ | NSString  | String   |
+ | Integer16 | Int(64) |
+ | Integer32 | Int(64) |
+ | Integer64 | Int(64) |
+ | Decimal | Double |
+ | Float | Double |
+ | Boolean | Int(64) |
+ | NSManagedObject | Reference |
+ 
+ **In the table above :** `Integer16`, `Integer32`, `Integer64`, `Decimal`, `Float` and `Boolean` are referring to the instance of `NSNumber` used
+ to represent them in CoreData Models. `NSManagedObject` refers to a `to-one relationship` in a CoreData Model.
+ 
+ ### Relationships
+ 
+ | CoreData Relationship  | Translation on CloudKit |
+ | ------------- | ------------- |
+ | To - one    | To one relationships are translated as CKReferences on the CloudKit Servers.|
+ | To - many    | To many relationships are not explicitly created. Seam only creates and manages to-one relationships on the CloudKit Servers. <br/> <strong>Example</strong> -> If an Employee has a to-one relationship to Department and Department has a to-many relationship to Employee than Seam will only create the former on the CloudKit Servers. It will fullfil the later by using the to-one relationship. If all employees of a department are accessed Seam will fulfil it by fetching all the employees that belong to that particular department.|
+ 
+ <strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and corruption of data can possibly occur.
+ 
+ ## Sync
+ 
+ Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing the following two notifications.
+ - SMStoreDidStartSyncOperationNotification
+ - SMStoreDidFinishSyncOperationNotification
+ 
+ #### Resolution Policies
+ In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
+ 
+ - ClientTellsWhichWins
+ 
+ This policy requires you to set syncConflictResolutionBlock block of SMStore. You get both versions of the record as arguments. You do whatever changes you want on the second argument and return it.
+ 
+ - ServerRecordWins
+ 
+ This is the default. It considers the server record as the true record.
+ 
+ - ClientRecordWins
+ 
+ This considers the client record as the true record.
+ 
+ ## How to use
+ 
+ - Declare a SMStore type property in the class where your CoreData stack resides.
+ ```swift
+ var smStore: SMStore
+ ```
+ - For iOS9 and earlier, add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
+ ```swift
+ SMStore.registerStoreClass()
+ do
+ {
+ self.smStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
+ }
+ ```
+ - For iOS10 using `NSPersistentContainer`:
+ 
+ ```swift
+ lazy var persistentContainer: NSPersistentContainer = {
+ 
+ SMStore.registerStoreClass()
+ 
+ let container = NSPersistentContainer(name: "Seam3Demo2")
+ 
+ let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+ 
+ if let applicationDocumentsDirectory = urls.last {
+ 
+ let url = applicationDocumentsDirectory.appendingPathComponent("SingleViewCoreData.sqlite")
+ 
+ let storeDescription = NSPersistentStoreDescription(url: url)
+ 
+ storeDescription.type = SMStore.type
+ 
+ container.persistentStoreDescriptions=[storeDescription]
+ 
+ container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+ if let error = error as NSError? {
+ // Replace this implementation with code to handle the error appropriately.
+ // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+ 
+ /*
+ Typical reasons for an error here include:
+ * The parent directory does not exist, cannot be created, or disallows writing.
+ * The persistent store is not accessible, due to permissions or data protection when the device is locked.
+ * The device is out of space.
+ * The store could not be migrated to the current model version.
+ Check the error message to determine what the actual problem was.
+ */
+ fatalError("Unresolved error \(error), \(error.userInfo)")
+ }
+ })
+ return container
+ }
+ 
+ fatalError("Unable to access documents directory")
+ 
+ }()
+ ```
+ You can access the `SMStore` instance using:
+ ```
+ self.smStore = container.persistentStoreCoordinator.persistentStores.first as? SMStore
+ ```
+ - Enable Push Notifications for your app.
+ ![](http://s29.postimg.org/rb9vj0egn/Screen_Shot_2015_08_23_at_5_44_59_pm.png)
+ - Implement didReceiveRemoteNotification Method in your AppDelegate and call `handlePush` on the instance of SMStore created earlier.
+ ```swift
+ func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject])
+ {
+ self.smStore?.handlePush(userInfo: userInfo)
+ }
+ ```
+ */
 
 import CoreData
 import CloudKit
@@ -223,25 +223,25 @@ open class SMStore: NSIncrementalStore {
     
     public static let SMStoreSyncConflictResolutionPolicyOption = "SMStoreSyncConflictResolutionPolicyOption"
     public static let SMStoreErrorDomain = "SMStoreErrorDomain"
- 
+    
     /**
-    The default Cloud Kit container is named using your app or application's *bundle identifier*.  If you want to share Cloud Kit data between apps on different platforms (e.g. iOS and macOS) then you need to use a named Cloud Kit container.  You can specify a cloud kit container when you create your SMStore instance.
-    
-    On iOS10, specify the `SMStore.SMStoreContainerOption` using the `NSPersistentStoreDescription` object
-    
-    ```
-    let storeDescription = NSPersistentStoreDescription(url: url)
-    storeDescription.type = SMStore.type
-    storeDescription.setOption("iCloud.org.cocoapods.demo.Seam3-Example" as NSString, forKey: SMStore.SMStoreContainerOption)
-    ```
-    
-    On iOS9 and macOS specify an options dictionary to the persistent store coordinator
-    
-    ```
-    let options:[String:Any] = [SMStore.SMStoreContainerOption:"iCloud.org.cocoapods.demo.Seam3-Example"]
-    self.smStore = try coordinator!.addPersistentStore(ofType: SMStore.type, configurationName: nil, at: url, options: options) as? SMStore
-    ```
-    */
+     The default Cloud Kit container is named using your app or application's *bundle identifier*.  If you want to share Cloud Kit data between apps on different platforms (e.g. iOS and macOS) then you need to use a named Cloud Kit container.  You can specify a cloud kit container when you create your SMStore instance.
+     
+     On iOS10, specify the `SMStore.SMStoreContainerOption` using the `NSPersistentStoreDescription` object
+     
+     ```
+     let storeDescription = NSPersistentStoreDescription(url: url)
+     storeDescription.type = SMStore.type
+     storeDescription.setOption("iCloud.org.cocoapods.demo.Seam3-Example" as NSString, forKey: SMStore.SMStoreContainerOption)
+     ```
+     
+     On iOS9 and macOS specify an options dictionary to the persistent store coordinator
+     
+     ```
+     let options:[String:Any] = [SMStore.SMStoreContainerOption:"iCloud.org.cocoapods.demo.Seam3-Example"]
+     self.smStore = try coordinator!.addPersistentStore(ofType: SMStore.type, configurationName: nil, at: url, options: options) as? SMStore
+     ```
+     */
     public static let SMStoreContainerOption = "SMStoreContainerOption"
     
     static let SMStoreCloudStoreCustomZoneName = "SMStoreCloudStore_CustomZone"
@@ -278,13 +278,13 @@ open class SMStore: NSIncrementalStore {
     
     /// Initialize this store
     /// -SeeAlso: `NSIncrementalStore.initialize`
-  /*  override open class func initialize() {
-        NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: self.type)
-    }*/
+    /*  override open class func initialize() {
+     NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: self.type)
+     }*/
     
     /**
-      You must call this function to register the SMStore class before attempting 
-      to create a store 
+     You must call this function to register the SMStore class before attempting
+     to create a store
      */
     
     public class func registerStoreClass() {
@@ -302,7 +302,7 @@ open class SMStore: NSIncrementalStore {
     /// - returns: A new store object, associated with coordinator, that represents a persistent store at url using the options in options and—if it is not nil—the managed object model configuration configurationName.
     
     override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator?, configurationName name: String?, at url: URL, options: [AnyHashable: Any]?) {
-       
+        
         if let opts = options {
             
             if let containerIdentifier = opts[SMStore.SMStoreContainerOption] as? String {
@@ -344,7 +344,7 @@ open class SMStore: NSIncrementalStore {
     /// Instructs the receiver to load its metadata.
     /// - returns: `true` if the metadata was loaded correctly, otherwise `false`.
     /// - throws: An `SMStoreError` if the backing store could not be created
-
+    
     override open func loadMetadata() throws {
         self.metadata=[
             NSStoreUUIDKey: ProcessInfo().globallyUniqueString,
@@ -357,7 +357,7 @@ open class SMStore: NSIncrementalStore {
     /// Reset the backing store.  This function should be called where the local store should be cleared prior to a re-sync from the cloud.  E.g. Where a change in CloudKit user has been identified.
     /// - throws: An `SMStoreError` if the backing store could not be reset
     public func resetBackingStore() throws {
-       
+        
         guard let backingMOM = self.backingModel() else {
             throw SMStoreError.backingStoreResetFailed
         }
@@ -383,7 +383,7 @@ open class SMStore: NSIncrementalStore {
     /// - parameter completionHandler: A closure to be invoked with the result of the Cloud Kit operations
     /// - parameter status: The current Cloud Kit authentication status
     /// - parameter error: Any error that resulted from the operation
-
+    
     
     @available(*,deprecated:1.0.7, message:"Use verifyCloudKitConnectionAndUser")
     open func verifyCloudKitConnection(_ completionHandler: ((_ status: CKAccountStatus, _ error: Error?) -> Void )?) -> Void {
@@ -398,11 +398,11 @@ open class SMStore: NSIncrementalStore {
         }
     }
     
-    /// Verify that Cloud Kit is connected and return a user identifier for the current Cloud 
+    /// Verify that Cloud Kit is connected and return a user identifier for the current Cloud
     /// Kit user
     /// - parameter completionHandler: A closure to be invoked with the result of the Cloud Kit operations
     /// - parameter status: The current Cloud Kit authentication status
-    /// - parameter userIdentifier: An identifier for the current Cloud Kit user.  
+    /// - parameter userIdentifier: An identifier for the current Cloud Kit user.
     ///   Note that this is not a userid or email address, merely a unique identifier
     /// - parameter error: Any error that resulted from the operation
     
@@ -428,7 +428,7 @@ open class SMStore: NSIncrementalStore {
         }
     }
     
-    /// Trigger a sync operation.  
+    /// Trigger a sync operation.
     /// - parameter complete: If `true` then all records are retrieved from Cloud Kit.  If `false` then only changes since the last sync are fetched
     
     open func triggerSync(complete: Bool = false) {
@@ -438,7 +438,7 @@ open class SMStore: NSIncrementalStore {
     }
     
     private func triggerSync(block: Bool, complete: Bool = false) {
-    
+        
         guard self.cloudKitValid else {
             NSLog("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
             return
@@ -458,7 +458,7 @@ open class SMStore: NSIncrementalStore {
         let syncOperationBlock = {
             self.syncOperation = SMStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, entitiesToSync: self.entitiesToParticipateInSync()!, conflictPolicy: self.cksStoresSyncConflictPolicy, database: self.database)
             self.syncOperation!.syncConflictResolutionBlock = self.recordConflictResolutionBlock
-    
+            
             self.syncOperation!.syncCompletionBlock =  { error in
                 if let error = error {
                     print("Sync unsuccessful \(error)")
@@ -550,7 +550,11 @@ open class SMStore: NSIncrementalStore {
     override open func execute(_ request: NSPersistentStoreRequest, with context: NSManagedObjectContext?) throws -> Any {
         if request.requestType == NSPersistentStoreRequestType.fetchRequestType {
             let fetchRequest = request as! NSFetchRequest<NSFetchRequestResult>
-            return try self.executeInResponseToFetchRequest(fetchRequest, context: context!)
+            if fetchRequest.resultType == .countResultType {
+                return try self.executeInResponseToCountFetchRequest(fetchRequest, context: context!)
+            } else {
+                return try self.executeInResponseToFetchRequest(fetchRequest, context: context!)
+          }
         } else if request.requestType == NSPersistentStoreRequestType.saveRequestType {
             let saveChangesRequest: NSSaveChangesRequest = request as! NSSaveChangesRequest
             return try self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context!)
@@ -586,7 +590,7 @@ open class SMStore: NSIncrementalStore {
                 if let identifier = managedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String {
                     if let targetEntity = targetEntities[managedObject.entity.name!] {
                         let objID = self.newObjectID(for: targetEntity, referenceObject:identifier)
-
+                        
                         backingObjectValues[key] = objID
                     }
                 }
@@ -663,7 +667,7 @@ open class SMStore: NSIncrementalStore {
         return [NSManagedObjectID]()
     }
     
-
+    
     override open func obtainPermanentIDs(for array: [NSManagedObject]) throws -> [NSManagedObjectID] {
         return array.map { object in
             let insertedObject:NSManagedObject = object as NSManagedObject
@@ -686,6 +690,11 @@ open class SMStore: NSIncrementalStore {
             })
         }
         return []
+    }
+    
+    func executeInResponseToCountFetchRequest(_ fetchRequest:NSFetchRequest<NSFetchRequestResult>,context:NSManagedObjectContext) throws ->[Int] {
+        let resultsFromLocalStore = try self.backingMOC.count(for:fetchRequest)
+        return [resultsFromLocalStore]
     }
     
     // MARK : SaveChanges Request
@@ -751,20 +760,20 @@ open class SMStore: NSIncrementalStore {
     
     func insertObjectsInBackingStore(objectsToInsert objects:Set<NSObject>, mainContext: NSManagedObjectContext) throws -> Void {
         for object in objects {
-                
-                let sourceObject: NSManagedObject = object as! NSManagedObject
-                let managedObject:NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: (sourceObject.entity.name)!, into: self.backingMOC) as NSManagedObject
-                let keys = Array(sourceObject.entity.attributesByName.keys)
-                let dictionary = sourceObject.dictionaryWithValues(forKeys: keys)
-                managedObject.setValuesForKeys(dictionary)
-                let referenceObject: String = self.referenceObject(for: sourceObject.objectID) as! String
-                managedObject.setValue(referenceObject, forKey: SMStore.SMLocalStoreRecordIDAttributeName)
-                mainContext.willChangeValue(forKey: "objectID")
-                try mainContext.obtainPermanentIDs(for: [sourceObject])
-                mainContext.didChangeValue(forKey: "objectID")
-                SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
-                try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
-                try self.backingMOC.saveIfHasChanges()
+            
+            let sourceObject: NSManagedObject = object as! NSManagedObject
+            let managedObject:NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: (sourceObject.entity.name)!, into: self.backingMOC) as NSManagedObject
+            let keys = Array(sourceObject.entity.attributesByName.keys)
+            let dictionary = sourceObject.dictionaryWithValues(forKeys: keys)
+            managedObject.setValuesForKeys(dictionary)
+            let referenceObject: String = self.referenceObject(for: sourceObject.objectID) as! String
+            managedObject.setValue(referenceObject, forKey: SMStore.SMLocalStoreRecordIDAttributeName)
+            mainContext.willChangeValue(forKey: "objectID")
+            try mainContext.obtainPermanentIDs(for: [sourceObject])
+            mainContext.didChangeValue(forKey: "objectID")
+            SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
+            try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
+            try self.backingMOC.saveIfHasChanges()
         }
     }
     
