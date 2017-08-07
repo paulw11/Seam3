@@ -78,6 +78,8 @@
  - SMStoreDidStartSyncOperationNotification
  - SMStoreDidFinishSyncOperationNotification
  
+ If an error occurred during the sync operation, then the `userInfo` property of the `SMStoreDidFinishSyncOperationNotification` notification will contain an `Error` object for the key `SMStore.SMStoreErrorDomain`
+ 
  #### Resolution Policies
  In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
  
@@ -461,9 +463,9 @@ open class SMStore: NSIncrementalStore {
             
             self.syncOperation!.syncCompletionBlock =  { error in
                 if let error = error {
-                    print("Sync unsuccessful \(error)")
+                    print("Sync unsuccessful \(error.localizedDescription)")
                     OperationQueue.main.addOperation {
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: error.userInfo)
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                     }
                 } else {
                     print("Sync performed successfully")

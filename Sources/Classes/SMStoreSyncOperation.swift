@@ -39,6 +39,21 @@ enum SMSyncOperationError: Error {
     case unknownError
 }
 
+extension SMSyncOperationError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .localChangesFetchError:
+            return NSLocalizedString("Failed to fetch local changes.", comment: "localChangesFetchError")
+        case .conflictsDetected(let records):
+            return String(format:NSLocalizedString("%d conflicted records detected.", comment: "conflictsDetected"),records.count)
+        case .missingReferences(let records):
+            return String(format:NSLocalizedString("%d records with missing references.", comment: "conflictsDetected"),records.count)
+        case .unknownError:
+            return NSLocalizedString("Unknown Seam3 error.", comment: "unknownError")
+        }
+    }
+}
+
 class SMStoreSyncOperation: Operation {
     
     static let SMStoreSyncOperationErrorDomain = "SMStoreSyncOperationDomain"
@@ -236,7 +251,7 @@ class SMStoreSyncOperation: Operation {
                     
                     if let clientRecord = clientServerCKRecord.clientRecord {
                         clientServerCKRecord.serverRecord = clientRecord
-                    } 
+                    }
                     
                 case .serverRecordWins:
                     print("Resolving conflict in favour of server")
@@ -360,11 +375,13 @@ class SMStoreSyncOperation: Operation {
             }
         }
         
-        
-        if retryCount < self.RETRYLIMIT && !deferredRecords.isEmpty {
-            try self.insertOrUpdateManagedObjects(fromCKRecords: deferredRecords, retryCount:retryCount+1)
-        } else {
-            throw SMSyncOperationError.missingReferences(referringRcords: deferredRecords)
+        if !deferredRecords.isEmpty {
+            
+            if retryCount < self.RETRYLIMIT  {
+                try self.insertOrUpdateManagedObjects(fromCKRecords: deferredRecords, retryCount:retryCount+1)
+            } else {
+                throw SMSyncOperationError.missingReferences(referringRcords: deferredRecords)
+            }
         }
     }
     
