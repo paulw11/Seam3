@@ -56,6 +56,8 @@ Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you kn
 - SMStoreDidStartSyncOperationNotification
 - SMStoreDidFinishSyncOperationNotification
 
+If an error occurred during the sync operation, then the `userInfo` property of the `SMStoreDidFinishSyncOperationNotification` notification will contain an `Error` object for the key `SMStore.SMStoreErrorDomain`
+
 #### Conflict Resolution Policies
 In case of any sync conflicts, Seam exposes 3 conflict resolution policies.
 
