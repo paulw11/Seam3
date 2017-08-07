@@ -42,7 +42,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String : Any]) {
-        print("Recieved push")
+        print("Received push")
         self.smStore?.handlePush(userInfo: userInfo)
     }
     
