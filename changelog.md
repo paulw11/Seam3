@@ -1,6 +1,11 @@
 Seam3 Changelog
 ===============
 
+# [1.2.4]
+ - Fix infinite loop when reference is missing in cloudkit - #29
+ - Include `Error` in sync complete notification `userInfo`
+ - Add description of sync errors
+
 # [1.2.3]
  - Fix crash when `count` is invoked against a seam3 backed `NSManagedObjectContext` - Fix #20
  - Fix potential crash due to a race condition with a remotely deleted object Fix #21
