@@ -35,6 +35,7 @@ import CoreData
 enum SMSyncOperationError: Error {
     case localChangesFetchError
     case conflictsDetected(conflictedRecords: [CKRecord])
+    case missingReferences(referringRcords: [CKRecord])
     case unknownError
 }
 
@@ -48,6 +49,7 @@ class SMStoreSyncOperation: Operation {
     fileprivate var persistentStoreCoordinator: NSPersistentStoreCoordinator?
     fileprivate var entities: Array<NSEntityDescription>
     fileprivate var database: CKDatabase?
+    fileprivate let RETRYLIMIT = 5
     var syncConflictPolicy: SMSyncConflictResolutionPolicy
     var syncCompletionBlock: ((_ syncError:NSError?) -> ())?
     var syncConflictResolutionBlock: ((_ clientRecord:CKRecord,_ serverRecord:CKRecord)->CKRecord)?
@@ -343,7 +345,7 @@ class SMStoreSyncOperation: Operation {
         return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,moreComing)
     }
     
-    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>, retry: Bool = true) throws {
+    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>, retryCount: Int = 0) throws {
         var deferredRecords = [CKRecord]()
         for record in ckRecords {
             var success = false
@@ -358,8 +360,11 @@ class SMStoreSyncOperation: Operation {
             }
         }
         
-        if retry && !deferredRecords.isEmpty {
-            try self.insertOrUpdateManagedObjects(fromCKRecords: deferredRecords, retry:true)
+        
+        if retryCount < self.RETRYLIMIT && !deferredRecords.isEmpty {
+            try self.insertOrUpdateManagedObjects(fromCKRecords: deferredRecords, retryCount:retryCount+1)
+        } else {
+            throw SMSyncOperationError.missingReferences(referringRcords: deferredRecords)
         }
     }
     
