@@ -10,7 +10,7 @@ import Cocoa
 import Seam3
 
 class EventTableViewController: NSViewController {
-
+    
     @IBOutlet weak var tableview: NSTableView!
     
     var managedObjectContext: NSManagedObjectContext!
@@ -27,7 +27,7 @@ class EventTableViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
-        appDelegate = NSApplication.shared().delegate as! AppDelegate
+        appDelegate = NSApplication.shared.delegate as! AppDelegate
         self.managedObjectContext = appDelegate.managedObjectContext
         
         self.loadData()
@@ -35,7 +35,7 @@ class EventTableViewController: NSViewController {
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: nil, queue: nil) { notification in
             
             if notification.userInfo != nil {
-                let appDelegate = NSApplication.shared().delegate as! AppDelegate
+                let appDelegate = NSApplication.shared.delegate as! AppDelegate
                 appDelegate.smStore?.triggerSync(complete: true)
             }
             
@@ -78,7 +78,7 @@ class EventTableViewController: NSViewController {
                 newEvent = NSEntityDescription.insertNewObject(forEntityName: "Event", into: context) as! Event
             }
             
-            newEvent.timestamp = NSDate()
+            newEvent.timestamp = NSDate() as Date
             newEvent.creatingDevice = self.appDelegate.device
             // Save the context.
             do {
@@ -103,11 +103,12 @@ extension EventTableViewController: NSTableViewDataSource {
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
         let event = self.events![row]
         if tableColumn == tableView.tableColumns[0] {
-            let dateString = self.dateFormatter.string(from: event.timestamp as Date?)
-            return dateString
-        } else {
-            return "\(event.intAttribute)"
+            if let timestamp = event.timestamp  {
+                let dateString = self.dateFormatter.string(from: timestamp)
+                return dateString
+            }
         }
+        return "\(event.intAttribute)"
     }
     
 }

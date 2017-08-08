@@ -19,7 +19,7 @@ class DeviceTableViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
-        let appDelegate = NSApplication.shared().delegate as! AppDelegate
+        let appDelegate = NSApplication.shared.delegate as! AppDelegate
         self.managedObjectContext = appDelegate.managedObjectContext
         
         self.loadData()
@@ -27,7 +27,7 @@ class DeviceTableViewController: NSViewController {
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: nil, queue: nil) { notification in
             
             if notification.userInfo != nil {
-                let appDelegate = NSApplication.shared().delegate as! AppDelegate
+                let appDelegate = NSApplication.shared.delegate as! AppDelegate
                 appDelegate.smStore?.triggerSync(complete: true)
             }
             
