@@ -1,6 +1,12 @@
 Seam3 Changelog
 ===============
 
+# [1.2.6]
+ - Fix documentation for iOS 9
+
+# [1.2.5]
+ - Not released
+
 # [1.2.4]
  - Fix infinite loop when reference is missing in cloudkit - #29
  - Include `Error` in sync complete notification `userInfo`
