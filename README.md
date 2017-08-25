@@ -79,13 +79,13 @@ This considers the client record as the true record.
 ```swift
 var smStore: SMStore
 ```
-- For iOS9 and earlier or macOS, add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
+- For iOS9 and earlier or macOS, add a store type of `SMStore.type` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
 ```swift
 
 SMStore.registerStoreClass()
 do 
 {
-   self.smStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
+   self.smStore = try coordinator.addPersistentStoreWithType(SMStore.type, configuration: nil, URL: url, options: nil) as? SMStore
 }
 ```
 - For iOS10 using `NSPersistentContainer`:
