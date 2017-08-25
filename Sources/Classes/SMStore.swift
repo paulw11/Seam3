@@ -445,9 +445,7 @@ open class SMStore: NSIncrementalStore {
             NSLog("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
             return
         }
-        
-        UIBackgroundTaskInvalid
-        
+                
         if block == false {
             guard self.operationQueue?.operationCount == 0 else {
                 print("Aborting sync; operation in progress")
