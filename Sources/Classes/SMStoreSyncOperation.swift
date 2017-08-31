@@ -34,7 +34,7 @@ import CoreData
 
 enum SMSyncOperationError: Error {
     case localChangesFetchError
-    case conflictsDetected(conflictedRecords: [CKRecord])
+    case conflictsDetected(conflictedRecords: [SeamConflictedRecord])
     case missingReferences(referringRcords: [CKRecord])
     case unknownError
 }
@@ -54,6 +54,13 @@ extension SMSyncOperationError: LocalizedError {
     }
 }
 
+public struct SeamConflictedRecord {
+    var serverRecord: CKRecord
+    var clientRecord: CKRecord
+    var clientAncestorRecord: CKRecord
+}
+
+
 class SMStoreSyncOperation: Operation {
     
     static let SMStoreSyncOperationErrorDomain = "SMStoreSyncOperationDomain"
@@ -67,7 +74,8 @@ class SMStoreSyncOperation: Operation {
     fileprivate let RETRYLIMIT = 5
     var syncConflictPolicy: SMSyncConflictResolutionPolicy
     var syncCompletionBlock: ((_ syncError:NSError?) -> ())?
-    var syncConflictResolutionBlock: ((_ clientRecord:CKRecord,_ serverRecord:CKRecord)->CKRecord)?
+    
+    var syncConflictResolutionBlock: SMStore.SMStoreConflictResolutionBlock?
     
     init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy = .serverRecordWins, database: CKDatabase?) {
         self.persistentStoreCoordinator = persistentStoreCoordinator
@@ -105,7 +113,7 @@ class SMStoreSyncOperation: Operation {
             try SMStoreChangeSetHandler.defaultHandler.removeAllQueuedChangeSets(backingContext: self.localStoreMOC!)
             return
         } catch SMSyncOperationError.conflictsDetected(let conflictedRecords) {
-            let resolvedRecords = self.resolveConflicts(conflictedRecords: conflictedRecords)
+            let resolvedRecords = self.resolveConflicts(conflictedRecords)
             var insertedOrUpdatedCKRecordsWithRecordIDStrings: Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
             for record in localChangesInServerRepresentation.insertedOrUpdatedCKRecords! {
                 let ckRecord: CKRecord = record as CKRecord
@@ -168,19 +176,37 @@ class SMStoreSyncOperation: Operation {
         let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: Array(changedRecords.values), recordIDsToDelete: deletedCKRecordIDs)
         ckModifyRecordsOperation.database = self.database
         let savedRecords: [CKRecord] = [CKRecord]()
-        var conflictedRecords: [CKRecord] = [CKRecord]()
+        var conflictedRecords = [SeamConflictedRecord]()
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
             if operationError != nil {
-                print("Operation error \(operationError!)")
+                if let error = operationError as? CKError {
+                    if let recordErrors = error.userInfo[CKPartialErrorsByItemIDKey] as? [CKRecordID:CKError] {
+                        for recordError in recordErrors.values {
+                            if recordError.code != CKError.serverRecordChanged {
+                                print("Operation error:\(recordError)")
+                            }
+                        }
+                    }
+                } else {
+                    print("Operation error \(operationError!)")
+                }
             }
         })
         ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,operationError)->Void in
             
-            let error:NSError? = operationError as NSError?
-            if error != nil && error!.code == CKError.serverRecordChanged.rawValue
-            {
-                print("Conflicted Record \(error!)", terminator: "\n")
-                conflictedRecords.append(ckRecord)
+            guard let error = operationError as? CKError else {
+                return
+            }
+            
+            if error.code == CKError.serverRecordChanged {
+                guard let serverRecord = error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord,
+                    let clientRecord = error.userInfo[CKRecordChangedErrorClientRecordKey] as? CKRecord,
+                    let ancestorRecord = error.userInfo[CKRecordChangedErrorAncestorRecordKey] as? CKRecord
+                    else {
+                        return
+                }
+                let conflict = SeamConflictedRecord(serverRecord: serverRecord, clientRecord: clientRecord, clientAncestorRecord: ancestorRecord)
+                conflictedRecords.append(conflict)
             }
         })
         self.operationQueue.addOperation(ckModifyRecordsOperation)
@@ -207,73 +233,42 @@ class SMStoreSyncOperation: Operation {
         }
     }
     
-    func resolveConflicts(conflictedRecords: [CKRecord]) -> [CKRecord]
+    fileprivate func resolveConflicts(_ conflictedRecords: [SeamConflictedRecord]) -> [CKRecord]
     {
         var finalCKRecords: [CKRecord] = [CKRecord]()
-        if conflictedRecords.count > 0 {
-            var conflictedRecordsWithStringRecordIDs: Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)> = Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)>()
-            for record in conflictedRecords {
-                conflictedRecordsWithStringRecordIDs[record.recordID.recordName] = (record,nil)
-            }
-            let ckFetchRecordsOperation:CKFetchRecordsOperation = CKFetchRecordsOperation(recordIDs: conflictedRecords.map({(object)-> CKRecordID in
-                let ckRecord:CKRecord = object as CKRecord
-                return ckRecord.recordID
-            }))
+        
+        for conflict in conflictedRecords {
+            let serverRecord = conflict.serverRecord
+            let clientRecord = conflict.clientRecord
+            let ancestorRecord = conflict.clientAncestorRecord
             
-            ckFetchRecordsOperation.database = database
-            
-            ckFetchRecordsOperation.perRecordCompletionBlock = ({(record,recordID,error)->Void in
-                if error == nil {
-                    let ckRecord: CKRecord? = record
-                    let ckRecordID: CKRecordID? = recordID
-                    if conflictedRecordsWithStringRecordIDs[ckRecordID!.recordName] != nil {
-                        conflictedRecordsWithStringRecordIDs[ckRecordID!.recordName] = (conflictedRecordsWithStringRecordIDs[ckRecordID!.recordName]!.clientRecord,ckRecord)
-                    }
-                }
-            })
-            self.operationQueue?.addOperation(ckFetchRecordsOperation)
-            self.operationQueue?.waitUntilAllOperationsAreFinished()
-            
-            for key in Array(conflictedRecordsWithStringRecordIDs.keys) {
-                let value = conflictedRecordsWithStringRecordIDs[key]!
-                var clientServerCKRecord = value as (clientRecord:CKRecord?,serverRecord:CKRecord?)
+            switch self.syncConflictPolicy {
+            case .serverRecordWins:
+                finalCKRecords.append(conflict.serverRecord)
                 
-                switch self.syncConflictPolicy {
-                    
-                case .clientTellsWhichWins:
-                    if self.syncConflictResolutionBlock != nil {
-                        clientServerCKRecord.serverRecord = self.syncConflictResolutionBlock!(clientServerCKRecord.clientRecord!,clientServerCKRecord.serverRecord!)
-                    } else {
-                        print("ClientTellsWhichWins conflict resolution policy requires to set syncConflictResolutionBlock on the instance of SMStore.  Defaulting to serverRecordWins")
-                    }
-                    
-                case .clientRecordWins:
-                    
-                    if let clientRecord = clientServerCKRecord.clientRecord {
-                        clientServerCKRecord.serverRecord = clientRecord
-                    }
-                    
-                case .serverRecordWins:
-                    print("Resolving conflict in favour of server")
-                    if clientServerCKRecord.serverRecord == nil {
-                        if let clientRecord = clientServerCKRecord.clientRecord {
-                            do {
-                                try deleteManagedObjects(fromCKRecordIDs: [clientRecord.recordID])
-                            } catch {
-                                NSLog("Error deleting client record \(error)")
-                            }
-                            clientServerCKRecord.clientRecord = nil
-                        }
-                    }
+            case .clientRecordWins:
+                
+
+                for key in serverRecord.allKeys() {
+                    serverRecord[key] = clientRecord[key]
                 }
-                if let serverRecord = clientServerCKRecord.serverRecord {
-                    finalCKRecords.append(serverRecord)
-                } else if let clientRecord = clientServerCKRecord.clientRecord {
-                    finalCKRecords.append(clientRecord)
+                
+                finalCKRecords.append(conflict.serverRecord)
+                
+            case .clientTellsWhichWins:
+                guard let conflictResolutionBlock = self.syncConflictResolutionBlock else {
+                    fatalError("Conflict resolution policy .clientTellsWhichWins requires a syncConflictResolutionBlock")
                 }
+                
+                let updatedRecord = conflictResolutionBlock(serverRecord, clientRecord, ancestorRecord)
+                guard updatedRecord == serverRecord else {
+                    fatalError("Conflict resolution block must return serverRecord")
+                }
+                finalCKRecords.append(updatedRecord)
             }
-            
         }
+        
+        
         return finalCKRecords
     }
     
