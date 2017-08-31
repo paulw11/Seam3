@@ -1,6 +1,11 @@
 Seam3 Changelog
 ===============
 
+# [1.3.0]
+ - Fix #31 - Conflict resolution issues
+ - Fix #27 - Superfluous logging of conflicts that will be resolved by the framework
+ - New example code and documentation on conflict resolution
+
 # [1.2.6]
  - Fix documentation for iOS 9
 
