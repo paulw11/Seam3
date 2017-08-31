@@ -30,6 +30,7 @@
 
 import UIKit
 import CoreData
+import CloudKit
 import Seam3
 
 @UIApplicationMain
@@ -56,6 +57,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         application.registerForRemoteNotifications()
         
         self.smStore = container.persistentStoreCoordinator.persistentStores.first as? SMStore
+        
+        // Uncomment the following block to use `clientTellsWhichWins` conflict resolution
+        
+        /* self.smStore?.recordConflictResolutionBlock =  ({(serverRecord, clientRecord, ancestorRecord) -> CKRecord in
+         
+         if let serverInt = serverRecord["intAttribute"] as? NSNumber,
+         let clientInt = clientRecord["intAttribute"] as? NSNumber {
+         
+         if clientInt.intValue > serverInt.intValue {
+         serverRecord["intAttribute"] = clientInt
+         }
+         
+         }
+         
+         
+         return serverRecord
+         
+         } )*/
+        
         
         self.validateCloudKitAndSync() {
             let device = self.setupDeviceRecord()
@@ -221,7 +241,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             storeDescription.setOption("iCloud.org.cocoapods.demo.Seam3-Example" as NSString, forKey: SMStore.SMStoreContainerOption)
             
             // Uncomment next line for "client wins" conflict resolution policy
-            //         storeDescription.setOption(NSNumber(value:SMSyncConflictResolutionPolicy.clientRecordWins.rawValue), forKey:SMStore.SMStoreSyncConflictResolutionPolicyOption)
+            //storeDescription.setOption(NSNumber(value:SMSyncConflictResolutionPolicy.clientRecordWins.rawValue), forKey:SMStore.SMStoreSyncConflictResolutionPolicyOption)
+            
+            // Uncomment the next line for `clientTellsWhichWins` conflict resolution
+            
+            //   storeDescription.setOption(NSNumber(value:SMSyncConflictResolutionPolicy.clientTellsWhichWins.rawValue), forKey:SMStore.SMStoreSyncConflictResolutionPolicyOption)
             
             container.persistentStoreDescriptions=[storeDescription]
             
