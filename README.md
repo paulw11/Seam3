@@ -46,30 +46,30 @@ If a `Binary Data` attribute has the *Allows External Storage* option selected, 
 | CoreData Relationship  | Translation on CloudKit |
 | ------------- | ------------- |
 | To - one    | To one relationships are translated as CKReferences on the CloudKit Servers.|
-| To - many    | To many relationships are not explicitly created. Seam only creates and manages to-one relationships on the CloudKit Servers. <br/> <strong>Example</strong> -> If an Employee has a to-one relationship to Department and Department has a to-many relationship to Employee than Seam will only create the former on the CloudKit Servers. It will fullfil the later by using the to-one relationship. If all employees of a department are accessed Seam will fulfil it by fetching all the employees that belong to that particular department.|
+| To - many    | To many relationships are not explicitly created. Seam3 only creates and manages to-one relationships on the CloudKit Servers. <br/> <strong>Example</strong> -> If an Employee has a to-one relationship to Department and Department has a to-many relationship to Employee than Seam3 will only create the former on the CloudKit Servers. It will fullfil the later by using the to-one relationship. If all employees of a department are accessed Seam3 will fulfil it by fetching all the employees that belong to that particular department.|
 
-<strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and corruption of data can possibly occur.
+<strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam3 wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and corruption of data can possibly occur.
 
 ## Sync
 
-Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing the following two notifications.
+Seam3 keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing the following two notifications.
 - SMStoreDidStartSyncOperationNotification
 - SMStoreDidFinishSyncOperationNotification
 
 If an error occurred during the sync operation, then the `userInfo` property of the `SMStoreDidFinishSyncOperationNotification` notification will contain an `Error` object for the key `SMStore.SMStoreErrorDomain`
 
 #### Conflict Resolution Policies
-In case of any sync conflicts, Seam exposes 3 conflict resolution policies.
+In case of any sync conflicts, Seam3 exposes 3 conflict resolution policies.
 
-- ClientTellsWhichWins
+- `clientTellsWhichWins`
 
-This policy requires you to set the `syncConflictResolutionBlock` property of your `SMStore`. The closure you specify will receive both versions of the record as arguments. Your closure must return the de-conflicted record.
+This policy requires you to set the `syncConflictResolutionBlock` property of your `SMStore`. The closure you specify will receive three `CKRecord` arguments; The first is the current server record.  The second is the current client record and the third is the client record before the most recent change.  Your closure must modify and return the server record that was passed as the first argument.
 
-- ServerRecordWins
+- `serverRecordWins`
 
 This is the default. It considers the server record as the true record.
 
-- ClientRecordWins
+- `clientRecordWins`
 
 This considers the client record as the true record.
 
