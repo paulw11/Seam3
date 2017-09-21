@@ -112,7 +112,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
     
 
-    func insertNewObject(_ sender: Any) {
+    @objc func insertNewObject(_ sender: Any) {
         if let context = self.managedObjectContext {
             let newEvent = Event(context: context)
             
