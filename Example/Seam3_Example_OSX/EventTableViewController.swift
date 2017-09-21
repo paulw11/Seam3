@@ -10,7 +10,7 @@ import Cocoa
 import Seam3
 
 class EventTableViewController: NSViewController {
-
+    
     @IBOutlet weak var tableview: NSTableView!
     
     var managedObjectContext: NSManagedObjectContext!
@@ -103,8 +103,12 @@ extension EventTableViewController: NSTableViewDataSource {
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
         let event = self.events![row]
         if tableColumn == tableView.tableColumns[0] {
-            let dateString = self.dateFormatter.string(from: event.timestamp as Date?)
-            return dateString
+            if let date = event.timestamp as Date? {
+                let dateString = self.dateFormatter.string(from: date)
+                return dateString
+            } else {
+                return ""
+            }
         } else {
             return "\(event.intAttribute)"
         }
