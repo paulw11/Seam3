@@ -352,7 +352,7 @@ open class SMStore: NSIncrementalStore {
     override open func loadMetadata() throws {
         self.metadata=[
             NSStoreUUIDKey: ProcessInfo().globallyUniqueString,
-            NSStoreTypeKey: type(of: self).type
+            NSStoreTypeKey: Swift.type(of: self).type
         ]
         
         try self.createBackingStore()
@@ -712,7 +712,9 @@ open class SMStore: NSIncrementalStore {
         try self.updateObjectsInBackingStore(objectsToUpdate: context.updatedObjects)
         
         try self.backingMOC.saveIfHasChanges()
-        self.triggerSync()
+        if self.syncAutomatically {
+            self.triggerSync()
+        }
         return []
     }
     
