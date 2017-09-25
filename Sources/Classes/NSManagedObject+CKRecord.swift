@@ -68,6 +68,19 @@ extension NSManagedObject {
                     } else {
                         ckRecord.setObject(self.value(forKey: attrName) as! Data as CKRecordValue?, forKey: attrName)
                     }
+                case .transformableAttributeType:
+                  if attributeDescription.valueTransformerName == nil {
+                    if let value = self.value(forKey: attrName) as? NSCoding {
+                      let data = NSKeyedArchiver.archivedData(withRootObject: value)
+                      if attributeDescription.allowsExternalBinaryDataStorage {
+                        if let asset = self.createAsset(data: data) {
+                          ckRecord.setObject(asset, forKey:attrName)
+                        }
+                      } else {
+                        ckRecord.setObject(data as CKRecordValue?, forKey: attrName)
+                      }
+                    }
+                  }
                 default:
                     break
                 }
