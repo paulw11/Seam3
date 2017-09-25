@@ -109,8 +109,7 @@ class SMStoreChangeSetHandler {
     func modelForLocalStore(usingModel model: NSManagedObjectModel) -> NSManagedObjectModel {
         let backingModel: NSManagedObjectModel = model.copy() as! NSManagedObjectModel
         for entity in backingModel.entities {
-          let hasSuperEntity = entity.superentity != nil
-          if !hasSuperEntity {
+          if entity.superentity == nil {
             self.addExtraBackingStoreAttributes(toEntity: entity)
           }
         }
