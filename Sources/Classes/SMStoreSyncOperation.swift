@@ -351,6 +351,13 @@ class SMStoreSyncOperation: Operation {
                 print("No more records coming", terminator: "\n")
             }
             moreComing = fetchRecordChangesOperation.moreComing
+        } else {
+            if let error = syncOperationError as? CKError {
+                if error.code == .changeTokenExpired {
+                    SMServerTokenHandler.defaultHandler.delete()
+                    return self.fetchRecordChangesFromServer()
+                }
+            }
         }
         return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,moreComing)
     }
