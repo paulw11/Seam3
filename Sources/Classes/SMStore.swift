@@ -743,6 +743,8 @@ open class SMStore: NSIncrementalStore {
                 })
             case .countResultType:
                 return [resultsFromLocalStore.count]
+            default:
+                break
             }
         }
         return []
