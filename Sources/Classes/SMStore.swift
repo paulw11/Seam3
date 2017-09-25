@@ -381,6 +381,34 @@ open class SMStore: NSIncrementalStore {
 		
 		defaults.set(false, forKey:SMStore.SMStoreCloudStoreSubscriptionName)
 	}
+    
+    /// Retrieve an `NSPredicate` that will match the supplied `NSManagedObject`.
+    /// - parameter for: The name of the relationship that holds the reference to the target object
+    /// - parameter object: The related `NSManagedObject` to search for
+    /// - returns: An `NSPredicate` that will retrieve the supplied object.
+    
+    public func predicate(for relationship: String, referencing object: NSManagedObject) -> NSPredicate {
+        let recordID = self.referenceObject(for: object.objectID)
+        
+        let predicateObjectRecordIDKey = "objectRecordID"
+        let predicate: NSPredicate = NSPredicate(format: "%K == $objectRecordID", "\(relationship).sm_LocalStore_RecordID")
+        
+        return predicate.withSubstitutionVariables([predicateObjectRecordIDKey: recordID])
+    }
+    
+    /// Retrieve an `NSPredicate` that will match the supplied `NSManagedObject` in a to-many.
+    /// - parameter forToMany: The name of the to-many relationship that holds the reference to the target object
+    /// - parameter object: The related `NSManagedObject` to search for
+    /// - returns: An `NSPredicate` that will retrieve the supplied .
+    
+    public func predicate(forToMany relationship: String, referencing object: NSManagedObject) -> NSPredicate {
+        let recordID = self.referenceObject(for: object.objectID)
+        
+        let predicateObjectRecordIDKey = "objectRecordID"
+        let predicate: NSPredicate = NSPredicate(format: "%K CONTAINS $objectRecordID", "\(relationship).sm_LocalStore_RecordID")
+        
+        return predicate.withSubstitutionVariables([predicateObjectRecordIDKey: recordID])
+    }
 	
 	/// Verify that Cloud Kit is connected and return a connection status
 	/// - SeeAlso: `verifyCloudKitConnectionAndUser(_)`
