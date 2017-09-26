@@ -132,19 +132,44 @@ extension CKRecord {
     
                 
       
-    private func setValuesOn(_ managedObject: NSManagedObject, inContext context: NSManagedObjectContext ) throws {
-        managedObject.setValue(self.encodedSystemFields(), forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName)
-        if var valuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)  {
-            valuesDictionary = self.replaceAssets(in:valuesDictionary)
-            managedObject.setValuesForKeys(valuesDictionary)
-        }
-        let referencesValuesDictionary = try self.allCKReferencesAsManagedObjects(usingContext: context, forManagedObject: managedObject)
-        if referencesValuesDictionary != nil {
-            for (key,value) in referencesValuesDictionary! {
-                    managedObject.setValue(value, forKey: key)
-            }
-        }
+  private func setValuesOn(_ managedObject: NSManagedObject, inContext context: NSManagedObjectContext ) throws {
+    
+    let attributes = managedObject.entity.attributesByName
+    var transformableAttributeKeys = Set<String>()
+    for (key, attributeDescription) in attributes {
+      if attributeDescription.attributeType == NSAttributeType.transformableAttributeType {
+        transformableAttributeKeys.insert(key)
+      }
     }
+    managedObject.setValue(self.encodedSystemFields(), forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName)
+    if var valuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)  {
+      valuesDictionary = self.replaceAssets(in:valuesDictionary)
+      valuesDictionary = self.transformAttributes(in: valuesDictionary, keys: transformableAttributeKeys)
+      managedObject.setValuesForKeys(valuesDictionary)
+    }
+    let referencesValuesDictionary = try self.allCKReferencesAsManagedObjects(usingContext: context, forManagedObject: managedObject)
+    if referencesValuesDictionary != nil {
+      for (key,value) in referencesValuesDictionary! {
+        managedObject.setValue(value, forKey: key)
+      }
+    }
+  }
+  
+  private func transformAttributes(in dictionary: [String:AnyObject], keys: Set<String>) -> [String:AnyObject] {
+    
+    var returnDict = [String:AnyObject]()
+    for (key,value) in dictionary {
+      if keys.contains(key) {
+        if let data = dictionary[key] as? Data {
+          let unarchived = NSKeyedUnarchiver.unarchiveObject(with: data) as AnyObject
+          returnDict[key] = unarchived
+        }
+      } else {
+        returnDict[key] = value
+      }
+    }
+    return returnDict
+  }
     
     private func replaceAssets(in dictionary: [String:AnyObject]) -> [String:AnyObject] {
         var returnDict = [String:AnyObject]()
