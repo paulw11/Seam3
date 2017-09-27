@@ -216,8 +216,13 @@ public enum SMSyncConflictResolutionPolicy: Int16 {
  */
 
 open class SMStore: NSIncrementalStore {
+    
+    /// Default value of `syncAutomatically` assigned to new `SMStore` instances.
+    /// Defaults to `true`
+    public static var syncAutomatically: Bool = true
+    
     /// If true, a sync is triggered automatically when a save operation is performed against the store. Defaults to `true`
-    public var syncAutomatically: Bool = true
+    public var syncAutomatically: Bool = SMStore.syncAutomatically
     
     public typealias SMStoreConflictResolutionBlock = (_ clientRecord:CKRecord,_ serverRecord:CKRecord, _ ancestorRecord:CKRecord )->CKRecord
     
