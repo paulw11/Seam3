@@ -351,7 +351,7 @@ open class SMStore: NSIncrementalStore {
     
     override open func loadMetadata() throws {
         self.metadata=[
-            NSStoreUUIDKey: ProcessInfo().globallyUniqueString,
+            NSStoreUUIDKey: "A9909604-1EF0-4049-BD7F-2CF6AE3D3A6D",
             NSStoreTypeKey: Swift.type(of: self).type
         ]
         
