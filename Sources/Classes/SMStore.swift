@@ -824,7 +824,9 @@ open class SMStore: NSIncrementalStore {
     }
     
     func insertObjectsInBackingStore(objectsToInsert objects:Set<NSObject>, mainContext: NSManagedObjectContext) throws -> Void {
-        for object in objects {
+        let mobs = Array(objects) as! [NSManagedObject]
+        let sorted = SMObjectDependencyGraph(objects: mobs).sorted
+        for object in sorted {
             
             let sourceObject: NSManagedObject = object as! NSManagedObject
             let managedObject:NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: (sourceObject.entity.name)!, into: self.backingMOC) as NSManagedObject
