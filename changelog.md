@@ -1,6 +1,10 @@
 Seam3 Changelog
 ===============
 
+# [1.4.0]
+ - Fix #37 - Provide new functions for retrieving predicates that search relationships
+ - Fix #45 - Ensure migration works by using a fixed store identifier in metadata
+
 # [1.3.1]
  - Fix #32 - Conflict resolution issues
  - Fix #27 - Superfluous logging of conflicts that will be resolved by the framework
