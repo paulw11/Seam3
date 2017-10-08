@@ -828,7 +828,7 @@ open class SMStore: NSIncrementalStore {
         let sorted = SMObjectDependencyGraph(objects: mobs).sorted
         for object in sorted {
             
-            let sourceObject: NSManagedObject = object as! NSManagedObject
+            let sourceObject: NSManagedObject = object
             let managedObject:NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: (sourceObject.entity.name)!, into: self.backingMOC) as NSManagedObject
             let keys = Array(sourceObject.entity.attributesByName.keys)
             let dictionary = sourceObject.dictionaryWithValues(forKeys: keys)

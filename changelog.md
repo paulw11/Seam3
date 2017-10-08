@@ -1,7 +1,8 @@
 Seam3 Changelog
 ===============
 
-# [1.4.1]
+# [1.4.2]
+ - Include the ability to import object graphs
  - Fix #37 - Provide new functions for retrieving predicates that search relationships
  - Fix #45 - Ensure migration works by using a fixed store identifier in metadata
 

@@ -186,7 +186,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             fetchedDevice!.deviceID = deviceID
             let 🐱 = #imageLiteral(resourceName: "kitten")
             if let data = UIImageJPEGRepresentation(🐱, 0.5) {
-                fetchedDevice!.image = data as NSData
+                fetchedDevice!.image = data 
             }
             do {
                 try moc.save()
