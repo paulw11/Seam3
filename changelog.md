@@ -1,10 +1,11 @@
 Seam3 Changelog
 ===============
 
-# [1.4.2]
+# [1.4.3]
  - Include the ability to import object graphs
  - Fix #37 - Provide new functions for retrieving predicates that search relationships
  - Fix #45 - Ensure migration works by using a fixed store identifier in metadata
+ - Swift 4.0 support
 
 # [1.3.1]
  - Fix #32 - Conflict resolution issues
