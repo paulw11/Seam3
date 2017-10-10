@@ -68,6 +68,7 @@ class SMStoreSyncOperation: Operation {
     
     fileprivate var operationQueue: OperationQueue!
     fileprivate var localStoreMOC: NSManagedObjectContext!
+    fileprivate var backingMOC: NSManagedObjectContext
     fileprivate var persistentStoreCoordinator: NSPersistentStoreCoordinator?
     fileprivate var entities: Array<NSEntityDescription>
     fileprivate var database: CKDatabase?
@@ -77,11 +78,12 @@ class SMStoreSyncOperation: Operation {
     
     var syncConflictResolutionBlock: SMStore.SMStoreConflictResolutionBlock?
     
-    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy = .serverRecordWins, database: CKDatabase?) {
+  init(persistentStoreCoordinator:NSPersistentStoreCoordinator?, entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy = .serverRecordWins, database: CKDatabase?, backingMOC: NSManagedObjectContext) {
         self.persistentStoreCoordinator = persistentStoreCoordinator
         self.entities = entities
         self.database = database
         self.syncConflictPolicy = conflictPolicy
+        self.backingMOC = backingMOC
         super.init()
     }
     
@@ -92,6 +94,7 @@ class SMStoreSyncOperation: Operation {
         self.operationQueue.maxConcurrentOperationCount = 1
         self.localStoreMOC = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.privateQueueConcurrencyType)
         self.localStoreMOC.persistentStoreCoordinator = self.persistentStoreCoordinator
+        NotificationCenter.default.addObserver(self, selector: #selector(SMStoreSyncOperation.backingContextDidSave(notification:)), name: NSNotification.Name.NSManagedObjectContextDidSave, object: backingMOC)
         if let completionBlock = self.syncCompletionBlock {
             do {
                 try self.performSync()
@@ -101,6 +104,7 @@ class SMStoreSyncOperation: Operation {
                 print("Sync Performed with Error", terminator: "\n")
                 completionBlock(error)
             }
+            NotificationCenter.default.removeObserver(self)
         }
     }
     
@@ -409,5 +413,13 @@ class SMStoreSyncOperation: Operation {
             }
         }
         try self.localStoreMOC.saveIfHasChanges()
+    }
+  
+    // MARK: Prevent Conflicts
+    @objc func backingContextDidSave(notification: Notification) {
+      print("OK backingContextDidSave")
+      self.localStoreMOC.performAndWait {
+        self.localStoreMOC.mergeChanges(fromContextDidSave: notification)
+      }
     }
 }
