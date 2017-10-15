@@ -62,7 +62,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             var completeSync = true
             
             let previousUser = UserDefaults.standard.string(forKey: "CloudKitUser")
-            if  previousUser != currentUser {
+            if  previousUser != currentUser && previousUser != nil {
                 do {
                     print("New user")
                     try self.smStore?.resetBackingStore()
