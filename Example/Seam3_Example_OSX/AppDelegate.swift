@@ -61,15 +61,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             var completeSync = true
             
-            let previousUser = UserDefaults.standard.string(forKey: "CloudKitUser")
-            if  previousUser != currentUser {
-                do {
-                    print("New user")
-                    try self.smStore?.resetBackingStore()
-                    completeSync = true
-                } catch {
-                    NSLog("Error resetting backing store - \(error.localizedDescription)")
-                    return
+            if let previousUser = UserDefaults.standard.string(forKey: "CloudKitUser") {
+                if  previousUser != currentUser {
+                    do {
+                        print("New user")
+                        try self.smStore?.resetBackingStore()
+                        completeSync = true
+                    } catch {
+                        NSLog("Error resetting backing store - \(error.localizedDescription)")
+                        return
+                    }
                 }
             }
             

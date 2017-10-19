@@ -99,14 +99,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                 return
             }
             
-            let previousUser = UserDefaults.standard.string(forKey: "CloudKitUser")
-            if  previousUser != currentUser {
-                do {
-                    print("New user")
-                    try self.smStore?.resetBackingStore()
-                } catch {
-                    NSLog("Error resetting backing store - \(error.localizedDescription)")
-                    return
+            if let previousUser = UserDefaults.standard.string(forKey: "CloudKitUser") {
+                if  previousUser != currentUser  {
+                    do {
+                        print("New user")
+                        try self.smStore?.resetBackingStore()
+                    } catch {
+                        NSLog("Error resetting backing store - \(error.localizedDescription)")
+                        return
+                    }
                 }
             }
             

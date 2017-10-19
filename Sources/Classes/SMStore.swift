@@ -493,7 +493,7 @@ open class SMStore: NSIncrementalStore {
         }
         
         let syncOperationBlock = {
-            self.syncOperation = SMStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, entitiesToSync: self.entitiesToParticipateInSync()!, conflictPolicy: self.cksStoresSyncConflictPolicy, database: self.database)
+            self.syncOperation = SMStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, entitiesToSync: self.entitiesToParticipateInSync()!, conflictPolicy: self.cksStoresSyncConflictPolicy, database: self.database, backingMOC: self.backingMOC)
             self.syncOperation!.syncConflictResolutionBlock = self.recordConflictResolutionBlock
             
             self.syncOperation!.syncCompletionBlock =  { error in
