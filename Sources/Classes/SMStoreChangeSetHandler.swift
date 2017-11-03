@@ -124,6 +124,18 @@ class SMStoreChangeSetHandler {
         changeSet.setValue(entityName, forKey: SMStoreChangeSetHandler.SMLocalStoreEntityNameAttributeName)
         changeSet.setValue(NSNumber(value: SMLocalStoreRecordChangeType.recordInserted.rawValue as Int16), forKey: SMStoreChangeSetHandler.SMLocalStoreChangeTypeAttributeName)
     }
+  
+  func countOfChangeSet(backingContext: NSManagedObjectContext) -> Int {
+    let r = NSFetchRequest<NSFetchRequestResult>(entityName: SMStore.SMLocalStoreChangeSetEntityName)
+    do {
+      let c =   try backingContext.count(for: r)
+      VERBOSE("OK There are \(c) items ready for upload")
+      return c
+    } catch {
+      ERROR("ERROR fetching from \(SMStore.SMLocalStoreChangeSetEntityName): \(error)")
+      return -1
+    }
+  }
     
     func createChangeSet(ForUpdatedObject object: NSManagedObject, usingContext context: NSManagedObjectContext) {
         let changeSet = NSEntityDescription.insertNewObject(forEntityName: SMStore.SMLocalStoreChangeSetEntityName, into: context)
@@ -171,6 +183,8 @@ class SMStoreChangeSetHandler {
     
     func recordsForUpdatedObjects(backingContext context: NSManagedObjectContext) throws -> [CKRecord]? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: SMStore.SMLocalStoreChangeSetEntityName)
+      let r = try context.fetch(fetchRequest)
+      //print("Ok Found \(r.count) recordsForUpdatedObjects (ready for server upload)")
         fetchRequest.predicate = NSPredicate(format: "%K == %@ || %K == %@", SMStoreChangeSetHandler.SMLocalStoreChangeTypeAttributeName, NSNumber(value: SMLocalStoreRecordChangeType.recordInserted.rawValue as Int16), SMStoreChangeSetHandler.SMLocalStoreChangeTypeAttributeName, NSNumber(value: SMLocalStoreRecordChangeType.recordUpdated.rawValue as Int16))
         let results = try context.fetch(fetchRequest)
         var ckRecords: [CKRecord] = [CKRecord]()

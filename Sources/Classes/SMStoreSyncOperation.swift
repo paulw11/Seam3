@@ -68,7 +68,7 @@ class SMStoreSyncOperation: Operation {
     
     fileprivate var operationQueue: OperationQueue!
     fileprivate var localStoreMOC: NSManagedObjectContext!
-    fileprivate var backingMOC: NSManagedObjectContext
+    fileprivate var backingMOC: NSManagedObjectContext?
     fileprivate var persistentStoreCoordinator: NSPersistentStoreCoordinator?
     fileprivate var entities: Array<NSEntityDescription>
     fileprivate var database: CKDatabase?
@@ -78,13 +78,13 @@ class SMStoreSyncOperation: Operation {
     
     var syncConflictResolutionBlock: SMStore.SMStoreConflictResolutionBlock?
     
-  init(persistentStoreCoordinator:NSPersistentStoreCoordinator?, entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy = .serverRecordWins, database: CKDatabase?, backingMOC: NSManagedObjectContext) {
-        self.persistentStoreCoordinator = persistentStoreCoordinator
-        self.entities = entities
-        self.database = database
-        self.syncConflictPolicy = conflictPolicy
-        self.backingMOC = backingMOC
-        super.init()
+    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?, entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy = .serverRecordWins, database: CKDatabase?, backingMOC: NSManagedObjectContext) {
+      self.persistentStoreCoordinator = persistentStoreCoordinator
+      self.entities = entities
+      self.database = database
+      self.syncConflictPolicy = conflictPolicy
+      self.backingMOC = backingMOC
+      super.init()
     }
     
     // MARK: Sync
@@ -93,20 +93,29 @@ class SMStoreSyncOperation: Operation {
         self.operationQueue = OperationQueue()
         self.operationQueue.maxConcurrentOperationCount = 1
         self.localStoreMOC = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.privateQueueConcurrencyType)
-        self.localStoreMOC.persistentStoreCoordinator = self.persistentStoreCoordinator
         NotificationCenter.default.addObserver(self, selector: #selector(SMStoreSyncOperation.backingContextDidSave(notification:)), name: NSNotification.Name.NSManagedObjectContextDidSave, object: backingMOC)
+
+        self.localStoreMOC.persistentStoreCoordinator = self.persistentStoreCoordinator
         if let completionBlock = self.syncCompletionBlock {
             do {
                 try self.performSync()
                 print("Sync Performed", terminator: "\n")
+                NotificationCenter.default.removeObserver(self)
                 completionBlock(nil)
             } catch let error as NSError {
                 print("Sync Performed with Error", terminator: "\n")
+                NotificationCenter.default.removeObserver(self)
                 completionBlock(error)
             }
-            NotificationCenter.default.removeObserver(self)
         }
+      
     }
+  
+  @objc func backingContextDidSave(notification: Notification) {
+    self.localStoreMOC.performAndWait {
+      self.localStoreMOC.mergeChanges(fromContextDidSave: notification)
+    }
+  }
     
     func performSync() throws {
         var localChangesInServerRepresentation = try self.localChangesInServerRepresentation()
@@ -132,6 +141,16 @@ class SMStoreSyncOperation: Operation {
             SMServerTokenHandler.defaultHandler.commit()
             try SMStoreChangeSetHandler.defaultHandler.removeAllQueuedChangeSets(backingContext: self.localStoreMOC!)
         } catch {
+            print("ERROR during performSync() \(error)")
+          if let conflictList = (error as NSError).userInfo["conflictList"] as? [NSMergeConflict] {
+            for conflict in conflictList {
+              print("\nconflict:")
+              print("\nobjectSnapshot: \(conflict.objectSnapshot ?? [:])")
+              print("\ncachedSnapshot: \(conflict.cachedSnapshot ?? [:])")
+              print("\npersistedSnapshot: \(conflict.persistedSnapshot ?? [:])")
+            }
+          }
+
             throw error
         }
     }
@@ -153,6 +172,7 @@ class SMStoreSyncOperation: Operation {
     func applyServerChangesToLocalDatabase(_ insertedOrUpdatedCKRecords: [CKRecord], deletedCKRecordIDs:[CKRecordID]) throws {
         try self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
         try self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs)
+        try self.localStoreMOC.saveIfHasChanges()
     }
     
     func applyLocalChangesToServer(insertedOrUpdatedCKRecords: Array<CKRecord>? , deletedCKRecordIDs: Array<CKRecordID>?) throws {
@@ -368,27 +388,27 @@ class SMStoreSyncOperation: Operation {
     
     func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>, retryCount: Int = 0) throws {
         var deferredRecords = [CKRecord]()
-        for record in ckRecords {
-            var success = false
-            do {
-                let _ = try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
-                success = true
-            } catch SMStoreError.missingRelatedObject {
-                deferredRecords.append(record)
-            }
-            if success {
-                try self.localStoreMOC.saveIfHasChanges()
-            }
-        }
-        
-        if !deferredRecords.isEmpty {
-            
-            if retryCount < self.RETRYLIMIT  {
-                try self.insertOrUpdateManagedObjects(fromCKRecords: deferredRecords, retryCount:retryCount+1)
-            } else {
-                throw SMSyncOperationError.missingReferences(referringRcords: deferredRecords)
-            }
-        }
+      
+      // Sorting records using the dependancy graph can cut down dramatically ...
+      //  ...the number of deferred attempts necessary (see deferredRecords)
+      let sorted = SMObjectDependencyGraph(records: ckRecords, for: entities).sorted as! [CKRecord]
+      for record in sorted {
+          do {
+            let _ = try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
+          } catch SMStoreError.missingRelatedObject {
+            deferredRecords.append(record)
+          }
+        // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
+        // All saves are now performed in 'applyServerChangesToLocalDatabase()'
+      }
+      
+      if !deferredRecords.isEmpty {
+          if retryCount < self.RETRYLIMIT  {
+              try self.insertOrUpdateManagedObjects(fromCKRecords: deferredRecords, retryCount:retryCount+1)
+          } else {
+              throw SMSyncOperationError.missingReferences(referringRcords: deferredRecords)
+          }
+      }
     }
     
     func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<CKRecordID>) throws {
@@ -412,14 +432,7 @@ class SMStoreSyncOperation: Operation {
                 }
             }
         }
-        try self.localStoreMOC.saveIfHasChanges()
-    }
-  
-    // MARK: Prevent Conflicts
-    @objc func backingContextDidSave(notification: Notification) {
-      print("OK backingContextDidSave")
-      self.localStoreMOC.performAndWait {
-        self.localStoreMOC.mergeChanges(fromContextDidSave: notification)
-      }
+        // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
+        // All saves are now performed in 'applyServerChangesToLocalDatabase()'
     }
 }
