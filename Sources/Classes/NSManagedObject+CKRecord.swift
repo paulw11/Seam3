@@ -124,13 +124,15 @@ extension NSManagedObject {
             relationships = Array(self.entity.toOneRelationshipsByName().keys)
         }
         for relationship in relationships {
+            var ckReference: CKReference? = nil
             if let relationshipManagedObject = self.value(forKey: relationship) as? NSManagedObject {
-                let recordIDString: String = relationshipManagedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
-                let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
-                let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
-                let ckReference: CKReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.deleteSelf)
-                ckRecord.setObject(ckReference, forKey: relationship)
+                if let recordIDString: String = relationshipManagedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String {
+                    let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
+                    let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
+                    ckReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.deleteSelf)
+                }
             }
+            ckRecord.setObject(ckReference, forKey: relationship)
         }
     }
     
