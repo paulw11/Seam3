@@ -149,7 +149,6 @@ extension CKRecord {
     let referencesValuesDictionary = try self.allCKReferencesAsManagedObjects(usingContext: context, forManagedObject: managedObject)
     if referencesValuesDictionary != nil {
       for (key,value) in referencesValuesDictionary! {
-        let mo = value as? NSManagedObject
         managedObject.setValue(value, forKey: key)
       }
     }

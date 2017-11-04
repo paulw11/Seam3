@@ -97,14 +97,13 @@ class SMStoreSyncOperation: Operation {
 
         self.localStoreMOC.persistentStoreCoordinator = self.persistentStoreCoordinator
         if let completionBlock = self.syncCompletionBlock {
+            NotificationCenter.default.removeObserver(self)
             do {
                 try self.performSync()
                 print("Sync Performed", terminator: "\n")
-                NotificationCenter.default.removeObserver(self)
                 completionBlock(nil)
             } catch let error as NSError {
                 print("Sync Performed with Error", terminator: "\n")
-                NotificationCenter.default.removeObserver(self)
                 completionBlock(error)
             }
         }
