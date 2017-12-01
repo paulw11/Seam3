@@ -1,6 +1,10 @@
 Seam3 Changelog
 ===============
 
+# [1.4.4]
+ - Include migration fixes
+ - Include predicate creation fixes
+
 # [1.4.3]
  - Include the ability to import object graphs
  - Fix #37 - Provide new functions for retrieving predicates that search relationships
