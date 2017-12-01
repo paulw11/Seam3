@@ -392,13 +392,28 @@ open class SMStore: NSIncrementalStore {
     /// - parameter object: The related `NSManagedObject` to search for
     /// - returns: An `NSPredicate` that will retrieve the supplied object.
     
-    public func predicate(for relationship: String, referencing object: NSManagedObject) -> NSPredicate {
-        let recordID = self.referenceObject(for: object.objectID)
+    public func predicate(for relationship: String, referencing object: NSManagedObject) -> NSPredicate? {
+        guard let recordID = self.referenceObject(for: object.objectID) as? String else {
+            return nil
+        }
         
-        let predicateObjectRecordIDKey = "objectRecordID"
-        let predicate: NSPredicate = NSPredicate(format: "%K == $objectRecordID", "\(relationship).sm_LocalStore_RecordID")
-        
-        return predicate.withSubstitutionVariables([predicateObjectRecordIDKey: recordID])
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: object.entity.name!)
+        let predicate = NSPredicate(format: "%K == %@", SMStore.SMLocalStoreRecordIDAttributeName,recordID)
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = predicate
+        fetchRequest.resultType = NSFetchRequestResultType.managedObjectResultType
+        do {
+            if let results = try self.backingMOC.fetch(fetchRequest) as? [NSManagedObject]  {
+                if let result = results.first {
+                    let predicate: NSPredicate = NSPredicate(format: "%K == %@", relationship,result)
+                    
+                    return predicate
+                }
+            }
+        } catch {
+            
+        }
+        return nil
     }
     
     /// Retrieve an `NSPredicate` that will match the supplied `NSManagedObject` in a to-many.
