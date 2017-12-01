@@ -465,51 +465,64 @@ open class SMStore: NSIncrementalStore {
         }
     }
     
+    open func verifyCloudKitStoreExists(_ completionHandler: ((_ exists: Bool, _ error: Error?) -> Void)?) {
+        guard self.cloudKitValid else {
+            print("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
+            return
+        }
+        let operation = SMServerZoneLookupOperation(cloudDatabase: database)
+        operation.lookupOperationCompletionBlock = completionHandler
+        let queue = OperationQueue()
+        queue.addOperation(operation)
+    }
+    
     /// Trigger a sync operation.
     /// - parameter complete: If `true` then all records are retrieved from Cloud Kit.  If `false` then only changes since the last sync are fetched
     
-    open func triggerSync(complete: Bool = false) {
-        
-        self.triggerSync(block: false, complete: complete)
-        
-    }
+    /*open func triggerSync(complete: Bool = false, fetchCompletionHandler completion: ((Error?)->Void)? = nil) {
+     self.triggerSync(block: false, complete: complete, fetchCompletionHandler: nil)
+     }*/
     
-    private func triggerSync(block: Bool, complete: Bool = false) {
-        
+    open func triggerSync(complete: Bool = false, fetchCompletionHandler completion: ((Error?)->Void)? = nil) {
         guard self.cloudKitValid else {
-            NSLog("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
+            print("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
             return
-        }
-        
-        if block == false {
-            guard self.operationQueue?.operationCount == 0 else {
-                print("Aborting sync; operation in progress")
-                return
-            }
         }
         
         if complete {
             SMServerTokenHandler.defaultHandler.delete()
         }
         
-        let syncOperationBlock = {
-            self.syncOperation = SMStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, entitiesToSync: self.entitiesToParticipateInSync()!, conflictPolicy: self.cksStoresSyncConflictPolicy, database: self.database, backingMOC: self.backingMOC)
-            self.syncOperation!.syncConflictResolutionBlock = self.recordConflictResolutionBlock
+        let syncOperationBlock: (_ error: Error?) -> Void = { error in
             
-            self.syncOperation!.syncCompletionBlock =  { error in
-                if let error = error {
-                    print("Sync unsuccessful \(error.localizedDescription)")
-                    OperationQueue.main.addOperation {
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
-                    }
-                } else {
-                    print("Sync performed successfully")
-                    OperationQueue.main.addOperation {
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self)
-                    }
+            if let error = error {
+                print("Sync unsuccessful \(error)")
+                OperationQueue.main.addOperation {
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                 }
+                completion?(error)
+            } else {
+                
+                self.syncOperation = SMStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, entitiesToSync: self.entitiesToParticipateInSync()!, conflictPolicy: self.cksStoresSyncConflictPolicy, database: self.database, backingMOC: self.backingMOC)
+                
+                self.syncOperation!.syncConflictResolutionBlock = self.recordConflictResolutionBlock
+                
+                self.syncOperation!.syncCompletionBlock =  { error in
+                    if let error = error {
+                        print("Sync unsuccessful \(error)")
+                        OperationQueue.main.addOperation {
+                            NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
+                        }
+                    } else {
+                        print("Sync performed successfully")
+                        OperationQueue.main.addOperation {
+                            NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self)
+                        }
+                    }
+                    completion?(error)
+                }
+                self.operationQueue?.addOperation(self.syncOperation!)
             }
-            self.operationQueue?.addOperation(self.syncOperation!)
         }
         
         let defaults = UserDefaults.standard
@@ -520,13 +533,14 @@ open class SMStore: NSIncrementalStore {
             self.cloudStoreSetupOperation!.setupOperationCompletionBlock = { customZoneWasCreated, customZoneSubscriptionWasCreated, error in
                 if let error = error {
                     print("Error setting up cloudkit: \(error)")
+                    syncOperationBlock(error)
                 } else {
-                    syncOperationBlock()
+                    syncOperationBlock(nil)
                 }
             }
             self.operationQueue?.addOperation(self.cloudStoreSetupOperation!)
         } else {
-            syncOperationBlock()
+            syncOperationBlock(nil)
         }
         NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidStart), object: self)
     }
@@ -534,14 +548,15 @@ open class SMStore: NSIncrementalStore {
     /// Handle a push notification that indicates records have been updated in Cloud Kit
     /// - parameter userInfo: The userInfo dictionary from the push notification
     
-    open func handlePush(userInfo:[AnyHashable: Any]) {
+    open func handlePush(userInfo:[AnyHashable: Any], fetchCompletionHandler completion: ((_ error: Error?)->Void)? = nil) {
         let u = userInfo as! [String : NSObject]
         let ckNotification = CKNotification(fromRemoteNotificationDictionary: u)
         if ckNotification.notificationType == CKNotificationType.recordZone {
             let recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: u)
             if let zoneID = recordZoneNotification.recordZoneID {
                 if zoneID.zoneName == SMStore.SMStoreCloudStoreCustomZoneName {
-                    self.triggerSync(block: true)
+                    //self.triggerSync(block: true)
+                    self.triggerSync(complete: false, fetchCompletionHandler: completion)
                 }
             }
         }
@@ -585,6 +600,7 @@ open class SMStore: NSIncrementalStore {
     
     
     override open func execute(_ request: NSPersistentStoreRequest, with context: NSManagedObjectContext?) throws -> Any {
+        //do {
         if request.requestType == NSPersistentStoreRequestType.fetchRequestType {
             let fetchRequest = request as! NSFetchRequest<NSFetchRequestResult>
             if fetchRequest.resultType == .countResultType {
@@ -598,6 +614,10 @@ open class SMStore: NSIncrementalStore {
         } else {
             throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
         }
+        /*} catch {
+         print("OKERROR \(error)")
+         throw error
+         }*/
     }
     
     override open func newValuesForObject(with objectID: NSManagedObjectID, with context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {
@@ -762,10 +782,10 @@ open class SMStore: NSIncrementalStore {
     
     // MARK : SaveChanges Request
     fileprivate func executeInResponseToSaveChangesRequest(_ saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext) throws -> Array<AnyObject> {
-        
         try self.deleteObjectsFromBackingStore(objectsToDelete: context.deletedObjects, mainContext: context)
         try self.insertObjectsInBackingStore(objectsToInsert: context.insertedObjects, mainContext: context)
         try self.updateObjectsInBackingStore(objectsToUpdate: context.updatedObjects)
+        
         
         try self.backingMOC.saveIfHasChanges()
         if self.syncAutomatically {
@@ -825,7 +845,7 @@ open class SMStore: NSIncrementalStore {
     
     func insertObjectsInBackingStore(objectsToInsert objects:Set<NSObject>, mainContext: NSManagedObjectContext) throws -> Void {
         let mobs = Array(objects) as! [NSManagedObject]
-        let sorted = SMObjectDependencyGraph(objects: mobs).sorted
+        let sorted = SMObjectDependencyGraph(objects: mobs).sorted as! [NSManagedObject]
         for object in sorted {
             
             let sourceObject: NSManagedObject = object
@@ -840,7 +860,8 @@ open class SMStore: NSIncrementalStore {
             mainContext.didChangeValue(forKey: "objectID")
             SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
-            try self.backingMOC.saveIfHasChanges()
+            // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
+            // All saves are now performed in 'executeInResponseToSaveChangesRequest()'
         }
     }
     
@@ -858,7 +879,8 @@ open class SMStore: NSIncrementalStore {
                 if let backingObject: NSManagedObject = results.last as? NSManagedObject {
                     SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
                     self.backingMOC.delete(backingObject)
-                    try self.backingMOC.saveIfHasChanges()
+                    // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
+                    // All saves are now performed in 'executeInResponseToSaveChangesRequest()'
                 }
             }
         }
@@ -881,9 +903,11 @@ open class SMStore: NSIncrementalStore {
                     backingObject.setValuesForKeys(sourceObjectValues)
                     SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForUpdatedObject: backingObject, usingContext: self.backingMOC)
                     try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
-                    try self.backingMOC.saveIfHasChanges()
+                    // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
+                    // All saves are now performed in 'executeInResponseToSaveChangesRequest()'
                 }
             }
         }
     }
 }
+

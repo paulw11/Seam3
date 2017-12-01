@@ -33,8 +33,18 @@ import CoreData
 extension NSManagedObjectContext {
     
     func saveIfHasChanges() throws {
+      var err: Error?
         if self.hasChanges {
-            try self.save()
+          performAndWait {
+            do {
+              try self.save()
+            } catch {
+              err = error
+            }
+          }
         }
+      if err != nil {
+        throw err!
+      }
     }
 }

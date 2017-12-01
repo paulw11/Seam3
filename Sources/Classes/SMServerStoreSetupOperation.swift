@@ -50,7 +50,13 @@ class SMServerStoreSetupOperation:Operation {
         let defaults = UserDefaults.standard
         
         let fetchRecordZonesOperation = CKFetchRecordZonesOperation(recordZoneIDs: [zone.zoneID])
-        
+        if #available(iOS 11.0, *) {
+          let config = CKOperationConfiguration()
+          config.timeoutIntervalForResource = 10.0
+          fetchRecordZonesOperation.configuration = config
+        } else if #available(iOS 10.0, *) {
+          fetchRecordZonesOperation.timeoutIntervalForResource = 10.0
+        }
         fetchRecordZonesOperation.database = self.database
         
         fetchRecordZonesOperation.fetchRecordZonesCompletionBlock = ({(zones,operationError) -> Void in

@@ -90,7 +90,7 @@ extension CKRecord {
                                     let relationshipManagedObject: NSManagedObject = results.last as! NSManagedObject
                                     managedObjectsDictionary[key] = relationshipManagedObject
                                 } else {
-                                    print("No matching related object for \(recordIDString)")
+                                    print("WARNING Missing NON-OPTIONAL related object for '\(entity.name ?? "n/a").\(key)' (missing '\(name)' (\(recordIDString)) )")
                                     context.refresh(managedObject, mergeChanges: false)
                                     throw SMStoreError.missingRelatedObject
                                 }
@@ -123,7 +123,6 @@ extension CKRecord {
                 }
                 
                 try self.setValuesOn(managedObject!, inContext:context)
-                
                 return managedObject
             }
         }
