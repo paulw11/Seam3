@@ -109,9 +109,9 @@ class SMStoreChangeSetHandler {
     func modelForLocalStore(usingModel model: NSManagedObjectModel) -> NSManagedObjectModel {
         let backingModel: NSManagedObjectModel = model.copy() as! NSManagedObjectModel
         for entity in backingModel.entities {
-          if entity.superentity == nil {
-            self.addExtraBackingStoreAttributes(toEntity: entity)
-          }
+            if entity.superentity == nil {
+                self.addExtraBackingStoreAttributes(toEntity: entity)
+            }
         }
         backingModel.entities.append(self.changeSetEntity())
         return backingModel
@@ -124,7 +124,7 @@ class SMStoreChangeSetHandler {
         changeSet.setValue(entityName, forKey: SMStoreChangeSetHandler.SMLocalStoreEntityNameAttributeName)
         changeSet.setValue(NSNumber(value: SMLocalStoreRecordChangeType.recordInserted.rawValue as Int16), forKey: SMStoreChangeSetHandler.SMLocalStoreChangeTypeAttributeName)
     }
-  
+    
     func countOfChangeSet(backingContext: NSManagedObjectContext) throws -> Int {
         let r = NSFetchRequest<NSFetchRequestResult>(entityName: SMStore.SMLocalStoreChangeSetEntityName)
         let c = try backingContext.count(for: r)
@@ -158,7 +158,7 @@ class SMStoreChangeSetHandler {
         let results = try backingContext.fetch(fetchRequest)
         return results as [AnyObject]?
     }
-
+    
     
     func recordIDsForDeletedObjects(_ backingContext: NSManagedObjectContext) throws -> [CKRecordID]? {
         let propertiesToFetch = [SMStore.SMLocalStoreRecordIDAttributeName]
@@ -179,6 +179,40 @@ class SMStoreChangeSetHandler {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: SMStore.SMLocalStoreChangeSetEntityName)
         fetchRequest.predicate = NSPredicate(format: "%K == %@ || %K == %@", SMStoreChangeSetHandler.SMLocalStoreChangeTypeAttributeName, NSNumber(value: SMLocalStoreRecordChangeType.recordInserted.rawValue as Int16), SMStoreChangeSetHandler.SMLocalStoreChangeTypeAttributeName, NSNumber(value: SMLocalStoreRecordChangeType.recordUpdated.rawValue as Int16))
         let results = try context.fetch(fetchRequest)
+        // Dictionary will contain all recordIDs of changed records and respective changedKeys that have been changed for records after last sync.
+        var changedRecords = [String:Set<String>]()
+        
+        if !results.isEmpty {
+            var changedRecordIDs = Set<String>()
+            for result in results as! [NSManagedObject] {
+                let recordId = result.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
+                changedRecordIDs.insert(recordId)
+            }
+            
+            for changedRecordID in changedRecordIDs {
+                var changedPropertiesSet = Set<String>()
+                for result in results as! [NSManagedObject] {
+                    let recordId = result.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
+                    if recordId == changedRecordID {
+                        let changedPropertyKeys = result.value(forKey: SMStore.SMLocalStoreRecordChangedPropertiesAttributeName) as? String
+                        if changedPropertyKeys != nil && changedPropertyKeys!.isEmpty == false {
+                            if changedPropertyKeys!.range(of: ",") != nil {
+                                var changedPropertyKeysArray: [String]?
+                                changedPropertyKeysArray = changedPropertyKeys!.components(separatedBy: ",")
+                                for changedPropertyKeyElement in changedPropertyKeysArray! {
+                                    changedPropertiesSet.insert(changedPropertyKeyElement)
+                                }
+                                changedRecords[recordId] = changedPropertiesSet
+                            } else {
+                                changedPropertiesSet.insert(changedPropertyKeys!)
+                                changedRecords[recordId] = changedPropertiesSet
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
         var ckRecords: [CKRecord] = [CKRecord]()
         if !results.isEmpty {
             let recordIDSubstitution = "recordIDString"
@@ -193,15 +227,15 @@ class SMStoreChangeSetHandler {
                 let objects = try context.fetch(fetchRequest)
                 if objects.count > 0 {
                     let object: NSManagedObject = objects.last as! NSManagedObject
-                    let changedPropertyKeys = result.value(forKey: SMStore.SMLocalStoreRecordChangedPropertiesAttributeName) as? String
+                    
+                    // Use Dictionary with changed properties for each record.
                     var changedPropertyKeysArray: [String]?
-                    if changedPropertyKeys != nil && changedPropertyKeys!.isEmpty == false {
-                        if changedPropertyKeys!.range(of: ",") != nil {
-                            changedPropertyKeysArray = changedPropertyKeys!.components(separatedBy: ",")
-                        } else {
-                            changedPropertyKeysArray = [changedPropertyKeys!]
+                    if let changedPropertyKeysSet = changedRecords[recordIDString] {
+                        for property in changedPropertyKeysSet {
+                            changedPropertyKeysArray?.append(property)
                         }
                     }
+                    
                     if let ckRecord = object.createOrUpdateCKRecord(usingValuesOfChangedKeys: changedPropertyKeysArray) {
                         ckRecords.append(ckRecord)
                     }
@@ -211,7 +245,7 @@ class SMStoreChangeSetHandler {
         try context.saveIfHasChanges()
         return ckRecords
     }
-
+    
     func removeAllQueuedChangeSetsFromQueue(backingContext context: NSManagedObjectContext) throws {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: SMStore.SMLocalStoreChangeSetEntityName)
         fetchRequest.predicate = NSPredicate(format: "%K == %@", SMStoreChangeSetHandler.SMLocalStoreChangeQueuedAttributeName, NSNumber(value: true as Bool))
@@ -235,3 +269,4 @@ class SMStoreChangeSetHandler {
         }
     }
 }
+
