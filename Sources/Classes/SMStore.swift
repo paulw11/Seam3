@@ -197,6 +197,8 @@ enum SMStoreError: Error {
     case missingRelatedObject
     /// More than one match was found for a 'to-one' relationship
     case tooManyRelatedObjects
+    /// Missing/bad backing store record
+    case backingStoreRecordInvalid
 }
 
 /// Sync conflict resolution policies

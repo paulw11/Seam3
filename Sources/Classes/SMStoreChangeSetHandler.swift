@@ -178,34 +178,40 @@ class SMStoreChangeSetHandler {
     func recordsForUpdatedObjects(backingContext context: NSManagedObjectContext) throws -> [CKRecord]? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: SMStore.SMLocalStoreChangeSetEntityName)
         fetchRequest.predicate = NSPredicate(format: "%K == %@ || %K == %@", SMStoreChangeSetHandler.SMLocalStoreChangeTypeAttributeName, NSNumber(value: SMLocalStoreRecordChangeType.recordInserted.rawValue as Int16), SMStoreChangeSetHandler.SMLocalStoreChangeTypeAttributeName, NSNumber(value: SMLocalStoreRecordChangeType.recordUpdated.rawValue as Int16))
-        let results = try context.fetch(fetchRequest)
+        guard let results = try context.fetch(fetchRequest) as? [NSManagedObject] else {
+            throw SMStoreError.backingStoreUpdateError
+        }
         // Dictionary will contain all recordIDs of changed records and respective changedKeys that have been changed for records after last sync.
         var changedRecords = [String:Set<String>]()
         
         if !results.isEmpty {
             var changedRecordIDs = Set<String>()
-            for result in results as! [NSManagedObject] {
-                let recordId = result.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
-                changedRecordIDs.insert(recordId)
+            for result in results {
+                if let recordId = result.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String {
+                    changedRecordIDs.insert(recordId)
+                }
             }
             
             for changedRecordID in changedRecordIDs {
                 var changedPropertiesSet = Set<String>()
-                for result in results as! [NSManagedObject] {
-                    let recordId = result.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
+                for result in results {
+                    guard let recordId = result.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String else {
+                        throw SMStoreError.backingStoreUpdateError
+                    }
                     if recordId == changedRecordID {
-                        let changedPropertyKeys = result.value(forKey: SMStore.SMLocalStoreRecordChangedPropertiesAttributeName) as? String
-                        if changedPropertyKeys != nil && changedPropertyKeys!.isEmpty == false {
-                            if changedPropertyKeys!.range(of: ",") != nil {
-                                var changedPropertyKeysArray: [String]?
-                                changedPropertyKeysArray = changedPropertyKeys!.components(separatedBy: ",")
-                                for changedPropertyKeyElement in changedPropertyKeysArray! {
-                                    changedPropertiesSet.insert(changedPropertyKeyElement)
+                        if let changedPropertyKeys = result.value(forKey: SMStore.SMLocalStoreRecordChangedPropertiesAttributeName) as? String {
+                            if !changedPropertyKeys.isEmpty {
+                                if changedPropertyKeys.range(of: ",") != nil {
+                                    var changedPropertyKeysArray: [String]?
+                                    changedPropertyKeysArray = changedPropertyKeys.components(separatedBy: ",")
+                                    for changedPropertyKeyElement in changedPropertyKeysArray ?? [] {
+                                        changedPropertiesSet.insert(changedPropertyKeyElement)
+                                    }
+                                    changedRecords[recordId] = changedPropertiesSet
+                                } else {
+                                    changedPropertiesSet.insert(changedPropertyKeys)
+                                    changedRecords[recordId] = changedPropertiesSet
                                 }
-                                changedRecords[recordId] = changedPropertiesSet
-                            } else {
-                                changedPropertiesSet.insert(changedPropertyKeys!)
-                                changedRecords[recordId] = changedPropertiesSet
                             }
                         }
                     }
@@ -217,27 +223,27 @@ class SMStoreChangeSetHandler {
         if !results.isEmpty {
             let recordIDSubstitution = "recordIDString"
             let predicate = NSPredicate(format: "%K == $recordIDString", SMStore.SMLocalStoreRecordIDAttributeName)
-            for result in results as! [NSManagedObject] {
+            for result in results {
                 result.setValue(NSNumber(value: true as Bool), forKey: SMStoreChangeSetHandler.SMLocalStoreChangeQueuedAttributeName)
-                let entityName: String = result.value(forKey: SMStoreChangeSetHandler.SMLocalStoreEntityNameAttributeName) as! String
-                let recordIDString: String = result.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
-                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
-                fetchRequest.predicate = predicate.withSubstitutionVariables([recordIDSubstitution:recordIDString])
-                fetchRequest.fetchLimit = 1
-                let objects = try context.fetch(fetchRequest)
-                if objects.count > 0 {
-                    let object: NSManagedObject = objects.last as! NSManagedObject
-                    
-                    // Use Dictionary with changed properties for each record.
-                    var changedPropertyKeysArray: [String]?
-                    if let changedPropertyKeysSet = changedRecords[recordIDString] {
-                        for property in changedPropertyKeysSet {
-                            changedPropertyKeysArray?.append(property)
+                if let entityName: String = result.value(forKey: SMStoreChangeSetHandler.SMLocalStoreEntityNameAttributeName) as? String,
+                    let recordIDString: String = result.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String {
+                    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+                    fetchRequest.predicate = predicate.withSubstitutionVariables([recordIDSubstitution:recordIDString])
+                    fetchRequest.fetchLimit = 1
+                    if let objects = try context.fetch(fetchRequest) as? [NSManagedObject] {
+                        if let object = objects.last {
+                            // Use Dictionary with changed properties for each record.
+                            var changedPropertyKeysArray = [String]()
+                            if let changedPropertyKeysSet = changedRecords[recordIDString] {
+                                for property in changedPropertyKeysSet {
+                                    changedPropertyKeysArray.append(property)
+                                }
+                            }
+                            
+                            if let ckRecord = object.createOrUpdateCKRecord(usingValuesOfChangedKeys: changedPropertyKeysArray) {
+                                ckRecords.append(ckRecord)
+                            }
                         }
-                    }
-                    
-                    if let ckRecord = object.createOrUpdateCKRecord(usingValuesOfChangedKeys: changedPropertyKeysArray) {
-                        ckRecords.append(ckRecord)
                     }
                 }
             }
