@@ -26,6 +26,7 @@
 
 
 import UIKit
+import CoreData
 
 class SMBatchUpdateResult: NSBatchUpdateResult {
 
@@ -37,7 +38,7 @@ class SMBatchUpdateResult: NSBatchUpdateResult {
         return _resultType
     }
     
-    private var _resultType: NSBatchUpateRequestResultType = .resultTypeStatusOnly
+    private var _resultType: NSBatchUpdateRequestResultType = .statusOnlyResultType
     
     private var _result: Any? = nil
     
