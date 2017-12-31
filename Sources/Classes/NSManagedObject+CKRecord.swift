@@ -147,7 +147,7 @@ extension NSManagedObject {
             let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
             ckRecord = CKRecord(recordType: self.entity.name!, recordID: ckRecordID)
         }
-        if keys != nil {
+        if !(keys ?? []).isEmpty {
             let attributeKeys = self.entity.attributesByName.filter { (object) -> Bool in
                 return keys!.contains(object.0)
                 }.map { (object) -> String in
@@ -160,10 +160,10 @@ extension NSManagedObject {
             }
             self.setAttributesValues(ofCKRecord: ckRecord!, withValuesOfAttributeWithKeys: attributeKeys)
             self.setRelationshipValues(ofCKRecord: ckRecord!, withValuesOfRelationshipWithKeys: relationshipKeys)
-            return ckRecord
-        }
+        } else {
         self.setAttributesValues(ofCKRecord: ckRecord!, withValuesOfAttributeWithKeys: nil)
         self.setRelationshipValues(ofCKRecord: ckRecord!, withValuesOfRelationshipWithKeys: nil)
+        }
         return ckRecord
     }
 }
