@@ -1,0 +1,307 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C1E7E7C31FF8F1BA00F44A5A /* CKRecord+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* CKRecord+NSManagedObject.swift */; };
+		C1E7E7C41FF8F1BA00F44A5A /* CKRecordZone+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* CKRecordZone+Helpers.swift */; };
+		C1E7E7C51FF8F1BA00F44A5A /* CKRecordZoneID+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* CKRecordZoneID+Helpers.swift */; };
+		C1E7E7C61FF8F1BA00F44A5A /* NSEntityDescription+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* NSEntityDescription+Helpers.swift */; };
+		C1E7E7C71FF8F1BA00F44A5A /* NSManagedObject+CKRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* NSManagedObject+CKRecord.swift */; };
+		C1E7E7C81FF8F1BA00F44A5A /* NSManagedObjectContext+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* NSManagedObjectContext+Helpers.swift */; };
+		C1E7E7C91FF8F1BA00F44A5A /* SMObjectDependencyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* SMObjectDependencyGraph.swift */; };
+		C1E7E7CA1FF8F1BA00F44A5A /* SMServerStoreSetupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* SMServerStoreSetupOperation.swift */; };
+		C1E7E7CB1FF8F1BA00F44A5A /* SMServerTokenHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* SMServerTokenHandler.swift */; };
+		C1E7E7CC1FF8F1BA00F44A5A /* SMServerZoneLookupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* SMServerZoneLookupOperation.swift */; };
+		C1E7E7CD1FF8F1BA00F44A5A /* SMStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* SMStore.swift */; };
+		C1E7E7CE1FF8F1BA00F44A5A /* SMStoreChangeSetHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* SMStoreChangeSetHandler.swift */; };
+		C1E7E7CF1FF8F1BA00F44A5A /* SMStoreSyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* SMStoreSyncOperation.swift */; };
+		C1E7E7D91FF8F42400F44A5A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1E7E7D71FF8F40100F44A5A /* CloudKit.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		C1E7E7D41FF8F1BA00F44A5A /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1E7E7D71FF8F40100F44A5A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		OBJ_10 /* CKRecordZone+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecordZone+Helpers.swift"; sourceTree = "<group>"; };
+		OBJ_11 /* CKRecordZoneID+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecordZoneID+Helpers.swift"; sourceTree = "<group>"; };
+		OBJ_12 /* NSEntityDescription+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSEntityDescription+Helpers.swift"; sourceTree = "<group>"; };
+		OBJ_13 /* NSManagedObject+CKRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+CKRecord.swift"; sourceTree = "<group>"; };
+		OBJ_14 /* NSManagedObjectContext+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSManagedObjectContext+Helpers.swift"; sourceTree = "<group>"; };
+		OBJ_15 /* SMObjectDependencyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMObjectDependencyGraph.swift; sourceTree = "<group>"; };
+		OBJ_16 /* SMServerStoreSetupOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMServerStoreSetupOperation.swift; sourceTree = "<group>"; };
+		OBJ_17 /* SMServerTokenHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMServerTokenHandler.swift; sourceTree = "<group>"; };
+		OBJ_18 /* SMServerZoneLookupOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMServerZoneLookupOperation.swift; sourceTree = "<group>"; };
+		OBJ_19 /* SMStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMStore.swift; sourceTree = "<group>"; };
+		OBJ_20 /* SMStoreChangeSetHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMStoreChangeSetHandler.swift; sourceTree = "<group>"; };
+		OBJ_21 /* SMStoreSyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMStoreSyncOperation.swift; sourceTree = "<group>"; };
+		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		OBJ_9 /* CKRecord+NSManagedObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecord+NSManagedObject.swift"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C1E7E7D01FF8F1BA00F44A5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 0;
+			files = (
+				C1E7E7D91FF8F42400F44A5A /* CloudKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C1E7E7D61FF8F40100F44A5A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C1E7E7D71FF8F40100F44A5A /* CloudKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		OBJ_25 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C1E7E7D41FF8F1BA00F44A5A /* Seam3.framework */,
+			);
+			name = Products;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		OBJ_5 = {
+			isa = PBXGroup;
+			children = (
+				OBJ_6 /* Package.swift */,
+				OBJ_7 /* Sources */,
+				OBJ_25 /* Products */,
+				C1E7E7D61FF8F40100F44A5A /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		OBJ_7 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_8 /* Classes */,
+			);
+			name = Sources;
+			sourceTree = SOURCE_ROOT;
+		};
+		OBJ_8 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_9 /* CKRecord+NSManagedObject.swift */,
+				OBJ_10 /* CKRecordZone+Helpers.swift */,
+				OBJ_11 /* CKRecordZoneID+Helpers.swift */,
+				OBJ_12 /* NSEntityDescription+Helpers.swift */,
+				OBJ_13 /* NSManagedObject+CKRecord.swift */,
+				OBJ_14 /* NSManagedObjectContext+Helpers.swift */,
+				OBJ_15 /* SMObjectDependencyGraph.swift */,
+				OBJ_16 /* SMServerStoreSetupOperation.swift */,
+				OBJ_17 /* SMServerTokenHandler.swift */,
+				OBJ_18 /* SMServerZoneLookupOperation.swift */,
+				OBJ_19 /* SMStore.swift */,
+				OBJ_20 /* SMStoreChangeSetHandler.swift */,
+				OBJ_21 /* SMStoreSyncOperation.swift */,
+			);
+			name = Classes;
+			path = Sources/Classes;
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C1E7E7C11FF8F1BA00F44A5A /* Seam3-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C1E7E7D11FF8F1BA00F44A5A /* Build configuration list for PBXNativeTarget "Seam3-iOS" */;
+			buildPhases = (
+				C1E7E7C21FF8F1BA00F44A5A /* Sources */,
+				C1E7E7D01FF8F1BA00F44A5A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Seam3-iOS";
+			productName = Classes;
+			productReference = C1E7E7D41FF8F1BA00F44A5A /* Seam3.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		OBJ_1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 9999;
+				TargetAttributes = {
+					C1E7E7C11FF8F1BA00F44A5A = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = OBJ_2 /* Build configuration list for PBXProject "Seam3" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = OBJ_5;
+			productRefGroup = OBJ_25 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C1E7E7C11FF8F1BA00F44A5A /* Seam3-iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C1E7E7C21FF8F1BA00F44A5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 0;
+			files = (
+				C1E7E7C31FF8F1BA00F44A5A /* CKRecord+NSManagedObject.swift in Sources */,
+				C1E7E7C41FF8F1BA00F44A5A /* CKRecordZone+Helpers.swift in Sources */,
+				C1E7E7C51FF8F1BA00F44A5A /* CKRecordZoneID+Helpers.swift in Sources */,
+				C1E7E7C61FF8F1BA00F44A5A /* NSEntityDescription+Helpers.swift in Sources */,
+				C1E7E7C71FF8F1BA00F44A5A /* NSManagedObject+CKRecord.swift in Sources */,
+				C1E7E7C81FF8F1BA00F44A5A /* NSManagedObjectContext+Helpers.swift in Sources */,
+				C1E7E7C91FF8F1BA00F44A5A /* SMObjectDependencyGraph.swift in Sources */,
+				C1E7E7CA1FF8F1BA00F44A5A /* SMServerStoreSetupOperation.swift in Sources */,
+				C1E7E7CB1FF8F1BA00F44A5A /* SMServerTokenHandler.swift in Sources */,
+				C1E7E7CC1FF8F1BA00F44A5A /* SMServerZoneLookupOperation.swift in Sources */,
+				C1E7E7CD1FF8F1BA00F44A5A /* SMStore.swift in Sources */,
+				C1E7E7CE1FF8F1BA00F44A5A /* SMStoreChangeSetHandler.swift in Sources */,
+				C1E7E7CF1FF8F1BA00F44A5A /* SMStoreSyncOperation.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C1E7E7D21FF8F1BA00F44A5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = Seam3.xcodeproj/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.Seam.Seam3;
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGET_NAME = Seam3;
+				VALID_ARCHS = "arm64 armv7 armv7s i386";
+			};
+			name = Debug;
+		};
+		C1E7E7D31FF8F1BA00F44A5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = Seam3.xcodeproj/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.Seam.Seam3;
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGET_NAME = Seam3;
+				VALID_ARCHS = "arm64 armv7 armv7s i386";
+			};
+			name = Release;
+		};
+		OBJ_3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_NS_ASSERTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "-DXcode";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SWIFT_PACKAGE;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				USE_HEADERMAP = NO;
+			};
+			name = Debug;
+		};
+		OBJ_4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_OPTIMIZATION_LEVEL = s;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OTHER_SWIFT_FLAGS = "-DXcode";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SWIFT_PACKAGE;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				USE_HEADERMAP = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C1E7E7D11FF8F1BA00F44A5A /* Build configuration list for PBXNativeTarget "Seam3-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1E7E7D21FF8F1BA00F44A5A /* Debug */,
+				C1E7E7D31FF8F1BA00F44A5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		OBJ_2 /* Build configuration list for PBXProject "Seam3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_3 /* Debug */,
+				OBJ_4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = OBJ_1 /* Project object */;
+}
