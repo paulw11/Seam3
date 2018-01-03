@@ -1,6 +1,10 @@
 Seam3 Changelog
 ===============
 
+# [1.4.5]
+ - Add support for batch deletes
+ - Add Carthage support
+
 # [1.4.4]
  - Include migration fixes
  - Include predicate creation fixes
