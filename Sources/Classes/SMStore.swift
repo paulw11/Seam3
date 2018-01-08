@@ -816,7 +816,7 @@ open class SMStore: NSIncrementalStore {
                 })
             case .managedObjectIDResultType:
                 return resultsFromLocalStore.map({(result)->NSManagedObjectID in
-                    let result = result as! NSManagedObjectID
+                let result = result as! NSManagedObjectID
                     let object = self.backingMOC.registeredObject(for: result)!
                     let recordID: String = object.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
                     let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[fetchRequest.entityName!]
@@ -840,7 +840,7 @@ open class SMStore: NSIncrementalStore {
     fileprivate func executeInResponseToSaveChangesRequest(_ saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext) throws -> Array<AnyObject> {
         try self.deleteObjectsFromBackingStore(objectsToDelete: context.deletedObjects, mainContext: context)
         try self.insertObjectsInBackingStore(objectsToInsert: context.insertedObjects, mainContext: context)
-        try self.updateObjectsInBackingStore(objectsToUpdate: context.updatedObjects)
+        try self.updateObjectsInBackingStore(objectsToUpdate: context.updatedObjects, mainContext: context)
         
         try self.backingMOC.saveIfHasChanges()
         if self.syncAutomatically {
@@ -906,7 +906,7 @@ open class SMStore: NSIncrementalStore {
         
     }
     
-    fileprivate func setRelationshipValuesForBackingObject(_ backingObject:NSManagedObject,sourceObject:NSManagedObject) throws -> Void {
+    fileprivate func setRelationshipValuesForBackingObject(_ backingObject:NSManagedObject, inContext: NSManagedObjectContext?, sourceObject:NSManagedObject) throws -> Void {
         for relationship in Array(sourceObject.entity.relationshipsByName.values) as [NSRelationshipDescription] {
             if sourceObject.hasFault(forRelationshipNamed: relationship.name) || sourceObject.value(forKey: relationship.name) == nil {
                 continue
@@ -935,6 +935,7 @@ open class SMStore: NSIncrementalStore {
                         let backingRelationshipObject = try self.backingMOC.existingObject(with: backingRelationshipObjectID!)
                         backingObject.setValue(backingRelationshipObject, forKey: relationship.name)
                     }
+                    inContext?.refresh(sourceObject, mergeChanges: true)
                 }
             }
         }
@@ -944,19 +945,18 @@ open class SMStore: NSIncrementalStore {
         let mobs = Array(objects) as! [NSManagedObject]
         let sorted = SMObjectDependencyGraph(objects: mobs).sorted as! [NSManagedObject]
         for object in sorted {
-            
-            let sourceObject: NSManagedObject = object
-            let managedObject:NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: (sourceObject.entity.name)!, into: self.backingMOC) as NSManagedObject
-            let keys = Array(sourceObject.entity.attributesByName.keys)
-            let dictionary = sourceObject.dictionaryWithValues(forKeys: keys)
+            let managedObject:NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: (object.entity.name)!, into: self.backingMOC) as NSManagedObject
+            let keys = Array(object.entity.attributesByName.keys)
+            let dictionary = object.dictionaryWithValues(forKeys: keys)
             managedObject.setValuesForKeys(dictionary)
-            let referenceObject: String = self.referenceObject(for: sourceObject.objectID) as! String
+            let referenceObject: String = self.referenceObject(for: object.objectID) as! String
             managedObject.setValue(referenceObject, forKey: SMStore.SMLocalStoreRecordIDAttributeName)
             mainContext.willChangeValue(forKey: "objectID")
-            try mainContext.obtainPermanentIDs(for: [sourceObject])
+            try mainContext.obtainPermanentIDs(for: [object])
             mainContext.didChangeValue(forKey: "objectID")
-            SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
-            try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
+            SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: object.entity.name!, backingContext: self.backingMOC)
+            try self.setRelationshipValuesForBackingObject(managedObject, inContext:mainContext, sourceObject: object)
+             mainContext.refresh(object, mergeChanges: true)
             // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
             // All saves are now performed in 'executeInResponseToSaveChangesRequest()'
         }
@@ -976,6 +976,7 @@ open class SMStore: NSIncrementalStore {
                 if let backingObject: NSManagedObject = results.last as? NSManagedObject {
                     SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
                     self.backingMOC.delete(backingObject)
+                    mainContext.refreshAllObjects()
                     // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
                     // All saves are now performed in 'executeInResponseToSaveChangesRequest()'
                 }
@@ -983,7 +984,7 @@ open class SMStore: NSIncrementalStore {
         }
     }
     
-    fileprivate func updateObjectsInBackingStore(objectsToUpdate objects: Set<NSManagedObject>) throws -> Void {
+    fileprivate func updateObjectsInBackingStore(objectsToUpdate objects: Set<NSManagedObject>, mainContext: NSManagedObjectContext) throws -> Void {
         let predicateObjectRecordIDKey = "objectRecordID"
         let predicate: NSPredicate = NSPredicate(format: "%K == $objectRecordID", SMStore.SMLocalStoreRecordIDAttributeName)
         for object in objects {
@@ -998,11 +999,12 @@ open class SMStore: NSIncrementalStore {
                     let sourceObjectValues = object.dictionaryWithValues(forKeys: keys)
                     backingObject.setValuesForKeys(sourceObjectValues)
                     SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForUpdatedObject: backingObject, usingContext: self.backingMOC)
-                    try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: object)
+                    try self.setRelationshipValuesForBackingObject(backingObject, inContext: nil, sourceObject: object)
                     // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
                     // All saves are now performed in 'executeInResponseToSaveChangesRequest()'
                 }
             }
+            mainContext.refresh(object, mergeChanges: true)
         }
     }
 }
