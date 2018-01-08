@@ -1,6 +1,9 @@
 Seam3 Changelog
 ===============
 
+# [1.4.6]
+ - Handle purged zone in CloudKit
+
 # [1.4.5]
  - Add support for batch deletes
  - Add Carthage support
