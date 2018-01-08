@@ -68,7 +68,7 @@ class SMServerStoreSetupOperation:Operation {
                 ckError = ckError?.partialErrorsByItemID?.values.first as? CKError
             }
             
-            if error == nil || ckError?.code == .zoneNotFound {
+            if error == nil || ckError?.code == .zoneNotFound || ckError?.code == .userDeletedZone {
                 error = nil
                 if zones?.first == nil {
                     
