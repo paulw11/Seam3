@@ -62,7 +62,11 @@ class SMStoreChangeSetHandler {
         let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
         recordIDAttribute.name = SMStore.SMLocalStoreRecordIDAttributeName
         recordIDAttribute.isOptional = false
-        recordIDAttribute.isIndexed = true
+        if #available(iOS 11.0, *) {
+            entity.indexes = [NSFetchIndexDescription(name: "byRecordID", elements: [NSFetchIndexElementDescription(property: recordIDAttribute, collationType: .binary)])]
+        } else {
+            recordIDAttribute.isIndexed = true
+        }
         recordIDAttribute.attributeType = NSAttributeType.stringAttributeType
         entity.properties.append(recordIDAttribute)
         let recordEncodedValuesAttribute: NSAttributeDescription = NSAttributeDescription()
@@ -84,7 +88,11 @@ class SMStoreChangeSetHandler {
         recordIDAttribute.name = SMStore.SMLocalStoreRecordIDAttributeName
         recordIDAttribute.attributeType = NSAttributeType.stringAttributeType
         recordIDAttribute.isOptional = false
-        recordIDAttribute.isIndexed = true
+        if #available(iOS 11.0, *) {
+            changeSetEntity.indexes = [NSFetchIndexDescription(name: "byRecordID", elements: [NSFetchIndexElementDescription(property: recordIDAttribute, collationType: .binary)])]
+        } else {
+            recordIDAttribute.isIndexed = true
+        }
         changeSetEntity.properties.append(recordIDAttribute)
         let recordChangedPropertiesAttribute: NSAttributeDescription = NSAttributeDescription()
         recordChangedPropertiesAttribute.name = SMStore.SMLocalStoreRecordChangedPropertiesAttributeName
