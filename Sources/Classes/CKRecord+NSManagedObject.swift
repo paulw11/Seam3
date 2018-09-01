@@ -81,7 +81,7 @@ extension CKRecord {
                 if let relationshipDescription = entity.relationshipsByName[key] {
                     if let destinationEntity = relationshipDescription.destinationEntity {
                         if let name = destinationEntity.name  {
-                            let recordIDString = (value as! CKReference).recordID.recordName
+                            let recordIDString = (value as! CKRecord.Reference).recordID.recordName
                             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: name)
                             fetchRequest.predicate = NSPredicate(format: "%K == %@", SMStore.SMLocalStoreRecordIDAttributeName,recordIDString)
                             fetchRequest.fetchLimit = 1

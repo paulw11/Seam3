@@ -160,15 +160,15 @@ class SMStoreChangeSetHandler {
     }
     
     
-    func recordIDsForDeletedObjects(_ backingContext: NSManagedObjectContext) throws -> [CKRecordID]? {
+    func recordIDsForDeletedObjects(_ backingContext: NSManagedObjectContext) throws -> [CKRecord.ID]? {
         let propertiesToFetch = [SMStore.SMLocalStoreRecordIDAttributeName]
         if let deletedObjectsChangeSets = try self.changeSets(ForChangeType: SMLocalStoreRecordChangeType.recordDeleted, propertiesToFetch: propertiesToFetch, backingContext: backingContext) {
             if !deletedObjectsChangeSets.isEmpty  {
-                return deletedObjectsChangeSets.map({ (object) -> CKRecordID in
+                return deletedObjectsChangeSets.map({ (object) -> CKRecord.ID in
                     let valuesDictionary: Dictionary<String,NSObject> = object as! Dictionary<String,NSObject>
                     let recordID: String = valuesDictionary[SMStore.SMLocalStoreRecordIDAttributeName] as! String
-                    let cksRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
-                    return CKRecordID(recordName: recordID, zoneID: cksRecordZoneID)
+                    let cksRecordZoneID: CKRecordZone.ID = CKRecordZone.ID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
+                    return CKRecord.ID(recordName: recordID, zoneID: cksRecordZoneID)
                 })
             }
         }

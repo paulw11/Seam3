@@ -155,26 +155,18 @@ class SMStoreSyncOperation: Operation {
     }
     
     func fetchAndApplyServerChangesToLocalDatabase() throws {
-        var moreComing = true
-        var insertedOrUpdatedCKRecordsFromServer = [CKRecord]()
-        var deletedCKRecordIDsFromServer = [CKRecordID]()
-        while moreComing {
-            let returnValue = self.fetchRecordChangesFromServer()
-            insertedOrUpdatedCKRecordsFromServer.append(contentsOf: [] + returnValue.insertedOrUpdatedCKRecords)
-            deletedCKRecordIDsFromServer.append(contentsOf: [] + returnValue.deletedRecordIDs)
-            moreComing = returnValue.moreComing
-        }
-        try self.applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecordsFromServer, deletedCKRecordIDs: deletedCKRecordIDsFromServer)
+        let returnValue = self.fetchRecordChangesFromServer()
+        try self.applyServerChangesToLocalDatabase(returnValue.insertedOrUpdatedCKRecords, deletedCKRecordIDs: returnValue.deletedRecordIDs)
     }
     
     // MARK: Local Changes
-    func applyServerChangesToLocalDatabase(_ insertedOrUpdatedCKRecords: [CKRecord], deletedCKRecordIDs:[CKRecordID]) throws {
+    func applyServerChangesToLocalDatabase(_ insertedOrUpdatedCKRecords: [CKRecord], deletedCKRecordIDs:[CKRecord.ID]) throws {
         try self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
         try self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs)
         try self.localStoreMOC.saveIfHasChanges()
     }
     
-    func applyLocalChangesToServer(insertedOrUpdatedCKRecords: Array<CKRecord>? , deletedCKRecordIDs: Array<CKRecordID>?) throws {
+    func applyLocalChangesToServer(insertedOrUpdatedCKRecords: Array<CKRecord>? , deletedCKRecordIDs: Array<CKRecord.ID>?) throws {
         
         if insertedOrUpdatedCKRecords == nil && deletedCKRecordIDs == nil {
             return
@@ -203,7 +195,7 @@ class SMStoreSyncOperation: Operation {
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
             if operationError != nil {
                 if let error = operationError as? CKError {
-                    if let recordErrors = error.userInfo[CKPartialErrorsByItemIDKey] as? [CKRecordID:CKError] {
+                    if let recordErrors = error.userInfo[CKPartialErrorsByItemIDKey] as? [CKRecord.ID:CKError] {
                         for recordError in recordErrors.values {
                             if recordError.code != CKError.serverRecordChanged {
                                 print("Operation error:\(recordError)")
@@ -295,45 +287,50 @@ class SMStoreSyncOperation: Operation {
         return finalCKRecords
     }
     
-    func localChangesInServerRepresentation() throws -> (insertedOrUpdatedCKRecords:Array<CKRecord>?,deletedCKRecordIDs:Array<CKRecordID>?) {
+    func localChangesInServerRepresentation() throws -> (insertedOrUpdatedCKRecords:Array<CKRecord>?,deletedCKRecordIDs:Array<CKRecord.ID>?) {
         let changeSetHandler = SMStoreChangeSetHandler.defaultHandler
         let insertedOrUpdatedCKRecords = try changeSetHandler.recordsForUpdatedObjects(backingContext: self.localStoreMOC!)
         let deletedCKRecordIDs = try changeSetHandler.recordIDsForDeletedObjects(self.localStoreMOC!)
         return (insertedOrUpdatedCKRecords,deletedCKRecordIDs)
     }
     
-    func fetchRecordChangesFromServer() -> (insertedOrUpdatedCKRecords:Array<CKRecord>,deletedRecordIDs:Array<CKRecordID>,moreComing:Bool) {
+    func fetchRecordChangesFromServer() -> (insertedOrUpdatedCKRecords: Array<CKRecord>, deletedRecordIDs: Array<CKRecord.ID>) {
         
         var syncOperationError: Error? = nil
-        var moreComing = false
         
         let token = SMServerTokenHandler.defaultHandler.token()
-        let recordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
-        let fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: recordZoneID, previousServerChangeToken: token)
+        let recordZoneID = CKRecordZone.ID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
+        let fetchRecordChangesOperation = CKFetchRecordZoneChangesOperation()
+        fetchRecordChangesOperation.recordZoneIDs = [recordZoneID]
+        if #available(iOS 12.0, *) {
+            fetchRecordChangesOperation.configurationsByRecordZoneID?[recordZoneID] = CKFetchRecordZoneChangesOperation.ZoneConfiguration(previousServerChangeToken: token, resultsLimit: nil, desiredKeys: nil)
+        }
         fetchRecordChangesOperation.database = self.database
         var insertedOrUpdatedCKRecords: [CKRecord] = [CKRecord]()
-        var deletedCKRecordIDs: [CKRecordID] = [CKRecordID]()
-        fetchRecordChangesOperation.fetchRecordChangesCompletionBlock = { serverChangeToken,clientChangeToken,operationError in
-            if operationError == nil {
-                SMServerTokenHandler.defaultHandler.save(serverChangeToken: serverChangeToken!)
-                SMServerTokenHandler.defaultHandler.commit()
-            } else {
-                syncOperationError = operationError
+        var deletedCKRecordIDs: [CKRecord.ID] = [CKRecord.ID]()
+        fetchRecordChangesOperation.recordZoneChangeTokensUpdatedBlock = { recordZoneID, serverChangeToken, clientChangeTokenData in
+            SMServerTokenHandler.defaultHandler.save(serverChangeToken: serverChangeToken!)
+            SMServerTokenHandler.defaultHandler.commit()
+        }
+        fetchRecordChangesOperation.fetchRecordZoneChangesCompletionBlock = { error in
+            if error != nil {
+                syncOperationError = error
             }
         }
+        
         fetchRecordChangesOperation.recordChangedBlock = { record in
-            let ckRecord:CKRecord = record as CKRecord
+            let ckRecord = record as CKRecord
             insertedOrUpdatedCKRecords.append(ckRecord)
         }
-        fetchRecordChangesOperation.recordWithIDWasDeletedBlock = { recordID in
-            deletedCKRecordIDs.append(recordID as CKRecordID)
+        fetchRecordChangesOperation.recordWithIDWasDeletedBlock = { recordID, recordType in
+            deletedCKRecordIDs.append(recordID as CKRecord.ID)
         }
         self.operationQueue!.addOperation(fetchRecordChangesOperation)
         self.operationQueue!.waitUntilAllOperationsAreFinished()
         if syncOperationError == nil {
             
             if !insertedOrUpdatedCKRecords.isEmpty {
-                let recordIDs: [CKRecordID] = insertedOrUpdatedCKRecords.map { record in
+                let recordIDs: [CKRecord.ID] = insertedOrUpdatedCKRecords.map { record in
                     return record.recordID
                 }
                 var recordTypes: Set<String> = Set<String>()
@@ -368,12 +365,6 @@ class SMStoreSyncOperation: Operation {
                 self.operationQueue.addOperation(fetchRecordsOperation)
                 self.operationQueue.waitUntilAllOperationsAreFinished()
             }
-            if fetchRecordChangesOperation.moreComing {
-                print("More records coming", terminator: "\n")
-            } else {
-                print("No more records coming", terminator: "\n")
-            }
-            moreComing = fetchRecordChangesOperation.moreComing
         } else {
             if let error = syncOperationError as? CKError {
                 if error.code == .changeTokenExpired {
@@ -382,7 +373,7 @@ class SMStoreSyncOperation: Operation {
                 }
             }
         }
-        return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,moreComing)
+        return (insertedOrUpdatedCKRecords, deletedCKRecordIDs)
     }
     
     func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>, retryCount: Int = 0) throws {
@@ -410,11 +401,11 @@ class SMStoreSyncOperation: Operation {
       }
     }
     
-    func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<CKRecordID>) throws {
+    func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<CKRecord.ID>) throws {
         if !ckRecordIDs.isEmpty {
             let predicate = NSPredicate(format: "%K IN $ckRecordIDs",SMStore.SMLocalStoreRecordIDAttributeName)
             let ckRecordIDStrings = ckRecordIDs.map({(object)->String in
-                let ckRecordID:CKRecordID = object
+                let ckRecordID:CKRecord.ID = object
                 return ckRecordID.recordName
             })
             let entityNames = self.entities.map { (entity) in

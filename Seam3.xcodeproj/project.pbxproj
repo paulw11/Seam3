@@ -140,6 +140,7 @@
 				LastUpgradeCheck = 1000;
 				TargetAttributes = {
 					C1E7E7C11FF8F1BA00F44A5A = {
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -208,7 +209,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_VERSION = 4.2;
 				TARGET_NAME = Seam3;
 				VALID_ARCHS = "arm64 armv7 armv7s i386";
 			};
@@ -236,7 +238,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_VERSION = 4.2;
 				TARGET_NAME = Seam3;
 				VALID_ARCHS = "arm64 armv7 armv7s i386";
 			};

@@ -597,7 +597,7 @@ open class SMStore: NSIncrementalStore {
     open func handlePush(userInfo:[AnyHashable: Any], fetchCompletionHandler completion: ((_ error: Error?)->Void)? = nil) {
         let u = userInfo as! [String : NSObject]
         let ckNotification = CKNotification(fromRemoteNotificationDictionary: u)
-        if ckNotification.notificationType == CKNotificationType.recordZone {
+        if ckNotification.notificationType == CKNotification.NotificationType.recordZone {
             let recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: u)
             if let zoneID = recordZoneNotification.recordZoneID {
                 if zoneID.zoneName == SMStore.SMStoreCloudStoreCustomZoneName {

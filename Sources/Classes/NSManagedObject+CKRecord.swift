@@ -124,12 +124,12 @@ extension NSManagedObject {
             relationships = Array(self.entity.toOneRelationshipsByName().keys)
         }
         for relationship in relationships {
-            var ckReference: CKReference? = nil
+            var ckReference: CKRecord.Reference? = nil
             if let relationshipManagedObject = self.value(forKey: relationship) as? NSManagedObject {
                 if let recordIDString: String = relationshipManagedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String {
-                    let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
-                    let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
-                    ckReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.deleteSelf)
+                    let ckRecordZoneID: CKRecordZone.ID = CKRecordZone.ID.smCloudStoreCustomZoneID()
+                    let ckRecordID: CKRecord.ID = CKRecord.ID(recordName: recordIDString, zoneID: ckRecordZoneID)
+                    ckReference = CKRecord.Reference(recordID: ckRecordID, action: CKRecord.Reference.Action.deleteSelf)
                 }
             }
             ckRecord.setObject(ckReference, forKey: relationship)
@@ -143,8 +143,8 @@ extension NSManagedObject {
             ckRecord = CKRecord.recordWithEncodedFields(encodedFields!)
         } else {
             let recordIDString = self.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
-            let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
-            let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
+            let ckRecordZoneID: CKRecordZone.ID = CKRecordZone.ID.smCloudStoreCustomZoneID()
+            let ckRecordID: CKRecord.ID = CKRecord.ID(recordName: recordIDString, zoneID: ckRecordZoneID)
             ckRecord = CKRecord(recordType: self.entity.name!, recordID: ckRecordID)
         }
         if !(keys ?? []).isEmpty {
