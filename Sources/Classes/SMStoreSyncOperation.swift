@@ -308,7 +308,7 @@ class SMStoreSyncOperation: Operation {
         var moreComing = false
         
         let token = SMServerTokenHandler.defaultHandler.token()
-        let recordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+        let recordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
         let fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: recordZoneID, previousServerChangeToken: token)
         fetchRecordChangesOperation.database = self.database
         var insertedOrUpdatedCKRecords: [CKRecord] = [CKRecord]()

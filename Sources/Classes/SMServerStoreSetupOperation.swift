@@ -93,6 +93,7 @@ class SMServerStoreSetupOperation:Operation {
         operationQueue.addOperation(fetchRecordZonesOperation)
         operationQueue.waitUntilAllOperationsAreFinished()
         
+        #if !os(watchOS)
         if error == nil {
             
             let fetchSubscription = CKFetchSubscriptionsOperation(subscriptionIDs: [SMStore.SMStoreCloudStoreSubscriptionName])
@@ -138,6 +139,7 @@ class SMServerStoreSetupOperation:Operation {
             operationQueue.addOperation(fetchSubscription)
             operationQueue.waitUntilAllOperationsAreFinished()
         }
+        #endif
         
         if let completionBlock = self.setupOperationCompletionBlock {
             completionBlock(customZoneCreated,subscriptionCreated,error)

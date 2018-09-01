@@ -167,7 +167,7 @@ class SMStoreChangeSetHandler {
                 return deletedObjectsChangeSets.map({ (object) -> CKRecordID in
                     let valuesDictionary: Dictionary<String,NSObject> = object as! Dictionary<String,NSObject>
                     let recordID: String = valuesDictionary[SMStore.SMLocalStoreRecordIDAttributeName] as! String
-                    let cksRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+                    let cksRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
                     return CKRecordID(recordName: recordID, zoneID: cksRecordZoneID)
                 })
             }

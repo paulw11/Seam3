@@ -19,8 +19,8 @@ Pod::Spec.new do |s|
 
   s.description      = <<-DESC
 Seam3 is a framework built to bridge gaps between CoreData and CloudKit. It handles almost all of the CloudKit hassle.
-All you have to do is use it as a store type for your CoreData store. 
-Local caching and sync is taken care of. 
+All you have to do is use it as a store type for your CoreData store.
+Local caching and sync is taken care of.
 It builds and exposes different features to facilitate and give control to the developer where it is demanded and required.
 
 Seam3 is based on [Seam](https://github.com/nofelmahmood/Seam) by [nofelmahmood](https://github.com/nofelmahmood/)
@@ -43,9 +43,10 @@ Changes in Seam3 include:
   s.ios.deployment_target = '9.0'
   s.osx.deployment_target = '10.11'
   s.tvos.deployment_target = '9.0'
+  s.watchos.deployment_target = '3.0'
 
   s.source_files = 'Sources/Classes/**/*'
-  
+
   # s.resource_bundles = {
   #   'Seam3' => ['Seam3/Assets/*.png']
   # }
