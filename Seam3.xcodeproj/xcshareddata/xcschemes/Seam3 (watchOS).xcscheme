@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C1E7E7C11FF8F1BA00F44A5A"
+               BlueprintIdentifier = "68DB9AC4213B9779002E35C3"
                BuildableName = "Seam3.framework"
-               BlueprintName = "Seam3-iOS"
+               BlueprintName = "Seam3 (watchOS)"
                ReferencedContainer = "container:Seam3.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C1E7E7C11FF8F1BA00F44A5A"
+            BlueprintIdentifier = "68DB9AC4213B9779002E35C3"
             BuildableName = "Seam3.framework"
-            BlueprintName = "Seam3-iOS"
+            BlueprintName = "Seam3 (watchOS)"
             ReferencedContainer = "container:Seam3.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -63,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C1E7E7C11FF8F1BA00F44A5A"
+            BlueprintIdentifier = "68DB9AC4213B9779002E35C3"
             BuildableName = "Seam3.framework"
-            BlueprintName = "Seam3-iOS"
+            BlueprintName = "Seam3 (watchOS)"
             ReferencedContainer = "container:Seam3.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

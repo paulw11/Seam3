@@ -302,7 +302,7 @@ class SMStoreSyncOperation: Operation {
         let recordZoneID = CKRecordZone.ID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
         let fetchRecordChangesOperation = CKFetchRecordZoneChangesOperation()
         fetchRecordChangesOperation.recordZoneIDs = [recordZoneID]
-        if #available(iOS 12.0, watchOS 5.0, *) {
+        if #available(iOS 12.0, watchOS 5.0, macOS 10.14, tvOS 12.0, *) {
             fetchRecordChangesOperation.configurationsByRecordZoneID?[recordZoneID] = CKFetchRecordZoneChangesOperation.ZoneConfiguration(previousServerChangeToken: token, resultsLimit: nil, desiredKeys: nil)
         }
         fetchRecordChangesOperation.database = self.database
