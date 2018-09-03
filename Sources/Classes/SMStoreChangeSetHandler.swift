@@ -63,7 +63,6 @@ class SMStoreChangeSetHandler {
         recordIDAttribute.name = SMStore.SMLocalStoreRecordIDAttributeName
         recordIDAttribute.isOptional = false
         if #available(iOS 11.0, macOS 10.13, tvOS 11.0, *) {
-            entity.indexes = [NSFetchIndexDescription(name: "byRecordID", elements: [NSFetchIndexElementDescription(property: recordIDAttribute, collationType: .binary)])]
         } else {
             recordIDAttribute.isIndexed = true
         }
@@ -74,6 +73,9 @@ class SMStoreChangeSetHandler {
         recordEncodedValuesAttribute.attributeType = NSAttributeType.binaryDataAttributeType
         recordEncodedValuesAttribute.isOptional = true
         entity.properties.append(recordEncodedValuesAttribute)
+        if #available(iOS 11.0, macOS 10.13, tvOS 11.0, *) {
+            entity.indexes = [NSFetchIndexDescription(name: "byRecordID", elements: [NSFetchIndexElementDescription(property: recordIDAttribute, collationType: .binary)])]
+        }
     }
     
     func changeSetEntity() -> NSEntityDescription {
@@ -89,7 +91,6 @@ class SMStoreChangeSetHandler {
         recordIDAttribute.attributeType = NSAttributeType.stringAttributeType
         recordIDAttribute.isOptional = false
         if #available(iOS 11.0, macOS 10.14, tvOS 11.0, *) {
-            changeSetEntity.indexes = [NSFetchIndexDescription(name: "byRecordID", elements: [NSFetchIndexElementDescription(property: recordIDAttribute, collationType: .binary)])]
         } else {
             recordIDAttribute.isIndexed = true
         }
@@ -111,6 +112,9 @@ class SMStoreChangeSetHandler {
         changeTypeQueuedAttribute.attributeType = NSAttributeType.booleanAttributeType
         changeTypeQueuedAttribute.defaultValue = NSNumber(value: false as Bool)
         changeSetEntity.properties.append(changeTypeQueuedAttribute)
+        if #available(iOS 11.0, macOS 10.14, tvOS 11.0, *) {
+            changeSetEntity.indexes = [NSFetchIndexDescription(name: "byRecordID", elements: [NSFetchIndexElementDescription(property: recordIDAttribute, collationType: .binary)])]
+        }
         return changeSetEntity
     }
     
