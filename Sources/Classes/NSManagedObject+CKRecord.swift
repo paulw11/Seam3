@@ -30,6 +30,7 @@
 import Foundation
 import CoreData
 import CloudKit
+import os.log
 
 extension NSManagedObject {
     fileprivate func setAttributesValues(ofCKRecord ckRecord:CKRecord, withValuesOfAttributeWithKeys keys: [String]?) {
@@ -109,7 +110,7 @@ extension NSManagedObject {
             returnAsset = CKAsset(fileURL: fileURL)
             
         } catch {
-            print("Error creating asset: \(error)")
+            os_log("Error creating asset: %@", type: .error, error.localizedDescription)
         }
         
         return returnAsset

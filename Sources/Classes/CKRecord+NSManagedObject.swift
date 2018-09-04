@@ -30,6 +30,7 @@
 import Foundation
 import CoreData
 import CloudKit
+import os.log
 
 extension CKRecord {
     
@@ -90,7 +91,7 @@ extension CKRecord {
                                     let relationshipManagedObject: NSManagedObject = results.last as! NSManagedObject
                                     managedObjectsDictionary[key] = relationshipManagedObject
                                 } else {
-                                    print("WARNING Missing NON-OPTIONAL related object for '\(entity.name ?? "n/a").\(key)' (missing '\(name)' (\(recordIDString)) )")
+                                    os_log("WARNING Missing NON-OPTIONAL related object for %@.%@' (missing '%@' (%@) )", type: .debug, entity.name ?? "n/a", key, name, recordIDString)
                                     context.refresh(managedObject, mergeChanges: false)
                                     throw SMStoreError.missingRelatedObject
                                 }

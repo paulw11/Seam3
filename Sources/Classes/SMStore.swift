@@ -171,7 +171,7 @@
 import CoreData
 import CloudKit
 import ObjectiveC
-
+import os.log
 
 
 public struct SMStoreNotification {
@@ -513,7 +513,7 @@ open class SMStore: NSIncrementalStore {
     
     open func verifyCloudKitStoreExists(_ completionHandler: ((_ exists: Bool, _ error: Error?) -> Void)?) {
         guard self.cloudKitValid else {
-            print("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
+            os_log("Access to CloudKit has not been verified by calling verifyCloudKitConnection", type: .info)
             return
         }
         let operation = SMServerZoneLookupOperation(cloudDatabase: database)
@@ -531,7 +531,7 @@ open class SMStore: NSIncrementalStore {
     
     open func triggerSync(complete: Bool = false, fetchCompletionHandler completion: ((Error?)->Void)? = nil) {
         guard self.cloudKitValid else {
-            print("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
+            os_log("Access to CloudKit has not been verified by calling verifyCloudKitConnection", type: .info)
             return
         }
         
@@ -542,7 +542,7 @@ open class SMStore: NSIncrementalStore {
         let syncOperationBlock: (_ error: Error?) -> Void = { error in
             
             if let error = error {
-                print("Sync unsuccessful \(error)")
+                os_log("Sync unsuccessful %@", type: .error, error.localizedDescription)
                 OperationQueue.main.addOperation {
                     NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                 }
@@ -555,12 +555,12 @@ open class SMStore: NSIncrementalStore {
                 
                 self.syncOperation!.syncCompletionBlock =  { error in
                     if let error = error {
-                        print("Sync unsuccessful \(error)")
+                        os_log("Sync unsuccessful %@", type: .error, error.localizedDescription)
                         OperationQueue.main.addOperation {
                             NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                         }
                     } else {
-                        print("Sync performed successfully")
+                        os_log("Sync performed successfully", type: .info)
                         OperationQueue.main.addOperation {
                             NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self)
                         }
@@ -578,7 +578,7 @@ open class SMStore: NSIncrementalStore {
             self.cloudStoreSetupOperation = SMServerStoreSetupOperation(cloudDatabase: self.database)
             self.cloudStoreSetupOperation!.setupOperationCompletionBlock = { customZoneWasCreated, customZoneSubscriptionWasCreated, error in
                 if let error = error {
-                    print("Error setting up cloudkit: \(error)")
+                    os_log("Error setting up cloudkit: %@", type: .error, error.localizedDescription)
                     syncOperationBlock(error)
                 } else {
                     syncOperationBlock(nil)

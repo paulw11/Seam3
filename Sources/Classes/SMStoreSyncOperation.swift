@@ -30,6 +30,7 @@
 import Foundation
 import CloudKit
 import CoreData
+import os.log
 
 
 enum SMSyncOperationError: Error {
@@ -89,7 +90,7 @@ class SMStoreSyncOperation: Operation {
     
     // MARK: Sync
     override func main() {
-        print("Sync Started", terminator: "\n")
+        os_log("Cloud Sync Started", type: .info)
         self.operationQueue = OperationQueue()
         self.operationQueue.maxConcurrentOperationCount = 1
         self.localStoreMOC = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.privateQueueConcurrencyType)
@@ -100,10 +101,10 @@ class SMStoreSyncOperation: Operation {
             NotificationCenter.default.removeObserver(self)
             do {
                 try self.performSync()
-                print("Sync Performed", terminator: "\n")
+                os_log("Cloud Sync Performed", type: .info)
                 completionBlock(nil)
             } catch let error as NSError {
-                print("Sync Performed with Error", terminator: "\n")
+                os_log("Cloud Sync Performed with Error", type: .error)
                 completionBlock(error)
             }
         }
@@ -140,16 +141,17 @@ class SMStoreSyncOperation: Operation {
             SMServerTokenHandler.defaultHandler.commit()
             try SMStoreChangeSetHandler.defaultHandler.removeAllQueuedChangeSets(backingContext: self.localStoreMOC!)
         } catch {
-            print("ERROR during performSync() \(error)")
-          if let conflictList = (error as NSError).userInfo["conflictList"] as? [NSMergeConflict] {
-            for conflict in conflictList {
-              print("\nconflict:")
-              print("\nobjectSnapshot: \(conflict.objectSnapshot ?? [:])")
-              print("\ncachedSnapshot: \(conflict.cachedSnapshot ?? [:])")
-              print("\npersistedSnapshot: \(conflict.persistedSnapshot ?? [:])")
+            os_log("ERROR during performSync() %@", type: .error, error.localizedDescription)
+            #if DEBUG
+            if let conflictList = (error as NSError).userInfo["conflictList"] as? [NSMergeConflict] {
+                for conflict in conflictList {
+                    print("\nconflict:")
+                    print("\nobjectSnapshot: \(conflict.objectSnapshot ?? [:])")
+                    print("\ncachedSnapshot: \(conflict.cachedSnapshot ?? [:])")
+                    print("\npersistedSnapshot: \(conflict.persistedSnapshot ?? [:])")
+                }
             }
-          }
-
+            #endif
             throw error
         }
     }
@@ -198,7 +200,7 @@ class SMStoreSyncOperation: Operation {
                     if let recordErrors = error.userInfo[CKPartialErrorsByItemIDKey] as? [CKRecord.ID:CKError] {
                         for recordError in recordErrors.values {
                             if recordError.code != CKError.serverRecordChanged {
-                                print("Operation error:\(recordError)")
+                                os_log("Operation error:%@", type: .error, error.localizedDescription)
                             }
                         }
                     }
