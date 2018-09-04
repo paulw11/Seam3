@@ -594,7 +594,7 @@ open class SMStore: NSIncrementalStore {
     /// Handle a push notification that indicates records have been updated in Cloud Kit
     /// - parameter userInfo: The userInfo dictionary from the push notification
     
-    open func handlePush(userInfo:[AnyHashable: Any], fetchCompletionHandler completion: ((_ error: Error?)->Void)? = nil) {
+    open func handlePush(userInfo:[AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (FetchResult) -> Void) {
         let u = userInfo as! [String : NSObject]
         let ckNotification = CKNotification(fromRemoteNotificationDictionary: u)
         if ckNotification.notificationType == CKNotification.NotificationType.recordZone {
@@ -602,7 +602,13 @@ open class SMStore: NSIncrementalStore {
             if let zoneID = recordZoneNotification.recordZoneID {
                 if zoneID.zoneName == SMStore.SMStoreCloudStoreCustomZoneName {
                     //self.triggerSync(block: true)
-                    self.triggerSync(complete: false, fetchCompletionHandler: completion)
+                    self.triggerSync(complete: false) { error in
+                        if error != nil {
+                            completionHandler(.failed)
+                        } else {
+                            completionHandler(.newData)
+                        }
+                    }
                 }
             }
         }
@@ -1009,3 +1015,24 @@ open class SMStore: NSIncrementalStore {
     }
 }
 
+// MARK: - Fetch Result
+
+public enum FetchResult: UInt {
+    case newData = 0
+    case noData = 1
+    case failed = 2
+}
+
+#if os(iOS)
+import UIKit
+
+public extension FetchResult {
+    public var uiBackgroundFetchResult: UIBackgroundFetchResult {
+        switch self {
+        case .newData: return .newData
+        case .noData: return .noData
+        case .failed: return .failed
+        }
+    }
+}
+#endif
