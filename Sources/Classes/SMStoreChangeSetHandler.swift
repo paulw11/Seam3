@@ -62,7 +62,10 @@ class SMStoreChangeSetHandler {
         let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
         recordIDAttribute.name = SMStore.SMLocalStoreRecordIDAttributeName
         recordIDAttribute.isOptional = false
-        recordIDAttribute.isIndexed = true
+        if #available(iOS 11.0, macOS 10.13, tvOS 11.0, *) {
+        } else {
+            recordIDAttribute.isIndexed = true
+        }
         recordIDAttribute.attributeType = NSAttributeType.stringAttributeType
         entity.properties.append(recordIDAttribute)
         let recordEncodedValuesAttribute: NSAttributeDescription = NSAttributeDescription()
@@ -70,6 +73,9 @@ class SMStoreChangeSetHandler {
         recordEncodedValuesAttribute.attributeType = NSAttributeType.binaryDataAttributeType
         recordEncodedValuesAttribute.isOptional = true
         entity.properties.append(recordEncodedValuesAttribute)
+        if #available(iOS 11.0, macOS 10.13, tvOS 11.0, *) {
+            entity.indexes = [NSFetchIndexDescription(name: "byRecordID", elements: [NSFetchIndexElementDescription(property: recordIDAttribute, collationType: .binary)])]
+        }
     }
     
     func changeSetEntity() -> NSEntityDescription {
@@ -84,7 +90,10 @@ class SMStoreChangeSetHandler {
         recordIDAttribute.name = SMStore.SMLocalStoreRecordIDAttributeName
         recordIDAttribute.attributeType = NSAttributeType.stringAttributeType
         recordIDAttribute.isOptional = false
-        recordIDAttribute.isIndexed = true
+        if #available(iOS 11.0, macOS 10.14, tvOS 11.0, *) {
+        } else {
+            recordIDAttribute.isIndexed = true
+        }
         changeSetEntity.properties.append(recordIDAttribute)
         let recordChangedPropertiesAttribute: NSAttributeDescription = NSAttributeDescription()
         recordChangedPropertiesAttribute.name = SMStore.SMLocalStoreRecordChangedPropertiesAttributeName
@@ -103,6 +112,9 @@ class SMStoreChangeSetHandler {
         changeTypeQueuedAttribute.attributeType = NSAttributeType.booleanAttributeType
         changeTypeQueuedAttribute.defaultValue = NSNumber(value: false as Bool)
         changeSetEntity.properties.append(changeTypeQueuedAttribute)
+        if #available(iOS 11.0, macOS 10.14, tvOS 11.0, *) {
+            changeSetEntity.indexes = [NSFetchIndexDescription(name: "byRecordID", elements: [NSFetchIndexElementDescription(property: recordIDAttribute, collationType: .binary)])]
+        }
         return changeSetEntity
     }
     
@@ -160,15 +172,15 @@ class SMStoreChangeSetHandler {
     }
     
     
-    func recordIDsForDeletedObjects(_ backingContext: NSManagedObjectContext) throws -> [CKRecordID]? {
+    func recordIDsForDeletedObjects(_ backingContext: NSManagedObjectContext) throws -> [CKRecord.ID]? {
         let propertiesToFetch = [SMStore.SMLocalStoreRecordIDAttributeName]
         if let deletedObjectsChangeSets = try self.changeSets(ForChangeType: SMLocalStoreRecordChangeType.recordDeleted, propertiesToFetch: propertiesToFetch, backingContext: backingContext) {
             if !deletedObjectsChangeSets.isEmpty  {
-                return deletedObjectsChangeSets.map({ (object) -> CKRecordID in
+                return deletedObjectsChangeSets.map({ (object) -> CKRecord.ID in
                     let valuesDictionary: Dictionary<String,NSObject> = object as! Dictionary<String,NSObject>
                     let recordID: String = valuesDictionary[SMStore.SMLocalStoreRecordIDAttributeName] as! String
-                    let cksRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
-                    return CKRecordID(recordName: recordID, zoneID: cksRecordZoneID)
+                    let cksRecordZoneID: CKRecordZone.ID = CKRecordZone.ID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
+                    return CKRecord.ID(recordName: recordID, zoneID: cksRecordZoneID)
                 })
             }
         }

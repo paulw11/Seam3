@@ -51,7 +51,7 @@ class SMServerStoreSetupOperation:Operation {
         
         let fetchRecordZonesOperation = CKFetchRecordZonesOperation(recordZoneIDs: [zone.zoneID])
         if #available(iOS 11.0, tvOS 11.0, OSX 10.13, *) {
-          let config = CKOperationConfiguration()
+          let config = CKOperation.Configuration()
           config.timeoutIntervalForResource = 10.0
           fetchRecordZonesOperation.configuration = config
         } else if #available(iOS 10.0, tvOS 11.0, OSX 10.12, *) {
@@ -93,6 +93,7 @@ class SMServerStoreSetupOperation:Operation {
         operationQueue.addOperation(fetchRecordZonesOperation)
         operationQueue.waitUntilAllOperationsAreFinished()
         
+        #if !os(watchOS)
         if error == nil {
             
             let fetchSubscription = CKFetchSubscriptionsOperation(subscriptionIDs: [SMStore.SMStoreCloudStoreSubscriptionName])
@@ -108,10 +109,10 @@ class SMServerStoreSetupOperation:Operation {
                 }
                 if operationError == nil || ckError?.code == .unknownItem {
                     if subscriptions?.first == nil {
-                        let recordZoneID = CKRecordZoneID.smCloudStoreCustomZoneID()
-                        let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStore.SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
+                        let recordZoneID = CKRecordZone.ID.smCloudStoreCustomZoneID()
+                        let subscription = CKRecordZoneSubscription(zoneID: recordZoneID, subscriptionID: SMStore.SMStoreCloudStoreSubscriptionName)
                         
-                        let subscriptionNotificationInfo = CKNotificationInfo()
+                        let subscriptionNotificationInfo = CKSubscription.NotificationInfo()
                         subscriptionNotificationInfo.shouldSendContentAvailable = true
                         subscription.notificationInfo = subscriptionNotificationInfo
                         if #available(iOS 9.0, tvOS 10.0, *) {
@@ -138,6 +139,7 @@ class SMServerStoreSetupOperation:Operation {
             operationQueue.addOperation(fetchSubscription)
             operationQueue.waitUntilAllOperationsAreFinished()
         }
+        #endif
         
         if let completionBlock = self.setupOperationCompletionBlock {
             completionBlock(customZoneCreated,subscriptionCreated,error)

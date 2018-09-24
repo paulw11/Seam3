@@ -29,14 +29,14 @@
 import CloudKit
 
 
-extension CKRecordZoneID {
+extension CKRecordZone.ID {
     
-    class func smCloudStoreCustomZoneID() -> CKRecordZoneID {
-        var zoneID: CKRecordZoneID
+    class func smCloudStoreCustomZoneID() -> CKRecordZone.ID {
+        var zoneID: CKRecordZone.ID
         if #available(iOS 10.0, macOS 10.12, tvOS 10.0, *) {
-            zoneID =  CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
+            zoneID =  CKRecordZone.ID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
         } else {
-            zoneID = CKRecordZoneID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+            zoneID = CKRecordZone.ID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName)
         }
         return zoneID
     }
