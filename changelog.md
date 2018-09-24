@@ -1,6 +1,11 @@
 Seam3 Changelog
 ===============
 
+# [1.4.7]
+ - Update to Swift 4.2
+ - Add support for WatchOS
+ - Add shared schemes for Carthage
+
 # [1.4.6]
  - Handle purged zone in CloudKit
 

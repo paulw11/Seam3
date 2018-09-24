@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Seam3'
-  s.version          = '1.4.6'
+  s.version          = '1.4.7'
   s.summary          = 'A CoreData store backed by CloudKit.'
 
 # This description is used to generate tags and improve search results.
@@ -29,7 +29,7 @@ Changes in Seam3 include:
 
 * Corrects one-to-many and many-to-one relationship mapping between CoreData and CloudKit
 * Adds mapping between binary attributes in CoreData and CKAssets in CloudKit
-* Code updates for Swift 3.0
+* Code updates for Swift 4.2
 * Restructures code to eliminate the use of global variables
                        DESC
 
