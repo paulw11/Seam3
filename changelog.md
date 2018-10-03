@@ -1,6 +1,10 @@
 Seam3 Changelog
 ===============
 
+# [1.4.8]
+ - Include platforms in example pod file
+ - Update osx minimum version
+
 # [1.4.7]
  - Update to Swift 4.2
  - Add support for WatchOS
