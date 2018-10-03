@@ -1,6 +1,9 @@
 use_frameworks!
 
 target 'Seam3_Example' do
+
+  platform :ios, '10.0'
+	
   pod 'Seam3', :path => '../'
 
   target 'Seam3_Tests' do
@@ -9,10 +12,12 @@ target 'Seam3_Example' do
 end
 
 target 'Seam3_Example_OSX' do
+  platform :osx, '10.12'
   pod 'Seam3', :path => '../'
 end
 
 
 target 'Seam3_Example_TVOS' do
+  platform :tvos, '10.0'
   pod 'Seam3', :path => '../'
 end
