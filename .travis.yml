@@ -2,15 +2,12 @@ language: swift
 osx_image: xcode10
 podfile: Example/Podfile
 
+xcode_workspace: Example/Seam3.xcworkspace
+xcode_scheme: Seam3-Example
+xcode_destination: platform=iOS Simulator,OS=12,name=iPhone 8
+
 notifications:
   webhooks: https://outlook.office365.com/webhook/cdda2aa3-6ecb-4b3c-be58-37c3ecf51f82@e3cf3c98-a978-465f-8254-9d541eeea73c/TravisCI/7937bbbcb04f482db82d650268b0df85/5659d4fa-3061-4ad6-8f54-5cf55bc655de
 
-before_install:
-- rvm get head
-- gem install cocoapods --pre # Since Travis is not always on latest version
-- pod --version
-- pod install --project-directory=Example
 script:
-- set -o pipefail
-- xcodebuild test -workspace Example/Seam3.xcworkspace -scheme Seam3-Example -sdk iphonesimulator -destination "OS=12.0,name=iPhone 8" ONLY_ACTIVE_ARCH=NO | xcpretty
 - pod lib lint
