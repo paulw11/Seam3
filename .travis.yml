@@ -1,5 +1,5 @@
-language: objective-c
-osx_image: xcode8
+language: swift
+osx_image: xcode10
 podfile: Example/Podfile
 
 notifications:
@@ -12,5 +12,5 @@ before_install:
 - pod install --project-directory=Example
 script:
 - set -o pipefail
-- xcodebuild test -workspace Example/Seam3.xcworkspace -scheme Seam3-Example -sdk iphonesimulator -destination "OS=10.0,name=iPhone 7" ONLY_ACTIVE_ARCH=NO | xcpretty
+- xcodebuild test -workspace Example/Seam3.xcworkspace -scheme Seam3-Example -sdk iphonesimulator -destination "OS=12.0,name=iPhone 8" ONLY_ACTIVE_ARCH=NO | xcpretty
 - pod lib lint
