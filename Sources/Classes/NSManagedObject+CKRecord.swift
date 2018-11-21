@@ -110,7 +110,7 @@ extension NSManagedObject {
             returnAsset = CKAsset(fileURL: fileURL)
             
         } catch {
-            os_log("Error creating asset: %@", type: .error, error.localizedDescription)
+            SMStore.logger?.error("ERROR creating asset: \(error.localizedDescription)")
         }
         
         return returnAsset

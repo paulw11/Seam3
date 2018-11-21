@@ -75,10 +75,10 @@ extension CKRecord {
             let referencesValuesDictionary = self.dictionaryWithValues(forKeys: self.allReferencesKeys(usingRelationshipsByNameFromEntity: entity.relationshipsByName))
             var managedObjectsDictionary: Dictionary<String,AnyObject> = Dictionary<String,AnyObject>()
             for (key,value) in referencesValuesDictionary {
-               /* if (value as? String) != nil && (value as! String) == SMStore.SMCloudRecordNilValue {
-                    managedObjectsDictionary[key] = SMStore.SMCloudRecordNilValue as AnyObject?
-                    continue
-                }*/
+                /* if (value as? String) != nil && (value as! String) == SMStore.SMCloudRecordNilValue {
+                 managedObjectsDictionary[key] = SMStore.SMCloudRecordNilValue as AnyObject?
+                 continue
+                 }*/
                 if let relationshipDescription = entity.relationshipsByName[key] {
                     if let destinationEntity = relationshipDescription.destinationEntity {
                         if let name = destinationEntity.name  {
@@ -87,14 +87,14 @@ extension CKRecord {
                             fetchRequest.predicate = NSPredicate(format: "%K == %@", SMStore.SMLocalStoreRecordIDAttributeName,recordIDString)
                             fetchRequest.fetchLimit = 1
                             let results = try context.fetch(fetchRequest)
-                                if !results.isEmpty {
-                                    let relationshipManagedObject: NSManagedObject = results.last as! NSManagedObject
-                                    managedObjectsDictionary[key] = relationshipManagedObject
-                                } else {
-                                    os_log("WARNING Missing NON-OPTIONAL related object for %@.%@' (missing '%@' (%@) )", type: .debug, entity.name ?? "n/a", key, name, recordIDString)
-                                    context.refresh(managedObject, mergeChanges: false)
-                                    throw SMStoreError.missingRelatedObject
-                                }
+                            if !results.isEmpty {
+                                let relationshipManagedObject: NSManagedObject = results.last as! NSManagedObject
+                                managedObjectsDictionary[key] = relationshipManagedObject
+                            } else {
+                                SMStore.logger?.info("WARNING Missing NON-OPTIONAL related object for \(entity.name ?? "nil").\(key)' (missing '\(name)' (\(recordIDString)) )")
+                                context.refresh(managedObject, mergeChanges: false)
+                                throw SMStoreError.missingRelatedObject
+                            }
                         }
                     }
                 }
@@ -116,11 +116,13 @@ extension CKRecord {
                 let results = try context.fetch(fetchRequest)
                 if !results.isEmpty {
                     managedObject = results.last as? NSManagedObject
+                    SMStore.logger?.debug("OK will update existing object from CKRecord \(entityName), recordID=\(recordIDString)")
                 }
                 
                 if managedObject == nil {
                     managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: context)
                     managedObject!.setValue(recordIDString, forKey: SMStore.SMLocalStoreRecordIDAttributeName)
+                    SMStore.logger?.debug("OK will insert new object from CKRecord \(entityName), recordID=\(recordIDString)")
                 }
                 
                 try self.setValuesOn(managedObject!, inContext:context)
@@ -130,46 +132,46 @@ extension CKRecord {
         throw SMStoreError.backingStoreUpdateError
     }
     
-                
-      
-  private func setValuesOn(_ managedObject: NSManagedObject, inContext context: NSManagedObjectContext ) throws {
     
-    let attributes = managedObject.entity.attributesByName
-    var transformableAttributeKeys = Set<String>()
-    for (key, attributeDescription) in attributes {
-      if attributeDescription.attributeType == NSAttributeType.transformableAttributeType {
-        transformableAttributeKeys.insert(key)
-      }
-    }
-    managedObject.setValue(self.encodedSystemFields(), forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName)
-    if var valuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)  {
-      valuesDictionary = self.replaceAssets(in:valuesDictionary)
-      valuesDictionary = self.transformAttributes(in: valuesDictionary, keys: transformableAttributeKeys)
-      managedObject.setValuesForKeys(valuesDictionary)
-    }
-    let referencesValuesDictionary = try self.allCKReferencesAsManagedObjects(usingContext: context, forManagedObject: managedObject)
-    if referencesValuesDictionary != nil {
-      for (key,value) in referencesValuesDictionary! {
-        managedObject.setValue(value, forKey: key)
-      }
-    }
-  }
-  
-  private func transformAttributes(in dictionary: [String:AnyObject], keys: Set<String>) -> [String:AnyObject] {
     
-    var returnDict = [String:AnyObject]()
-    for (key,value) in dictionary {
-      if keys.contains(key) {
-        if let data = dictionary[key] as? Data {
-          let unarchived = NSKeyedUnarchiver.unarchiveObject(with: data) as AnyObject
-          returnDict[key] = unarchived
+    private func setValuesOn(_ managedObject: NSManagedObject, inContext context: NSManagedObjectContext ) throws {
+        
+        let attributes = managedObject.entity.attributesByName
+        var transformableAttributeKeys = Set<String>()
+        for (key, attributeDescription) in attributes {
+            if attributeDescription.attributeType == NSAttributeType.transformableAttributeType {
+                transformableAttributeKeys.insert(key)
+            }
         }
-      } else {
-        returnDict[key] = value
-      }
+        managedObject.setValue(self.encodedSystemFields(), forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName)
+        if var valuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)  {
+            valuesDictionary = self.replaceAssets(in:valuesDictionary)
+            valuesDictionary = self.transformAttributes(in: valuesDictionary, keys: transformableAttributeKeys)
+            managedObject.setValuesForKeys(valuesDictionary)
+        }
+        let referencesValuesDictionary = try self.allCKReferencesAsManagedObjects(usingContext: context, forManagedObject: managedObject)
+        if referencesValuesDictionary != nil {
+            for (key,value) in referencesValuesDictionary! {
+                managedObject.setValue(value, forKey: key)
+            }
+        }
     }
-    return returnDict
-  }
+    
+    private func transformAttributes(in dictionary: [String:AnyObject], keys: Set<String>) -> [String:AnyObject] {
+        
+        var returnDict = [String:AnyObject]()
+        for (key,value) in dictionary {
+            if keys.contains(key) {
+                if let data = dictionary[key] as? Data {
+                    let unarchived = NSKeyedUnarchiver.unarchiveObject(with: data) as AnyObject
+                    returnDict[key] = unarchived
+                }
+            } else {
+                returnDict[key] = value
+            }
+        }
+        return returnDict
+    }
     
     private func replaceAssets(in dictionary: [String:AnyObject]) -> [String:AnyObject] {
         var returnDict = [String:AnyObject]()

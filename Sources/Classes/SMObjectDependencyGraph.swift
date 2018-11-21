@@ -121,7 +121,7 @@ class SMObjectDependencyGraph {
                 // Same order as entities
                 return index2 > index1
             }
-            os_log("WARNING Entity '%@' or '%@' not referenced in sortedEntityNames (this should never happen)", type: .debug, o1.entityIdentifier, o2.entityIdentifier)
+            SMStore.logger?.error("WARNING Entity '\(o1.entityIdentifier)' or '\(o2.entityIdentifier)' not referenced in sortedEntityNames (this should never happen)")
             return false
         }
         return results
@@ -133,7 +133,7 @@ class SMObjectDependencyGraph {
             for dependency in dependencies {
                 var augmentedChain = chain
                 if chain.contains(dependency) {
-                    os_log("WARNING Loop Detected! Path %@ already contains '%@'", type: .debug, chain.joined(separator: ", "), dependency)
+                    SMStore.logger?.info("WARNING Loop Detected! Path '\(chain.joined(separator: ", "))' already contains '\(dependency)'")
                     chains.append(chain)
                 } else {
                     augmentedChain.append(dependency)
