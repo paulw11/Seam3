@@ -357,11 +357,15 @@ class SMStoreSyncOperation: Operation {
         var deletedCKRecordIDs: [CKRecord.ID] = [CKRecord.ID]()
         fetchRecordChangesOperation.recordZoneFetchCompletionBlock = { recordZoneID, serverChangeToken, clientChangeTokenData, moreComing, recordZoneError in
             SMStore.logger?.debug("OK (sync operation) recordZoneFetchCompletionBlock called with serverChangeToken=\(serverChangeToken), clientChangeTokenData=\(clientChangeTokenData)")
-            SMServerTokenHandler.defaultHandler.save(serverChangeToken: serverChangeToken!)
+            if let token = serverChangeToken {
+                SMServerTokenHandler.defaultHandler.save(serverChangeToken: token)
+            }
         }
         fetchRecordChangesOperation.recordZoneChangeTokensUpdatedBlock = { recordZoneID, serverChangeToken, clientChangeTokenData in
             SMStore.logger?.debug("OK (sync operation) recordZoneChangeTokensUpdatedBlock called with serverChangeToken=\(serverChangeToken), clientChangeTokenData=\(clientChangeTokenData)")
-            SMServerTokenHandler.defaultHandler.save(serverChangeToken: serverChangeToken!)
+            if let token = serverChangeToken {
+                SMServerTokenHandler.defaultHandler.save(serverChangeToken: token)
+            }
         }
         fetchRecordChangesOperation.fetchRecordZoneChangesCompletionBlock = { error in
             if error != nil {

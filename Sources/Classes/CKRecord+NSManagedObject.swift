@@ -70,15 +70,10 @@ extension CKRecord {
     }
     
     fileprivate func allCKReferencesAsManagedObjects(usingContext context: NSManagedObjectContext, forManagedObject managedObject: NSManagedObject) throws -> [String:AnyObject]? {
-        // TODO: Need to fix relationships. No relationships are being saved at the moment
         if let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType] {
             let referencesValuesDictionary = self.dictionaryWithValues(forKeys: self.allReferencesKeys(usingRelationshipsByNameFromEntity: entity.relationshipsByName))
             var managedObjectsDictionary: Dictionary<String,AnyObject> = Dictionary<String,AnyObject>()
             for (key,value) in referencesValuesDictionary {
-                /* if (value as? String) != nil && (value as! String) == SMStore.SMCloudRecordNilValue {
-                 managedObjectsDictionary[key] = SMStore.SMCloudRecordNilValue as AnyObject?
-                 continue
-                 }*/
                 if let relationshipDescription = entity.relationshipsByName[key] {
                     if let destinationEntity = relationshipDescription.destinationEntity {
                         if let name = destinationEntity.name  {

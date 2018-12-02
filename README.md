@@ -135,7 +135,7 @@ lazy var persistentContainer: NSPersistentContainer = {
 ```
 By default, logs will be written to `os_log`, but you can route log messages to your own class by extending `SMLogger`:
 ```
-class WTVAppDelegate: SMLogDelegate {
+class AppDelegate: SMLogDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         SMStore.logger = self
     }
