@@ -41,9 +41,13 @@ class SMServerTokenHandler {
     func token() -> CKServerChangeToken? {
         if UserDefaults.standard.object(forKey: SMServerTokenHandler.SMStoreSyncOperationServerTokenKey) != nil {
             let fetchTokenKeyArchived = UserDefaults.standard.object(forKey: SMServerTokenHandler.SMStoreSyncOperationServerTokenKey) as! Data
-            let token = NSKeyedUnarchiver.unarchiveObject(with: fetchTokenKeyArchived) as? CKServerChangeToken
+            if let token = NSKeyedUnarchiver.unarchiveObject(with: fetchTokenKeyArchived) as? CKServerChangeToken {
             SMStore.logger?.debug("OK Retrieved CKServerChangeToken from userDefault: \(token)")
-            return token
+                return token
+            } else {
+                 SMStore.logger?.debug("No CKServerChangeToken in userDefault")
+            }
+            return nil
         }
         return nil
     }

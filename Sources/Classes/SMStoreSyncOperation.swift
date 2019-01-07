@@ -335,7 +335,11 @@ class SMStoreSyncOperation: Operation {
         
         let token = SMServerTokenHandler.defaultHandler.token()
         let recordZoneID = CKRecordZone.ID(zoneName: SMStore.SMStoreCloudStoreCustomZoneName, ownerName: CKCurrentUserDefaultName)
-        SMStore.logger?.debug("OK Will fetch server changes with previousServerChangeToken=\(token)")
+        if let token = token {
+            SMStore.logger?.debug("OK Will fetch server changes with previousServerChangeToken=\(token)")
+        } else {
+             SMStore.logger?.debug("No previous change token")
+        }
         let fetchRecordChangesOperation = CKFetchRecordZoneChangesOperation()
         fetchRecordChangesOperation.recordZoneIDs = [recordZoneID]
         /* By Tifroz: the commented code below (fetchRecordChangesOperation.configurationsByRecordZoneID) doesn't work at all - at least on iOS12
@@ -356,13 +360,14 @@ class SMStoreSyncOperation: Operation {
         var insertedOrUpdatedCKRecords: [CKRecord] = [CKRecord]()
         var deletedCKRecordIDs: [CKRecord.ID] = [CKRecord.ID]()
         fetchRecordChangesOperation.recordZoneFetchCompletionBlock = { recordZoneID, serverChangeToken, clientChangeTokenData, moreComing, recordZoneError in
-            SMStore.logger?.debug("OK (sync operation) recordZoneFetchCompletionBlock called with serverChangeToken=\(serverChangeToken), clientChangeTokenData=\(clientChangeTokenData)")
+            SMStore.logger?.debug("OK (sync operation) recordZoneFetchCompletionBlock called with serverChangeToken=\(String(describing: serverChangeToken)), clientChangeTokenData=\(String(describing: clientChangeTokenData))")
+
             if let token = serverChangeToken {
                 SMServerTokenHandler.defaultHandler.save(serverChangeToken: token)
             }
         }
         fetchRecordChangesOperation.recordZoneChangeTokensUpdatedBlock = { recordZoneID, serverChangeToken, clientChangeTokenData in
-            SMStore.logger?.debug("OK (sync operation) recordZoneChangeTokensUpdatedBlock called with serverChangeToken=\(serverChangeToken), clientChangeTokenData=\(clientChangeTokenData)")
+            SMStore.logger?.debug("OK (sync operation) recordZoneChangeTokensUpdatedBlock called with serverChangeToken=\(String(describing: serverChangeToken)), clientChangeTokenData=\(String(describing: clientChangeTokenData))")
             if let token = serverChangeToken {
                 SMServerTokenHandler.defaultHandler.save(serverChangeToken: token)
             }
@@ -450,7 +455,7 @@ class SMStoreSyncOperation: Operation {
         let sorted = SMObjectDependencyGraph(records: ckRecords, for: entities).sorted as! [CKRecord]
         for record in sorted {
             do {
-                let managedObj = try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
+                let _ = try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
             } catch SMStoreError.missingRelatedObject {
                 deferredRecords.append(record)
             }
@@ -480,7 +485,7 @@ class SMStoreSyncOperation: Operation {
             for name in entityNames {
                 let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: name as String)
                 //fetchRequest.predicate = NSPredicate.
-                let all = try self.localStoreMOC.fetch(fetchRequest) as! [NSManagedObject]
+                let _ = try self.localStoreMOC.fetch(fetchRequest) as! [NSManagedObject]
                 fetchRequest.predicate = predicate.withSubstitutionVariables(["ckRecordIDs":ckRecordIDStrings])
                 let results = try self.localStoreMOC.fetch(fetchRequest)
                 if !results.isEmpty {
