@@ -1,6 +1,13 @@
 Seam3 Changelog
 ===============
 
+# [1.4.9]
+ - Updates to example app
+ - Use flexible logging via os_log
+ - Address issues with concurrent access (Potential crashes)
+ - Address issues with handling for server change token that caused issues with sync
+ - Fix error in readme (#100)
+
 # [1.4.8]
  - Include platforms in example pod file
  - Update osx minimum version
