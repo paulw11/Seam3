@@ -53,6 +53,7 @@
 		68DB9AD3213B9779002E35C3 /* SMStoreSyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* SMStoreSyncOperation.swift */; };
 		68DB9AD5213B9779002E35C3 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1E7E7D71FF8F40100F44A5A /* CloudKit.framework */; };
 		68ED0157213A39A500E0A1E7 /* SMBatchDeleteResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68ED0156213A39A500E0A1E7 /* SMBatchDeleteResult.swift */; };
+		BBCB6B3D21E40CA60073BACA /* SMLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBCB6B3C21E40CA60073BACA /* SMLogger.swift */; };
 		C1E7E7C31FF8F1BA00F44A5A /* CKRecord+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* CKRecord+NSManagedObject.swift */; };
 		C1E7E7C41FF8F1BA00F44A5A /* CKRecordZone+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* CKRecordZone+Helpers.swift */; };
 		C1E7E7C51FF8F1BA00F44A5A /* CKRecordZoneID+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* CKRecordZoneID+Helpers.swift */; };
@@ -79,6 +80,7 @@
 		6844E479213ADDDD00A8F696 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		68DB9AD9213B9779002E35C3 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		68ED0156213A39A500E0A1E7 /* SMBatchDeleteResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMBatchDeleteResult.swift; sourceTree = "<group>"; };
+		BBCB6B3C21E40CA60073BACA /* SMLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMLogger.swift; sourceTree = "<group>"; };
 		C1E7E7D71FF8F40100F44A5A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		OBJ_10 /* CKRecordZone+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecordZone+Helpers.swift"; sourceTree = "<group>"; };
 		OBJ_11 /* CKRecordZoneID+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecordZoneID+Helpers.swift"; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 				OBJ_19 /* SMStore.swift */,
 				OBJ_20 /* SMStoreChangeSetHandler.swift */,
 				OBJ_21 /* SMStoreSyncOperation.swift */,
+				BBCB6B3C21E40CA60073BACA /* SMLogger.swift */,
 			);
 			name = Classes;
 			path = Sources/Classes;
@@ -374,6 +377,7 @@
 				C1E7E7C81FF8F1BA00F44A5A /* NSManagedObjectContext+Helpers.swift in Sources */,
 				C1E7E7C91FF8F1BA00F44A5A /* SMObjectDependencyGraph.swift in Sources */,
 				C1E7E7CA1FF8F1BA00F44A5A /* SMServerStoreSetupOperation.swift in Sources */,
+				BBCB6B3D21E40CA60073BACA /* SMLogger.swift in Sources */,
 				C1E7E7CB1FF8F1BA00F44A5A /* SMServerTokenHandler.swift in Sources */,
 				C1E7E7CC1FF8F1BA00F44A5A /* SMServerZoneLookupOperation.swift in Sources */,
 				C1E7E7CD1FF8F1BA00F44A5A /* SMStore.swift in Sources */,
