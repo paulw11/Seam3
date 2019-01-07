@@ -133,6 +133,31 @@ lazy var persistentContainer: NSPersistentContainer = {
         
     }()
 ```
+By default, logs will be written to `os_log`, but you can route log messages to your own class by extending `SMLogger`:
+```
+class AppDelegate: SMLogDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        SMStore.logger = self
+    }
+    // MARK: SMLogDelegate
+    func log(_ message: @autoclosure() -> String, type: SMLogType) {
+        #if DEBUG
+        switch type {
+        case .debug:
+        print("Debug: \(message())")
+        case .info:
+        print("Info: \(message())")
+        case .error:
+        print("Error: \(message())")
+        case .fault:
+        print("Fault: \(message())")
+        case .defaultType:
+        print("Default: \(message())")
+        }
+        #endif
+    }
+}
+```
 You can access the `SMStore` instance using:
 ```
 self.smStore = container.persistentStoreCoordinator.persistentStores.first as? SMStore

@@ -34,15 +34,15 @@ extension NSManagedObjectContext {
     
     func saveIfHasChanges() throws {
       var err: Error?
+      performAndWait {
         if self.hasChanges {
-          performAndWait {
-            do {
-              try self.save()
-            } catch {
-              err = error
-            }
+          do {
+            try self.save()
+          } catch {
+            err = error
           }
         }
+      }
       if err != nil {
         throw err!
       }
