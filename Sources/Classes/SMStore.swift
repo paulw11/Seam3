@@ -177,6 +177,7 @@ import os.log
 public struct SMStoreNotification {
     public static let SyncDidStart = "SMStoreDidStartSyncOperationNotification"
     public static let SyncDidFinish = "SMStoreDidFinishSyncOperationNotification"
+    public static let SyncOperationError = "SMStoreSyncOperationError"
 }
 
 /// Potential errors from SMStore operations
@@ -228,6 +229,7 @@ open class SMStore: NSIncrementalStore {
     /// Default value of `syncAutomatically` assigned to new `SMStore` instances.
     /// Defaults to `true`
     public static var syncAutomatically: Bool = true
+    weak public static var logger: SMLogDelegate? = SMLogger.sharedInstance
     
     /// If true, a sync is triggered automatically when a save operation is performed against the store. Defaults to `true`
     public var syncAutomatically: Bool = SMStore.syncAutomatically
@@ -326,7 +328,6 @@ open class SMStore: NSIncrementalStore {
     /// - returns: A new store object, associated with coordinator, that represents a persistent store at url using the options in options and—if it is not nil—the managed object model configuration configurationName.
     
     override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator?, configurationName name: String?, at url: URL, options: [AnyHashable: Any]?) {
-        
         if let opts = options {
             
             if let containerIdentifier = opts[SMStore.SMStoreContainerOption] as? String {
@@ -417,18 +418,13 @@ open class SMStore: NSIncrementalStore {
         fetchRequest.fetchLimit = 1
         fetchRequest.predicate = predicate
         fetchRequest.resultType = NSFetchRequestResultType.managedObjectResultType
-        do {
-            if let results = try self.backingMOC.fetch(fetchRequest) as? [NSManagedObject]  {
-                if let result = results.first {
-                    let predicate: NSPredicate = NSPredicate(format: "%K == %@", relationship,result)
-                    
-                    return predicate
-                }
+        var resultPredicate: NSPredicate?
+        self.backingMOC.performAndWait {
+            if let result = (try? self.backingMOC.fetch(fetchRequest) as? [NSManagedObject])??.first {
+                resultPredicate = NSPredicate(format: "%K == %@", relationship,result)
             }
-        } catch {
-            
         }
-        return nil
+        return resultPredicate
     }
     
     /// Retrieve an `NSPredicate` that will match the supplied `NSManagedObject` in a to-many.
@@ -513,7 +509,7 @@ open class SMStore: NSIncrementalStore {
     
     open func verifyCloudKitStoreExists(_ completionHandler: ((_ exists: Bool, _ error: Error?) -> Void)?) {
         guard self.cloudKitValid else {
-            os_log("Access to CloudKit has not been verified by calling verifyCloudKitConnection", type: .info)
+            SMStore.logger?.error("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
             return
         }
         let operation = SMServerZoneLookupOperation(cloudDatabase: database)
@@ -531,7 +527,7 @@ open class SMStore: NSIncrementalStore {
     
     open func triggerSync(complete: Bool = false, fetchCompletionHandler completion: ((Error?)->Void)? = nil) {
         guard self.cloudKitValid else {
-            os_log("Access to CloudKit has not been verified by calling verifyCloudKitConnection", type: .info)
+            SMStore.logger?.error("Access to CloudKit has not been verified by calling verifyCloudKitConnection")
             return
         }
         
@@ -542,7 +538,7 @@ open class SMStore: NSIncrementalStore {
         let syncOperationBlock: (_ error: Error?) -> Void = { error in
             
             if let error = error {
-                os_log("Sync unsuccessful %@", type: .error, error.localizedDescription)
+                SMStore.logger?.error("Sync failed \(error.localizedDescription)")
                 OperationQueue.main.addOperation {
                     NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                 }
@@ -555,12 +551,12 @@ open class SMStore: NSIncrementalStore {
                 
                 self.syncOperation!.syncCompletionBlock =  { error in
                     if let error = error {
-                        os_log("Sync unsuccessful %@", type: .error, error.localizedDescription)
+                        SMStore.logger?.error("Sync failed \(error)")
                         OperationQueue.main.addOperation {
                             NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                         }
                     } else {
-                        os_log("Sync performed successfully", type: .info)
+                        SMStore.logger?.info("Sync completed successfully")
                         OperationQueue.main.addOperation {
                             NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self)
                         }
@@ -578,7 +574,7 @@ open class SMStore: NSIncrementalStore {
             self.cloudStoreSetupOperation = SMServerStoreSetupOperation(cloudDatabase: self.database)
             self.cloudStoreSetupOperation!.setupOperationCompletionBlock = { customZoneWasCreated, customZoneSubscriptionWasCreated, error in
                 if let error = error {
-                    os_log("Error setting up cloudkit: %@", type: .error, error.localizedDescription)
+                    SMStore.logger?.error("Error setting up cloudkit: \(error.localizedDescription)")
                     syncOperationBlock(error)
                 } else {
                     syncOperationBlock(nil)
@@ -634,34 +630,52 @@ open class SMStore: NSIncrementalStore {
     }
     
     override open func execute(_ request: NSPersistentStoreRequest, with context: NSManagedObjectContext?) throws -> Any {
-        //do {
-        
-        switch request.requestType {
-        case .fetchRequestType:
-            guard let fetchRequest = request as? NSFetchRequest<NSFetchRequestResult> else {
-                throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
+        var executeError: Error?
+        var result: Any!
+        let executeBlock = {
+            do {
+                switch request.requestType {
+                case .fetchRequestType:
+                    guard let fetchRequest = request as? NSFetchRequest<NSFetchRequestResult> else {
+                        throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
+                    }
+                    if fetchRequest.resultType == .countResultType {
+                        result = try self.executeInResponseToCountFetchRequest(fetchRequest, context: context!)
+                    } else {
+                        result = try self.executeInResponseToFetchRequest(fetchRequest, context: context!)
+                    }
+                case .saveRequestType:
+                    guard let saveChangesRequest: NSSaveChangesRequest = request as? NSSaveChangesRequest else {
+                        throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
+                    }
+                    result = try self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context!)
+                    
+                case .batchDeleteRequestType:
+                    guard let batchDeleteRequest: NSBatchDeleteRequest = request as? NSBatchDeleteRequest else {
+                        throw  NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
+                    }
+                    result = try self.executeInResponseToBatchDeleteRequest(batchDeleteRequest, context: context!)
+                    
+                case .batchUpdateRequestType:
+                    throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
+                }
+            } catch {
+                executeError = error
             }
-            if fetchRequest.resultType == .countResultType {
-                return try self.executeInResponseToCountFetchRequest(fetchRequest, context: context!)
-            } else {
-                return try self.executeInResponseToFetchRequest(fetchRequest, context: context!)
-            }
-        case .saveRequestType:
-            guard let saveChangesRequest: NSSaveChangesRequest = request as? NSSaveChangesRequest else {
-                throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
-            }
-            return try self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context!)
-            
-        case .batchDeleteRequestType:
-            guard let batchDeleteRequest: NSBatchDeleteRequest = request as? NSBatchDeleteRequest else {
-                throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
-            }
-            return try self.executeInResponseToBatchDeleteRequest(batchDeleteRequest, context: context!)
-            
-            
-        case .batchUpdateRequestType:
-                throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
         }
+        
+        // Under some circumstances CoreData may call execute() with .mainQueueConcurrencyType, where 'performAndWait' cannot be used
+        if let concurrencyType = context?.concurrencyType, concurrencyType == .privateQueueConcurrencyType {
+            context!.performAndWait(executeBlock)
+        } else {
+            executeBlock()
+        }
+        
+        
+        if let error = executeError {
+            throw error
+        }
+        return result
     }
     
     override open func newValuesForObject(with objectID: NSManagedObjectID, with context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {
@@ -683,42 +697,74 @@ open class SMStore: NSIncrementalStore {
         fetchRequest.predicate = predicate
         fetchRequest.resultType = NSFetchRequestResultType.dictionaryResultType
         fetchRequest.propertiesToFetch = propertiesToFetch
-        let results = try self.backingMOC.fetch(fetchRequest)
+        
+        var fetchError: Error?
         var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: [:], version: 1)
-        if var backingObjectValues = results.last as? Dictionary<String,NSObject> {
-            for (key,value) in backingObjectValues {
-                if let managedObjectID = value as? NSManagedObjectID {
-                    let managedObject = try self.backingMOC.existingObject(with: managedObjectID)
-                    if let identifier = managedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String {
-                        if let targetEntity = targetEntities[managedObject.entity.name!] {
-                            let objID = self.newObjectID(for: targetEntity, referenceObject:identifier)
-                            
-                            backingObjectValues[key] = objID
+        self.backingMOC.performAndWait {
+            do {
+                let results = try self.backingMOC.fetch(fetchRequest)
+                if var backingObjectValues = results.last as? Dictionary<String,NSObject> {
+                    for (key,value) in backingObjectValues {
+                        if let managedObjectID = value as? NSManagedObjectID {
+                            let managedObject = try self.backingMOC.existingObject(with: managedObjectID)
+                            if let identifier = managedObject.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as? String {
+                                if let targetEntity = targetEntities[managedObject.entity.name!] {
+                                    let objID = self.newObjectID(for: targetEntity, referenceObject:identifier)
+                                    
+                                    backingObjectValues[key] = objID
+                                }
+                            }
                         }
                     }
+                    
+                    incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: backingObjectValues, version: 1)
                 }
+            } catch {
+                fetchError = error
             }
-            
-            incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: backingObjectValues, version: 1)
+        }
+        
+        if let error = fetchError {
+            throw error
         }
         return incrementalStoreNode
-        
     }
     
     override open func newValue(forRelationship relationship: NSRelationshipDescription, forObjectWith objectID: NSManagedObjectID, with context: NSManagedObjectContext?) throws -> Any {
-        
-        if relationship.isToMany {
-            guard let targetRelationship = relationship.inverseRelationship else {
-                throw SMStoreError.missingInverseRelationship
+        var result: Any!
+        var executeError: Error?
+        let executeBlock = {
+            do {
+                if relationship.isToMany {
+                    guard let targetRelationship = relationship.inverseRelationship else {
+                        throw SMStoreError.missingInverseRelationship
+                    }
+                    guard targetRelationship.isToMany == false else {
+                        throw SMStoreError.manyToManyUnsupported
+                    }
+                    
+                    result = try self.toManyValues(forRelationship: targetRelationship, forObjectWith: objectID, with: context)
+                } else {
+                    result = try self.toOneValue(forRelationship: relationship, forObjectWith: objectID, with: context)
+                }
+            } catch {
+                executeError = error
             }
-            guard targetRelationship.isToMany == false else {
-                throw SMStoreError.manyToManyUnsupported
-            }
-            
-            return try self.toManyValues(forRelationship: targetRelationship, forObjectWith: objectID, with: context)
-        } else {
-            return try self.toOneValue(forRelationship: relationship, forObjectWith: objectID, with: context)
         }
+        
+        // CoreData may call execute() with .mainQueueConcurrencyType
+        // ...in these circumstances, 'performAndWait' cannot be used
+        if let concurrencyType = context?.concurrencyType, concurrencyType == .privateQueueConcurrencyType {
+            context!.performAndWait(executeBlock)
+        } else {
+            executeBlock()
+        }
+        
+        
+        if let error = executeError {
+            throw error
+        }
+        return result
     }
     
     fileprivate func toOneValue(forRelationship relationship: NSRelationshipDescription, forObjectWith objectID: NSManagedObjectID, with context: NSManagedObjectContext?) throws -> Any {
@@ -822,7 +868,7 @@ open class SMStore: NSIncrementalStore {
                 })
             case .managedObjectIDResultType:
                 return resultsFromLocalStore.map({(result)->NSManagedObjectID in
-                let result = result as! NSManagedObjectID
+                    let result = result as! NSManagedObjectID
                     let object = self.backingMOC.registeredObject(for: result)!
                     let recordID: String = object.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
                     let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[fetchRequest.entityName!]
@@ -849,6 +895,10 @@ open class SMStore: NSIncrementalStore {
         try self.updateObjectsInBackingStore(objectsToUpdate: context.updatedObjects, mainContext: context)
         
         try self.backingMOC.saveIfHasChanges()
+        let allObjects = context.deletedObjects.union(context.insertedObjects).union(context.updatedObjects)
+        for object in allObjects {
+            context.refresh(object, mergeChanges: true)
+        }
         if self.syncAutomatically {
             self.triggerSync()
         }
@@ -862,11 +912,8 @@ open class SMStore: NSIncrementalStore {
         }
         
         let fr = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
-        
         fr.predicate = deleteRequest.fetchRequest.predicate
-        
         fr.resultType = .managedObjectResultType
-        
         guard let results = try context.fetch(fr) as? [NSManagedObject] else {
             throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
         }
@@ -874,26 +921,28 @@ open class SMStore: NSIncrementalStore {
         let deleteSet = Set<NSManagedObject>(results)
         
         try self.deleteObjectsFromBackingStore(objectsToDelete: deleteSet, mainContext: context)
+        try self.backingMOC.saveIfHasChanges()
+        for object in deleteSet {
+            context.refresh(object, mergeChanges: true)
+        }
+        if self.syncAutomatically {
+            self.triggerSync()
+        }
         
         let resultType = deleteRequest.resultType
-        
         var result: Any? = nil
-        
         switch resultType {
         case .resultTypeCount:
             result = results.count
-            
         case .resultTypeObjectIDs:
             result =  results.map {
                 return $0.objectID
             }
-            
         case .resultTypeStatusOnly:
             result = nil
         }
         
         let returnResult = SMBatchDeleteResult(resultType: resultType, result: result)
-        
         return returnResult
     }
     
@@ -962,7 +1011,6 @@ open class SMStore: NSIncrementalStore {
             mainContext.didChangeValue(forKey: "objectID")
             SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: object.entity.name!, backingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(managedObject, inContext:mainContext, sourceObject: object)
-             mainContext.refresh(object, mergeChanges: true)
             // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
             // All saves are now performed in 'executeInResponseToSaveChangesRequest()'
         }
@@ -982,7 +1030,6 @@ open class SMStore: NSIncrementalStore {
                 if let backingObject: NSManagedObject = results.last as? NSManagedObject {
                     SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
                     self.backingMOC.delete(backingObject)
-                    mainContext.refreshAllObjects()
                     // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
                     // All saves are now performed in 'executeInResponseToSaveChangesRequest()'
                 }
@@ -1010,7 +1057,6 @@ open class SMStore: NSIncrementalStore {
                     // All saves are now performed in 'executeInResponseToSaveChangesRequest()'
                 }
             }
-            mainContext.refresh(object, mergeChanges: true)
         }
     }
 }

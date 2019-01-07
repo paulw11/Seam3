@@ -210,8 +210,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         print("Received push")
-        self.smStore?.handlePush(userInfo: userInfo)
-        completionHandler(.newData)
+
+        smStore?.handlePush(userInfo: userInfo) { (result) in
+            completionHandler(result.uiBackgroundFetchResult)
+        }
     }
     
     

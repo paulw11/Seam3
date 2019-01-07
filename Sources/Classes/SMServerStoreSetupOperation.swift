@@ -51,11 +51,11 @@ class SMServerStoreSetupOperation:Operation {
         
         let fetchRecordZonesOperation = CKFetchRecordZonesOperation(recordZoneIDs: [zone.zoneID])
         if #available(iOS 11.0, tvOS 11.0, OSX 10.13, *) {
-          let config = CKOperation.Configuration()
-          config.timeoutIntervalForResource = 10.0
-          fetchRecordZonesOperation.configuration = config
+            let config = CKOperation.Configuration()
+            config.timeoutIntervalForResource = 10.0
+            fetchRecordZonesOperation.configuration = config
         } else if #available(iOS 10.0, tvOS 11.0, OSX 10.12, *) {
-          fetchRecordZonesOperation.timeoutIntervalForResource = 10.0
+            fetchRecordZonesOperation.timeoutIntervalForResource = 10.0
         }
         fetchRecordZonesOperation.database = self.database
         
@@ -76,11 +76,12 @@ class SMServerStoreSetupOperation:Operation {
                     modifyRecordZonesOperation.database = self.database
                     modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = ({(savedRecordZones, deletedRecordZonesIDs, operationError) -> Void in
                         error = operationError
-                        
-                        if operationError == nil {
-                            customZoneCreated = true
-                            defaults.set(true, forKey: SMStore.SMStoreCloudStoreCustomZoneName)
+                        guard operationError == nil else {
+                            SMStore.logger?.error("ERROR Failed to modify record zone \(operationError!)")
+                            return
                         }
+                        customZoneCreated = true
+                        defaults.set(true, forKey: SMStore.SMStoreCloudStoreCustomZoneName)
                     })
                     operationQueue.addOperation(modifyRecordZonesOperation)
                 } else {
@@ -122,11 +123,13 @@ class SMServerStoreSetupOperation:Operation {
                         let subscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
                         subscriptionsOperation.database = self.database
                         subscriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
-                            if operationError == nil {
-                                UserDefaults.standard.set(true, forKey: SMStore.SMStoreCloudStoreSubscriptionName)
-                                subscriptionCreated = true
-                            }
                             error = operationError
+                            guard operationError == nil else {
+                                SMStore.logger?.error("ERROR Failed to subscribe to Cloud Kit updates \(operationError!)")
+                                return
+                            }
+                            UserDefaults.standard.set(true, forKey: SMStore.SMStoreCloudStoreSubscriptionName)
+                            subscriptionCreated = true
                         })
                         operationQueue.addOperation(subscriptionsOperation)
                     } else {
