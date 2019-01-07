@@ -78,7 +78,7 @@ This considers the client record as the true record.
 
 - Declare a SMStore type property in the class where your CoreData stack resides.
 ```swift
-var smStore: SMStore
+var smStore: SMStore?
 ```
 - For iOS9 and earlier or macOS, add a store type of `SMStore.type` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
 ```swift
