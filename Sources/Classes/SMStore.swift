@@ -590,7 +590,7 @@ open class SMStore: NSIncrementalStore {
     /// Handle a push notification that indicates records have been updated in Cloud Kit
     /// - parameter userInfo: The userInfo dictionary from the push notification
     
-    open func handlePush(userInfo:[AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (FetchResult) -> Void) {
+    open func handlePush(userInfo:[AnyHashable: Any], fetchCompletionHandler completionHandler: ((FetchResult) -> Void)?=nil) {
         let u = userInfo as! [String : NSObject]
         let ckNotification = CKNotification(fromRemoteNotificationDictionary: u)
         if ckNotification.notificationType == CKNotification.NotificationType.recordZone {
@@ -600,9 +600,9 @@ open class SMStore: NSIncrementalStore {
                     //self.triggerSync(block: true)
                     self.triggerSync(complete: false) { error in
                         if error != nil {
-                            completionHandler(.failed)
+                            completionHandler?(.failed)
                         } else {
-                            completionHandler(.newData)
+                            completionHandler?(.newData)
                         }
                     }
                 }
@@ -1069,7 +1069,7 @@ public enum FetchResult: UInt {
     case failed = 2
 }
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
 import UIKit
 
 public extension FetchResult {
