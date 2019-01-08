@@ -1,6 +1,11 @@
 Seam3 Changelog
 ===============
 
+# [1.5.0]
+ - Update to Swift 4.2
+ - Fix isssues with non-iOS examples (#104)
+ - Make completion handler for `handlePush` optional
+
 # [1.4.9]
  - Updates to example app
  - Use flexible logging via os_log
