@@ -198,10 +198,13 @@ self.smStore?.verifyCloudKitConnectionAndUser() { (status, user, error) in
 ![](http://s29.postimg.org/rb9vj0egn/Screen_Shot_2015_08_23_at_5_44_59_pm.png)
 - Implement didReceiveRemoteNotification Method in your AppDelegate and call `handlePush` on the instance of SMStore created earlier.
 ```swift
- func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) 
- {
-    self.smStore?.handlePush(userInfo: userInfo)
- }
+func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        print("Received push")
+
+        smStore?.handlePush(userInfo: userInfo) { (result) in
+            completionHandler(result.uiBackgroundFetchResult)
+        }
+    }
 ```
 - Enjoy
 
