@@ -1,6 +1,9 @@
 Seam3 Changelog
 ===============
 
+# [1.5.2]
+ - Fix examples for Carthage
+
 # [1.5.1]
  - Update to Swift 4.2
  - Fix isssues with non-iOS examples (#104)
