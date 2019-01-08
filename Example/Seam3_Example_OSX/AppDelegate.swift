@@ -20,7 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
         
-        NSApplication.shared().registerForRemoteNotifications(matching:[])
+        NSApplication.shared.registerForRemoteNotifications(matching:[])
 
         let _ = self.persistentStoreCoordinator // Make sure SMStore is loaded
         
@@ -114,8 +114,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let macImage = #imageLiteral(resourceName: "Mac")
             let cgImage = macImage.cgImage(forProposedRect: nil, context: nil, hints: nil)!
             let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
-            if let jpegData = bitmapRep.representation(using: NSBitmapImageFileType.JPEG, properties: [:]) {
-                fetchedDevice!.image = jpegData as NSData
+            if let jpegData = bitmapRep.representation(using: NSBitmapImageRep.FileType.jpeg, properties: convertToNSBitmapImageRepPropertyKeyDictionary([:])) {
+                fetchedDevice!.image = jpegData
             }
             do {
                 try moc.save()
@@ -132,7 +132,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let platformExpert: io_service_t = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"));
         
         // Get the serial number as a CFString ( actually as Unmanaged<AnyObject>! )
-        let serialNumberAsCFString = IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformSerialNumberKey as CFString!, kCFAllocatorDefault, 0);
+        let serialNumberAsCFString = IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformSerialNumberKey as CFString, kCFAllocatorDefault, 0);
         
         // Release the platform expert (we're responsible)
         IOObjectRelease(platformExpert);
@@ -213,7 +213,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if shouldFail || (failError != nil) {
             // Report any error we got.
             if let error = failError {
-                NSApplication.shared().presentError(error)
+                NSApplication.shared.presentError(error)
                 fatalError("Unresolved error: \(error), \(error.userInfo)")
             }
             fatalError("Unsresolved error: \(failureReason)")
@@ -242,7 +242,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 try managedObjectContext.save()
             } catch {
                 let nserror = error as NSError
-                NSApplication.shared().presentError(nserror)
+                NSApplication.shared.presentError(nserror)
             }
         }
     }
@@ -252,7 +252,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return managedObjectContext.undoManager
     }
 
-    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplicationTerminateReply {
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         // Save changes in the application's managed object context before the application terminates.
         
         if !managedObjectContext.commitEditing() {
@@ -285,7 +285,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             alert.addButton(withTitle: cancelButton)
             
             let answer = alert.runModal()
-            if answer == NSAlertSecondButtonReturn {
+            if answer == NSApplication.ModalResponse.alertSecondButtonReturn {
                 return .terminateCancel
             }
         }
@@ -295,3 +295,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 }
 
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToNSBitmapImageRepPropertyKeyDictionary(_ input: [String: Any]) -> [NSBitmapImageRep.PropertyKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSBitmapImageRep.PropertyKey(rawValue: key), value)})
+}

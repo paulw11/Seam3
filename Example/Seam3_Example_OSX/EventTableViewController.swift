@@ -27,7 +27,7 @@ class EventTableViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
-        appDelegate = NSApplication.shared().delegate as! AppDelegate
+        appDelegate = (NSApplication.shared.delegate as! AppDelegate)
         self.managedObjectContext = appDelegate.managedObjectContext
         
         self.loadData()
@@ -35,7 +35,7 @@ class EventTableViewController: NSViewController {
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: nil, queue: nil) { notification in
             
             if notification.userInfo != nil {
-                let appDelegate = NSApplication.shared().delegate as! AppDelegate
+                let appDelegate = NSApplication.shared.delegate as! AppDelegate
                 appDelegate.smStore?.triggerSync(complete: true)
             }
             
@@ -78,7 +78,7 @@ class EventTableViewController: NSViewController {
                 newEvent = NSEntityDescription.insertNewObject(forEntityName: "Event", into: context) as! Event
             }
             
-            newEvent.timestamp = NSDate()
+            newEvent.timestamp = Date()
             newEvent.creatingDevice = self.appDelegate.device
             // Save the context.
             do {
