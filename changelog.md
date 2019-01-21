@@ -2,6 +2,8 @@ Seam3 Changelog
 ===============
 
 # [1.5.2]
+ - Fix missing version number for Carthage (#99)
+# [1.5.2]
  - Fix examples for Carthage
 
 # [1.5.1]
