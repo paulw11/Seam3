@@ -1,6 +1,6 @@
 # Seam3
 
-[![CI Status](http://img.shields.io/travis/paulw/Seam3.svg?style=flat)](https://travis-ci.org/paulw/Seam3)
+[![CI Status](http://img.shields.io/travis/paulw11/Seam3.svg?style=flat)](https://travis-ci.org/paulw11/Seam3)
 [![Version](https://img.shields.io/cocoapods/v/Seam3.svg?style=flat)](http://cocoapods.org/pods/Seam3)
 [![License](https://img.shields.io/cocoapods/l/Seam3.svg?style=flat)](http://cocoapods.org/pods/Seam3)
 [![Platform](https://img.shields.io/cocoapods/p/Seam3.svg?style=flat)](http://cocoapods.org/pods/Seam3)
