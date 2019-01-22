@@ -390,9 +390,19 @@ open class SMStore: NSIncrementalStore {
         for entity in backingMOM.entities {
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity.name!)
             let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            
-            try self.backingMOC.execute(deleteRequest)
-            
+
+            var executeError: Error?
+            self.backingMOC.performAndWait {
+                do {
+                    try self.backingMOC.execute(deleteRequest)
+                } catch {
+                    executeError = error
+                }
+            }
+
+            if let error = executeError {
+                throw error
+            }
         }
         
         
