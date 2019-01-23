@@ -1,8 +1,12 @@
 Seam3 Changelog
 ===============
 
-# [1.5.2]
+# [1.5.4]
+ - Fix concurrency issue with reseting backing store
+
+# [1.5.3]
  - Fix missing version number for Carthage (#99)
+
 # [1.5.2]
  - Fix examples for Carthage
 
