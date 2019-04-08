@@ -167,4 +167,11 @@ extension NSManagedObject {
         }
         return ckRecord
     }
+    
+    @objc public func allValuesExceptBackingStoreAttributes() -> [String : Any] {
+        let attributes = Array(self.entity.attributesByNameByRemovingBackingStoreAttributes().keys)
+        let valuesDictionary = self.dictionaryWithValues(forKeys: attributes)
+        return valuesDictionary
+    }
+    
 }

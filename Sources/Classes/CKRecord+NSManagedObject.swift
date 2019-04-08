@@ -63,7 +63,23 @@ extension CKRecord {
     
     fileprivate func allAttributeValuesAsManagedObjectAttributeValues(usingContext context: NSManagedObjectContext) -> [String:AnyObject]? {
         if let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType] {
-            return self.dictionaryWithValues(forKeys: self.allAttributeKeys(usingAttributesByNameFromEntity: entity.attributesByName)) as [String : AnyObject]?
+            
+            // use the keys from the CoreData entity rather than the CloudKit record since keys with null values are not present in CloudKit records. This important for allowing changing from value -> null to sync to other clients
+            let attrs = entity.attributesByNameByRemovingBackingStoreAttributes()
+            let values = self.dictionaryWithValues(forKeys: Array(attrs.values).map { $0.name }) as [String : AnyObject]
+            
+            // CloudKit records used to omit default property values, so we need to avoid setting them to null if that is not allowed.
+            let settableValues = values.filter { (key: String, value: AnyObject) -> Bool in
+                let isOptional = attrs[key]?.isOptional ?? true
+                if (!isOptional && value is NSNull) {
+                    return false
+                }
+                return true
+            }
+            if (settableValues.count != values.count) {
+                SMStore.logger?.error("Cloud record has some invalid values: \(self)")
+            }
+            return settableValues
         } else {
             return nil
         }
@@ -99,32 +115,36 @@ extension CKRecord {
         return nil
     }
     
-    public func createOrUpdateManagedObjectFromRecord(usingContext context: NSManagedObjectContext) throws -> NSManagedObject? {
-        
-        if let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType] {
-            if let entityName = entity.name  {
-                var managedObject: NSManagedObject?
-                let recordIDString = self.recordID.recordName
-                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
-                fetchRequest.fetchLimit = 1
-                fetchRequest.predicate = NSPredicate(format: "%K == %@", SMStore.SMLocalStoreRecordIDAttributeName, recordIDString)
-                let results = try context.fetch(fetchRequest)
-                if !results.isEmpty {
-                    managedObject = results.last as? NSManagedObject
-                    SMStore.logger?.debug("OK will update existing object from CKRecord \(entityName), recordID=\(recordIDString)")
-                }
-                
-                if managedObject == nil {
-                    managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: context)
-                    managedObject!.setValue(recordIDString, forKey: SMStore.SMLocalStoreRecordIDAttributeName)
-                    SMStore.logger?.debug("OK will insert new object from CKRecord \(entityName), recordID=\(recordIDString)")
-                }
-                
-                try self.setValuesOn(managedObject!, inContext:context)
-                return managedObject
-            }
+    public func managedObjectForRecord(context: NSManagedObjectContext) throws -> NSManagedObject? {
+        guard let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType],
+            let entityName = entity.name else {
+            throw SMStoreError.backingStoreUpdateError
         }
-        throw SMStoreError.backingStoreUpdateError
+        var managedObject: NSManagedObject?
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", SMStore.SMLocalStoreRecordIDAttributeName, self.recordID.recordName)
+        let results = try context.fetch(fetchRequest)
+        if !results.isEmpty {
+            managedObject = results.last as? NSManagedObject
+        }
+        return managedObject;
+    }
+    
+    public func createOrUpdateManagedObjectFromRecord(usingContext context: NSManagedObjectContext) throws -> NSManagedObject? {
+        guard let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType],
+            let entityName = entity.name else {
+            throw SMStoreError.backingStoreUpdateError
+        }
+
+        var managedObject = try managedObjectForRecord(context: context)
+        if managedObject == nil {
+            managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: context)
+            managedObject!.setValue(self.recordID.recordName, forKey: SMStore.SMLocalStoreRecordIDAttributeName)
+        }
+        
+        try self.setValuesOn(managedObject!, inContext:context)
+        return managedObject
     }
     
     
