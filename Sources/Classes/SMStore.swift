@@ -522,7 +522,7 @@ open class SMStore: NSIncrementalStore {
     /// - parameter error: Any error that resulted from the operation
     
     
-    @available(*,deprecated:1.0.7, message:"Use verifyCloudKitConnectionAndUser")
+    @available(swift,deprecated:1.0.7, message:"Use verifyCloudKitConnectionAndUser")
     open func verifyCloudKitConnection(_ completionHandler: ((_ status: CKAccountStatus, _ error: Error?) -> Void )?) -> Void {
         CKContainer.default().accountStatus { (status, error) in
             
@@ -1136,7 +1136,7 @@ open class SMStore: NSIncrementalStore {
 import UIKit
 
 public extension FetchResult {
-    public var uiBackgroundFetchResult: UIBackgroundFetchResult {
+     var uiBackgroundFetchResult: UIBackgroundFetchResult {
         switch self {
         case .newData: return .newData
         case .noData: return .noData
