@@ -656,9 +656,9 @@ open class SMStore: NSIncrementalStore {
     @objc open func handlePush(userInfo:[AnyHashable: Any], fetchCompletionHandler completionHandler: ((FetchResult) -> Void)?=nil) {
         let u = userInfo as! [String : NSObject]
         let ckNotification = CKNotification(fromRemoteNotificationDictionary: u)
-        if ckNotification.notificationType == CKNotification.NotificationType.recordZone {
+        if ckNotification?.notificationType == CKNotification.NotificationType.recordZone {
             let recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: u)
-            if let zoneID = recordZoneNotification.recordZoneID {
+            if let zoneID = recordZoneNotification?.recordZoneID {
                 if zoneID.zoneName == SMStore.SMStoreCloudStoreCustomZoneName {
                     //self.triggerSync(block: true)
                     self.triggerSync(complete: false) { (result, error) in
@@ -694,7 +694,7 @@ open class SMStore: NSIncrementalStore {
     
     override open func execute(_ request: NSPersistentStoreRequest, with context: NSManagedObjectContext?) throws -> Any {
         var executeError: Error?
-        var result: Any!
+        var result: Any?
         let executeBlock = {
             do {
                 switch request.requestType {
@@ -721,6 +721,8 @@ open class SMStore: NSIncrementalStore {
                     
                 case .batchUpdateRequestType:
                     throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
+                @unknown default:
+                    break
                 }
             } catch {
                 executeError = error
@@ -738,7 +740,7 @@ open class SMStore: NSIncrementalStore {
         if let error = executeError {
             throw error
         }
-        return result
+        return result!
     }
     
     override open func newValuesForObject(with objectID: NSManagedObjectID, with context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {
@@ -794,7 +796,7 @@ open class SMStore: NSIncrementalStore {
     }
     
     override open func newValue(forRelationship relationship: NSRelationshipDescription, forObjectWith objectID: NSManagedObjectID, with context: NSManagedObjectContext?) throws -> Any {
-        var result: Any!
+        var result: Any?
         var executeError: Error?
         let executeBlock = {
             do {
@@ -827,7 +829,7 @@ open class SMStore: NSIncrementalStore {
         if let error = executeError {
             throw error
         }
-        return result
+        return result!
     }
     
     fileprivate func toOneValue(forRelationship relationship: NSRelationshipDescription, forObjectWith objectID: NSManagedObjectID, with context: NSManagedObjectContext?) throws -> Any {
@@ -1003,6 +1005,8 @@ open class SMStore: NSIncrementalStore {
             }
         case .resultTypeStatusOnly:
             result = nil
+        @unknown default:
+            break
         }
         
         let returnResult = SMBatchDeleteResult(resultType: resultType, result: result)
