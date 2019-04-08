@@ -1,5 +1,38 @@
 Seam3 Changelog
 ===============
+# [1.5.5]
+
+* Improve logging of errors and activity in order to diagnose bugs and inefficiencies
+
+* Removed dead code that was duplicated elsewhere anyway
+
+* Fix syncing of attribute values when changing from a value to nil - Previously these changes were synced to the server, but wouldn't be applied to other clients because null values simply don't exist in CloudKit records
+
+* Fix conflict resolution block - parameter names were in the wrong order
+
+* Upload whole records to CloudKit, not partial (only changes) records - This is especially important since because of the changes in the previous commit we will now treat missing values as null.
+
+* Explicitly enqueue local 'deletes' so that they are cleared after success and aren't repeated forever
+
+* Combine multiple pending changes to the same object to minimize conflicts after being offline - For example, while offline, if you insert an object, then update it these two changes will now be combined.  When you sync to iCloud, a conflict will still occur on the second change set, but the server record will contain all the correct data and will be resolved correctly by default.
+
+* Don't save iCloud change token until fetched server changes have been saved locally
+
+* Handle possible errors in recordZoneFetchCompletionBlock (like .changeTokenExpired)
+
+* Handle CKError.unknownItem (missing in Cloud) with a retry that resends the whole record to the Cloud
+
+* Handle CKError.userDeletedZone and CKError.zoneNotFound besides just at startup time
+
+* Add function to resend all local data to cloud in case of new user or deleted zone
+
+* Syncing will now return a result indicating if any data was sent or received, for use with the background fetch API.
+
+* Expose required APIs to support Objective-C
+
+* Removed call to UserDefaults.synchronize
+
+* Swift 5.0
 
 # [1.5.4]
  - Fix concurrency issue with reseting backing store
