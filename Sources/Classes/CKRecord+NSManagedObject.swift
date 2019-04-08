@@ -191,8 +191,8 @@ extension CKRecord {
     private func replaceAssets(in dictionary: [String:AnyObject]) -> [String:AnyObject] {
         var returnDict = [String:AnyObject]()
         for (key,value) in dictionary {
-            if let val = value as? CKAsset {
-                if let assetData = NSData(contentsOfFile: val.fileURL.path) {
+            if let val = value as? CKAsset, let path = val.fileURL?.path {
+                if let assetData = NSData(contentsOfFile: path) {
                     returnDict[key] = assetData
                 }
             } else {

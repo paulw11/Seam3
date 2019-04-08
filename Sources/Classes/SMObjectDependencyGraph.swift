@@ -117,7 +117,7 @@ class SMObjectDependencyGraph {
                 return o1.instanceIdentifier < o2.instanceIdentifier
             }
             
-            if let index1 = sortedEntityNames.index(of: o1.entityIdentifier), let index2 = sortedEntityNames.index(of: o2.entityIdentifier) {
+            if let index1 = sortedEntityNames.firstIndex(of: o1.entityIdentifier), let index2 = sortedEntityNames.firstIndex(of: o2.entityIdentifier) {
                 // Same order as entities
                 return index2 > index1
             }

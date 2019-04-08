@@ -27,16 +27,16 @@ public protocol SMLogDelegate: class {
 
 extension SMLogDelegate {
   func info(_ message: @autoclosure() -> String) {
-    self.log(message, type: .info)
+    self.log(message(), type: .info)
   }
   func debug(_ message: @autoclosure() -> String) {
-    self.log(message, type: .debug)
+    self.log(message(), type: .debug)
   }
   func error(_ message: @autoclosure() -> String) {
-    self.log(message, type: .error)
+    self.log(message(), type: .error)
   }
   func fault(_ message: @autoclosure() -> String) {
-    self.log(message, type: .fault)
+    self.log(message(), type: .fault)
   }
 }
 

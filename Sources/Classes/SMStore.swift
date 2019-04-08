@@ -399,7 +399,7 @@ open class SMStore: NSIncrementalStore {
         for entity in backingMOM.entities {
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity.name!)
             let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-
+            
             var executeError: Error?
             self.backingMOC.performAndWait {
                 do {
@@ -408,7 +408,7 @@ open class SMStore: NSIncrementalStore {
                     executeError = error
                 }
             }
-
+            
             if let error = executeError {
                 throw error
             }
@@ -440,7 +440,7 @@ open class SMStore: NSIncrementalStore {
                     }
                 }
                 try self.backingMOC.saveIfHasChanges()
-
+                
                 for entity in entitiesToParticipateInSync() ?? [] {
                     let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: entity.name!)
                     let records = try self.localStoreMOC.fetch(fetchRequest)
@@ -459,7 +459,7 @@ open class SMStore: NSIncrementalStore {
             }
         }
     }
-
+    
     
     /// Retrieve an `NSPredicate` that will match the supplied `NSManagedObject`.
     /// - parameter for: The name of the relationship that holds the reference to the target object
@@ -655,17 +655,18 @@ open class SMStore: NSIncrementalStore {
     
     @objc open func handlePush(userInfo:[AnyHashable: Any], fetchCompletionHandler completionHandler: ((FetchResult) -> Void)?=nil) {
         let u = userInfo as! [String : NSObject]
-        let ckNotification = CKNotification(fromRemoteNotificationDictionary: u)
-        if ckNotification?.notificationType == CKNotification.NotificationType.recordZone {
-            let recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: u)
-            if let zoneID = recordZoneNotification?.recordZoneID {
-                if zoneID.zoneName == SMStore.SMStoreCloudStoreCustomZoneName {
-                    //self.triggerSync(block: true)
-                    self.triggerSync(complete: false) { (result, error) in
-                        if error != nil {
-                            completionHandler?(.failed)
-                        } else {
-                            completionHandler?(result)
+        if let ckNotification = CKNotification(fromRemoteNotificationDictionary: u) {
+            if ckNotification.notificationType == CKNotification.NotificationType.recordZone {
+                let recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: u)
+                if let zoneID = recordZoneNotification?.recordZoneID {
+                    if zoneID.zoneName == SMStore.SMStoreCloudStoreCustomZoneName {
+                        //self.triggerSync(block: true)
+                        self.triggerSync(complete: false) { (result, error) in
+                            if error != nil {
+                                completionHandler?(.failed)
+                            } else {
+                                completionHandler?(result)
+                            }
                         }
                     }
                 }
@@ -1140,7 +1141,7 @@ open class SMStore: NSIncrementalStore {
 import UIKit
 
 public extension FetchResult {
-     var uiBackgroundFetchResult: UIBackgroundFetchResult {
+    var uiBackgroundFetchResult: UIBackgroundFetchResult {
         switch self {
         case .newData: return .newData
         case .noData: return .noData
