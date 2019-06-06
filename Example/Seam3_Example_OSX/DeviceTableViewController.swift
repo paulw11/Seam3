@@ -24,7 +24,7 @@ class DeviceTableViewController: NSViewController {
         
         self.loadData()
         
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: nil, queue: nil) { notification in
+        NotificationCenter.default.addObserver(forName: .smSyncDidFinish, object: nil, queue: nil) { notification in
             
             if notification.userInfo != nil {
                 let appDelegate = NSApplication.shared.delegate as! AppDelegate

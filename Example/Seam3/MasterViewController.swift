@@ -57,7 +57,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             self.detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: nil, queue: nil) { notification in
+        NotificationCenter.default.addObserver(forName: .smSyncDidFinish, object: nil, queue: nil) { notification in
             
             if notification.userInfo != nil {
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate

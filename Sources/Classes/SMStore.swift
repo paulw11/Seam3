@@ -175,9 +175,18 @@ import os.log
 
 
 public struct SMStoreNotification {
+    @available(swift, deprecated: 1.5.6, message: "Use .smSyncDidStart")
     public static let SyncDidStart = "SMStoreDidStartSyncOperationNotification"
+    @available(swift, deprecated: 1.5.6, message: "Use .smSyncDidFinish")
     public static let SyncDidFinish = "SMStoreDidFinishSyncOperationNotification"
+    @available(swift, deprecated: 1.5.6, message: "Use .smSyncOperationError")
     public static let SyncOperationError = "SMStoreSyncOperationError"
+}
+
+extension Notification.Name {
+    static let smSyncDidStart = Notification.Name("SMStoreDidStartSyncOperationNotification")
+    static let smSyncDidFinish = Notification.Name("SMStoreDidFinishSyncOperationNotification")
+    static let smSyncOperationError = Notification.Name("SMStoreSyncOperationError")
 }
 
 /// Potential errors from SMStore operations
@@ -603,7 +612,7 @@ open class SMStore: NSIncrementalStore {
             if let error = error {
                 SMStore.logger?.error("Sync failed \(error.localizedDescription)")
                 OperationQueue.main.addOperation {
-                    NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
+                    NotificationCenter.default.post(name: .smSyncDidFinish, object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                 }
                 completion?(.failed, error)
             } else {
@@ -616,12 +625,12 @@ open class SMStore: NSIncrementalStore {
                     if let error = error {
                         SMStore.logger?.error("Sync failed \(error)")
                         OperationQueue.main.addOperation {
-                            NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
+                            NotificationCenter.default.post(name: .smSyncDidFinish, object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                         }
                     } else {
                         SMStore.logger?.info("Sync completed successfully")
                         OperationQueue.main.addOperation {
-                            NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self)
+                            NotificationCenter.default.post(name: .smSyncDidFinish, object: self)
                         }
                     }
                     completion?(result, error)
@@ -647,7 +656,7 @@ open class SMStore: NSIncrementalStore {
         } else {
             syncOperationBlock(nil)
         }
-        NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidStart), object: self)
+        NotificationCenter.default.post(name: .smSyncDidStart, object: self)
     }
     
     /// Handle a push notification that indicates records have been updated in Cloud Kit

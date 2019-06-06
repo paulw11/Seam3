@@ -39,7 +39,7 @@ class ViewController: UIViewController {
         self.appDelegate = UIApplication.shared.delegate as! AppDelegate
         self.managedObjectContext = self.appDelegate.persistentContainer.viewContext
         
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: nil, queue: nil) { notification in
+        NotificationCenter.default.addObserver(forName: .smSyncDidFinish, object: nil, queue: nil) { notification in
             
             if notification.userInfo != nil {
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
