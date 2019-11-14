@@ -76,8 +76,9 @@ extension CKRecord {
                 }
                 return true
             }
-            if (settableValues.count != values.count) {
-                SMStore.logger?.error("Cloud record has some invalid values: \(self)")
+            let missingValues = Set(values.keys).subtracting(Set(settableValues.keys))
+            if (missingValues.count > 0) {
+                SMStore.logger?.error("WARNING Cloud record '\(entity.name ?? "no name")' is missing NON-OPTIONAL attributes value: \(missingValues)\n\n\(self)")
             }
             return settableValues
         } else {
@@ -102,9 +103,9 @@ extension CKRecord {
                                 let relationshipManagedObject: NSManagedObject = results.last as! NSManagedObject
                                 managedObjectsDictionary[key] = relationshipManagedObject
                             } else {
-                                SMStore.logger?.info("WARNING Missing NON-OPTIONAL related object for \(entity.name ?? "nil").\(key)' (missing '\(name)' (\(recordIDString)) )")
+                                SMStore.logger?.error("WARNING Missing non-optional related object for \(entity.name ?? "nil").\(key)' (missing '\(name)' (\(recordIDString)).\nSMStore may recover if the missing record dependency is found as more CKRecords are being processed")
                                 context.refresh(managedObject, mergeChanges: false)
-                                throw SMStoreError.missingRelatedObject
+                                throw SMStoreError.missingRelatedObject(managedObject.objectID)
                             }
                         }
                     }
@@ -130,20 +131,49 @@ extension CKRecord {
         }
         return managedObject;
     }
+  
+    private func performSanityCheckBeforeImport(usingContext context: NSManagedObjectContext, entity: NSEntityDescription) throws {
+        let attrs = entity.attributesByNameByRemovingBackingStoreAttributes()
+        var missingAttributes = [String]()
+        for (attName, attDescription) in attrs {
+            if !attDescription.isOptional && attDescription.defaultValue == nil && self.value(forKey: attName) == nil {
+                missingAttributes.append(attName)
+            }
+        }
+        if missingAttributes.count > 0 {
+            throw SMStoreError.ckRecordInvalid(self, missingAttributes)
+        }
+    }
     
     public func createOrUpdateManagedObjectFromRecord(usingContext context: NSManagedObjectContext) throws -> NSManagedObject? {
         guard let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType],
             let entityName = entity.name else {
-            throw SMStoreError.backingStoreUpdateError
-        }
-
-        var managedObject = try managedObjectForRecord(context: context)
-        if managedObject == nil {
-            managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: context)
-            managedObject!.setValue(self.recordID.recordName, forKey: SMStore.SMLocalStoreRecordIDAttributeName)
+                throw SMStoreError.backingStoreUpdateError
         }
         
-        try self.setValuesOn(managedObject!, inContext:context)
+        try performSanityCheckBeforeImport(usingContext: context, entity: entity)
+        
+        // Using a child context to save individual records to the parent context (localStoreMOC)
+        // Saving the child context can fail, but we will still be able to save other updates from the parent records
+        // (this way we can isolate failure on a per-record basis)
+        
+        let insertAttemptContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        insertAttemptContext.parent = context
+        var managedObject = try managedObjectForRecord(context: insertAttemptContext)
+        if managedObject == nil {
+            managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: insertAttemptContext)
+            managedObject!.setValue(self.recordID.recordName, forKey: SMStore.SMLocalStoreRecordIDAttributeName)
+            SMStore.logger?.debug("OK will try inserting new '\(entityName)' from CKRecord into MOC, recordName=\(self.recordID.recordName)")
+        } else {
+            SMStore.logger?.debug("OK will try updating '\(entityName)' from CKRecord into MOC, recordName=\(self.recordID.recordName)")
+        }
+        
+        try self.setValuesOn(managedObject!, inContext: insertAttemptContext)
+        do {
+            try insertAttemptContext.saveIfHasChanges()
+        } catch {
+            throw SMStoreError.backingStoreIndividualRecordSaveError(error)
+        }
         return managedObject
     }
     

@@ -155,7 +155,8 @@ extension NSManagedObject {
                     return object.0
             }
             let relationshipKeys = self.entity.relationshipsByName.filter { (object) -> Bool in
-                return keys!.contains(object.0)
+                // 'keys' are obtained via allValuesExceptBackingStoreAttributes() which excludes relationship attributes
+                return !keys!.contains(object.0)
                 }.map { (object) -> String in
                     return object.0
             }

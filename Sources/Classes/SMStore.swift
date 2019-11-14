@@ -206,11 +206,15 @@ enum SMStoreError: Error {
     //// "To-many" relationships are not supported
     case manyToManyUnsupported
     /// The related object could not be found to satisfy a relationship
-    case missingRelatedObject
+    case missingRelatedObject(NSManagedObjectID)
     /// More than one match was found for a 'to-one' relationship
     case tooManyRelatedObjects
     /// Missing/bad backing store record
     case backingStoreRecordInvalid
+    /// Core Data entity not found for CKRecord
+    case ckRecordInvalid(CKRecord, [String])
+    /// Failed to save or update individual record
+    case backingStoreIndividualRecordSaveError(Error)
 }
 
 /// Error description key for `userinfo` dictionary on an `SMStoreError` error
@@ -610,7 +614,7 @@ open class SMStore: NSIncrementalStore {
         let syncOperationBlock: (_ error: Error?) -> Void = { error in
             
             if let error = error {
-                SMStore.logger?.error("Sync failed \(error.localizedDescription)")
+                SMStore.logger?.error("Unable to start sync operation \(error)")
                 OperationQueue.main.addOperation {
                     NotificationCenter.default.post(name: .smSyncDidFinish, object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                 }
@@ -623,9 +627,9 @@ open class SMStore: NSIncrementalStore {
                 
                 self.syncOperation!.syncCompletionBlock =  { result, error in
                     if let error = error {
-                        SMStore.logger?.error("Sync failed \(error)")
+                        SMStore.logger?.error("Sync operation failure notice \(error)")
                         OperationQueue.main.addOperation {
-                            NotificationCenter.default.post(name: .smSyncDidFinish, object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
+                            NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                         }
                     } else {
                         SMStore.logger?.info("Sync completed successfully")
@@ -646,7 +650,6 @@ open class SMStore: NSIncrementalStore {
             self.cloudStoreSetupOperation = SMServerStoreSetupOperation(cloudDatabase: self.database)
             self.cloudStoreSetupOperation!.setupOperationCompletionBlock = { customZoneWasCreated, customZoneSubscriptionWasCreated, error in
                 if let error = error {
-                    SMStore.logger?.error("Error setting up cloudkit: \(error.localizedDescription)")
                     syncOperationBlock(error)
                 } else {
                     syncOperationBlock(nil)
@@ -862,7 +865,7 @@ open class SMStore: NSIncrementalStore {
         if relationship.isOptional {
             return NSNull()
         } else {
-            throw SMStoreError.missingRelatedObject
+            throw SMStoreError.missingRelatedObject(objectID)
         }
     }
     

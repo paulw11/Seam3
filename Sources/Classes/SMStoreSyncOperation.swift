@@ -194,11 +194,31 @@ class SMStoreSyncOperation: Operation {
     }
     
     // MARK: Local Changes
+    private func managedObjectsByType(_ objects: Set<NSManagedObject>) -> [String:Int] {
+        let objectsByType = objects.reduce([String:Int]()) { (result: [String:Int], managedObject: NSManagedObject) -> [String:Int] in
+            
+            guard let entityName = managedObject.entity.name else {
+                return result
+            }
+            var result = result
+            if result[entityName] == nil {
+                result[entityName] = 0
+            }
+            result[entityName] = result[entityName]! + 1
+            return result
+        }
+        return objectsByType
+    }
     func applyServerChangesToLocalDatabase(_ insertedOrUpdatedCKRecords: [CKRecord], deletedCKRecordIDs:[CKRecord.ID]) throws {
         try self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
         try self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs)
+        let registeredObjects = self.localStoreMOC.registeredObjects
+        let objectsByType = managedObjectsByType(registeredObjects)
+        SMStore.logger?.info("OK SMStore will try to save to persistent store \(registeredObjects.count) objects\n\n\(objectsByType)")
         try self.localStoreMOC.saveIfHasChanges()
     }
+  
+  
     
     func applyLocalChangesToServer(insertedOrUpdatedCKRecords: Array<CKRecord>? , deletedCKRecordIDs: Array<CKRecord.ID>?) throws {
         
@@ -221,8 +241,9 @@ class SMStoreSyncOperation: Operation {
                 changedRecords[recordName] = record
             }
         }
-        SMStore.logger?.debug("Will attempt saving (insert/update) to the cloud \(changedRecords.count) CKRecords \(changedRecords.keys)")
-        SMStore.logger?.debug("Will attempt deleting from the cloud \(deletedCKRecordIDs?.count ?? 0) CKRecords \((deletedCKRecordIDs ?? []).map {$0.recordName})")
+        SMStore.logger?.debug("Will attempt saving (insert/update) to the cloud \(changedRecords.count) CKRecords \(changedRecords.keys) (zone=\(changedRecords.randomElement()?.value.recordID.zoneID.zoneName))\n\(changedRecords.map {return $0.value})")
+        SMStore.logger?.debug("Will attempt deleting from the cloud \(deletedCKRecordIDs?.count ?? 0) CKRecords \((deletedCKRecordIDs ?? []).map {$0.recordName}) (zone=\(deletedCKRecordIDs?.first?.zoneID.zoneName))")
+
         let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: Array(changedRecords.values), recordIDsToDelete: deletedCKRecordIDs)
         ckModifyRecordsOperation.database = self.database
         var outerSavedRecords: [CKRecord] = []
@@ -465,7 +486,7 @@ class SMStoreSyncOperation: Operation {
         return (insertedOrUpdatedCKRecords, deletedCKRecordIDs)
     }
     
-    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>, retryCount: Int = 0) throws {
+    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>) throws {
         var deferredRecords = [CKRecord]()
         
         // Sorting records using the dependancy graph can cut down dramatically ...
@@ -474,18 +495,29 @@ class SMStoreSyncOperation: Operation {
         for record in sorted {
             do {
                 let _ = try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
-            } catch SMStoreError.missingRelatedObject {
+            } catch SMStoreError.missingRelatedObject(let objectID) {
                 deferredRecords.append(record)
+            } catch SMStoreError.ckRecordInvalid(let record, let missingAttributes) {
+                // It would be preferable to delegate the handling of this error through a delegate call. For now just log'n forget
+                SMStore.logger?.error("CKRecord '\(record.recordType)' (recordName=\(record.recordID.recordName)), is missing non-optional attributes (\(missingAttributes)). Will skip record")
+            } catch SMStoreError.backingStoreIndividualRecordSaveError(let cause) {
+                // It would be preferable to delegate the handling of this error through a delegate call. For now just log'n forget
+                SMStore.logger?.error("Will skip CKRecord '\(record.recordType)' (recordName \(record.recordID.recordName)).\n\nreason=\(cause.localizedDescription)")
             }
             // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
             // All saves are now performed in 'applyServerChangesToLocalDatabase()'
         }
         
-        if !deferredRecords.isEmpty {
-            if retryCount < self.RETRYLIMIT  {
-                try self.insertOrUpdateManagedObjects(fromCKRecords: deferredRecords, retryCount:retryCount+1)
-            } else {
-                throw SMSyncOperationError.missingReferences(referringRcords: deferredRecords)
+        if deferredRecords.count == 0 {
+            return // We are done inserting/updating records
+        
+        } else if deferredRecords.count < ckRecords.count {
+            SMStore.logger?.info("\(deferredRecords.count) records could not be inserted or updated due to missing references. Will try again")
+            try self.insertOrUpdateManagedObjects(fromCKRecords: deferredRecords)
+        
+        } else {
+            for record in deferredRecords {
+                SMStore.logger?.error("ERROR will skip record \(record.recordID.recordName) of type '\(record.recordType)' (missing references: record has dependencies on other related records, which could not be found).")
             }
         }
     }
