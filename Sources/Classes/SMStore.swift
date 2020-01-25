@@ -175,15 +175,15 @@ import os.log
 
 
 public struct SMStoreNotification {
-    @available(swift, deprecated: 1.5.6, message: "Use .smSyncDidStart")
+    @available(swift, deprecated: 1.5.6, message: "Use Notification.Name.smSyncDidStart")
     public static let SyncDidStart = "SMStoreDidStartSyncOperationNotification"
-    @available(swift, deprecated: 1.5.6, message: "Use .smSyncDidFinish")
+    @available(swift, deprecated: 1.5.6, message: "Use Notification.Name.smSyncDidFinish")
     public static let SyncDidFinish = "SMStoreDidFinishSyncOperationNotification"
-    @available(swift, deprecated: 1.5.6, message: "Use .smSyncOperationError")
+    @available(swift, deprecated: 1.5.6, message: "Use Notification.Name.smSyncOperationError")
     public static let SyncOperationError = "SMStoreSyncOperationError"
 }
 
-extension Notification.Name {
+public extension Notification.Name {
     static let smSyncDidStart = Notification.Name("SMStoreDidStartSyncOperationNotification")
     static let smSyncDidFinish = Notification.Name("SMStoreDidFinishSyncOperationNotification")
     static let smSyncOperationError = Notification.Name("SMStoreSyncOperationError")
