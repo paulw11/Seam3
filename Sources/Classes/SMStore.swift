@@ -629,7 +629,7 @@ open class SMStore: NSIncrementalStore {
                     if let error = error {
                         SMStore.logger?.error("Sync operation failure notice \(error)")
                         OperationQueue.main.addOperation {
-                            NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreNotification.SyncDidFinish), object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
+                            NotificationCenter.default.post(name: .smSyncDidFinish, object: self, userInfo: [SMStore.SMStoreErrorDomain:error])
                         }
                     } else {
                         SMStore.logger?.info("Sync completed successfully")
