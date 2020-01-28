@@ -495,7 +495,7 @@ class SMStoreSyncOperation: Operation {
         for record in sorted {
             do {
                 let _ = try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
-            } catch SMStoreError.missingRelatedObject(let objectID) {
+            } catch SMStoreError.missingRelatedObject {
                 deferredRecords.append(record)
             } catch SMStoreError.ckRecordInvalid(let record, let missingAttributes) {
                 // It would be preferable to delegate the handling of this error through a delegate call. For now just log'n forget
