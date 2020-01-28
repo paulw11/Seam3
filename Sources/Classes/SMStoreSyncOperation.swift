@@ -241,8 +241,8 @@ class SMStoreSyncOperation: Operation {
                 changedRecords[recordName] = record
             }
         }
-        SMStore.logger?.debug("Will attempt saving (insert/update) to the cloud \(changedRecords.count) CKRecords \(changedRecords.keys) (zone=\(changedRecords.randomElement()?.value.recordID.zoneID.zoneName))\n\(changedRecords.map {return $0.value})")
-        SMStore.logger?.debug("Will attempt deleting from the cloud \(deletedCKRecordIDs?.count ?? 0) CKRecords \((deletedCKRecordIDs ?? []).map {$0.recordName}) (zone=\(deletedCKRecordIDs?.first?.zoneID.zoneName))")
+        SMStore.logger?.debug("Will attempt saving (insert/update) to the cloud \(changedRecords.count) CKRecords \(changedRecords.keys) (zone=\(String(describing: changedRecords.randomElement()?.value.recordID.zoneID.zoneName)))\n\(changedRecords.map {return $0.value})")
+        SMStore.logger?.debug("Will attempt deleting from the cloud \(deletedCKRecordIDs?.count ?? 0) CKRecords \((deletedCKRecordIDs ?? []).map {$0.recordName}) (zone=\(String(describing: deletedCKRecordIDs?.first?.zoneID.zoneName)))")
 
         let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: Array(changedRecords.values), recordIDsToDelete: deletedCKRecordIDs)
         ckModifyRecordsOperation.database = self.database
