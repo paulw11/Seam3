@@ -734,6 +734,8 @@ open class SMStore: NSIncrementalStore {
                     
                 case .batchUpdateRequestType:
                     throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
+                case .batchInsertRequestType:
+                    throw NSError(domain: SMStore.SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
                 @unknown default:
                     break
                 }
