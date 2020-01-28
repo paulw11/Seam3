@@ -1,5 +1,11 @@
 Seam3 Changelog
 ===============
+# [1.5.6]
+* Deprecate old notification ini favour of new `Notification` extension
+* Address issues with "entity is from different context"
+* Add Swift Package Manager support
+* Allow individual insert failures
+
 # [1.5.5]
 
 * Improve logging of errors and activity in order to diagnose bugs and inefficiencies

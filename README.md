@@ -54,10 +54,10 @@ If a `Binary Data` attribute has the *Allows External Storage* option selected, 
 ## Sync
 
 Seam3 keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing the following two notifications.
-- SMStoreDidStartSyncOperationNotification
-- SMStoreDidFinishSyncOperationNotification
+- `smSyncDidStart` `Notification`
+- `smSyncDidFinish` `Notification`
 
-If an error occurred during the sync operation, then the `userInfo` property of the `SMStoreDidFinishSyncOperationNotification` notification will contain an `Error` object for the key `SMStore.SMStoreErrorDomain`
+If an error occurred during the sync operation, then the `userInfo` property of the `smSyncDidFinish` notification will contain an `Error` object for the key `SMStore.SMStoreErrorDomain`
 
 #### Conflict Resolution Policies
 In case of any sync conflicts, Seam3 exposes 3 conflict resolution policies.
