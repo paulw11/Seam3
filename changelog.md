@@ -1,5 +1,8 @@
 Seam3 Changelog
 ===============
+# [1.5.7]
+* Fix potential crash due to unavailable objects in context (#130)
+
 # [1.5.6]
 * Deprecate old notification ini favour of new `Notification` extension
 * Address issues with "entity is from different context"
