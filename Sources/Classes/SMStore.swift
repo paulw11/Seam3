@@ -959,7 +959,7 @@ open class SMStore: NSIncrementalStore {
             case .managedObjectIDResultType:
                 return resultsFromLocalStore.map({(result)->NSManagedObjectID in
                     let result = result as! NSManagedObjectID
-                    let object = self.backingMOC.registeredObject(for: result)!
+                    let object = self.backingMOC.object(with: result)
                     let recordID: String = object.value(forKey: SMStore.SMLocalStoreRecordIDAttributeName) as! String
                     let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[fetchRequest.entityName!]
                     let objectID = self.newObjectID(for: entity!, referenceObject: recordID)
