@@ -86,7 +86,7 @@
 		BBD213FD23E0E98400A5051E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		BBD213FE23E0E98400A5051E /* Seam3.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Seam3.podspec; sourceTree = "<group>"; };
 		BBD213FF23E0E98400A5051E /* changelog.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = changelog.md; sourceTree = "<group>"; };
-		BBDE0CDA25CB57B100DAD8C8 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBDE0CDA25CB57B100DAD8C8 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Seam3.framework; path = "/Users/paulw/development/Sandbox/Seam3/build/Debug-appletvos/Seam3.framework"; sourceTree = "<absolute>"; };
 		C1E7E7D71FF8F40100F44A5A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		OBJ_10 /* CKRecordZone+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecordZone+Helpers.swift"; sourceTree = "<group>"; };
 		OBJ_11 /* CKRecordZoneID+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecordZoneID+Helpers.swift"; sourceTree = "<group>"; };
@@ -158,7 +158,6 @@
 				OBJ_7 /* Sources */,
 				C1E7E7D61FF8F40100F44A5A /* Frameworks */,
 				6844E479213ADDDD00A8F696 /* Seam3.framework */,
-				BBDE0CDA25CB57B100DAD8C8 /* Seam3.framework */,
 			);
 			sourceTree = "<group>";
 		};
