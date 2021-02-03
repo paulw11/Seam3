@@ -76,17 +76,17 @@
 /* Begin PBXFileReference section */
 		68019A28213AD91600E49254 /* Seam3-watchOS Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Seam3-watchOS Info.plist"; path = "Sources/Assets/Resources/watchOS/Seam3-watchOS Info.plist"; sourceTree = "<group>"; };
 		68019A29213AD91F00E49254 /* Seam3-iOS Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Seam3-iOS Info.plist"; path = "Sources/Assets/Resources/iOS/Seam3-iOS Info.plist"; sourceTree = "<group>"; };
-		682CE15B213C188C0006C2C7 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		682CE15B213C188C0006C2C7 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Seam3.framework; path = /Users/paulw/development/Sandbox/Seam3/build/Debug/Seam3.framework; sourceTree = "<absolute>"; };
 		682CE15C213C188C0006C2C7 /* Seam3-macOS Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Seam3-macOS Info.plist"; path = "Sources/Assets/Resources/macOS/Seam3-macOS Info.plist"; sourceTree = "<group>"; };
-		682CE172213C18EC0006C2C7 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		682CE173213C18EC0006C2C7 /* Seam3-tvOS Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Seam3-tvOS Info.plist"; path = "Sources/Assets/Resources/tvOS/Seam3-tvOS Info.plist"; sourceTree = "<group>"; };
 		6844E479213ADDDD00A8F696 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		68DB9AD9213B9779002E35C3 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		68DB9AD9213B9779002E35C3 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Seam3.framework; path = "/Users/paulw/development/Sandbox/Seam3/build/Debug-watchos/Seam3.framework"; sourceTree = "<absolute>"; };
 		68ED0156213A39A500E0A1E7 /* SMBatchDeleteResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMBatchDeleteResult.swift; sourceTree = "<group>"; };
 		BBCB6B3C21E40CA60073BACA /* SMLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMLogger.swift; sourceTree = "<group>"; };
 		BBD213FD23E0E98400A5051E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		BBD213FE23E0E98400A5051E /* Seam3.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Seam3.podspec; sourceTree = "<group>"; };
 		BBD213FF23E0E98400A5051E /* changelog.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = changelog.md; sourceTree = "<group>"; };
+		BBDE0CDA25CB57B100DAD8C8 /* Seam3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1E7E7D71FF8F40100F44A5A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		OBJ_10 /* CKRecordZone+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecordZone+Helpers.swift"; sourceTree = "<group>"; };
 		OBJ_11 /* CKRecordZoneID+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CKRecordZoneID+Helpers.swift"; sourceTree = "<group>"; };
@@ -158,9 +158,7 @@
 				OBJ_7 /* Sources */,
 				C1E7E7D61FF8F40100F44A5A /* Frameworks */,
 				6844E479213ADDDD00A8F696 /* Seam3.framework */,
-				68DB9AD9213B9779002E35C3 /* Seam3.framework */,
-				682CE15B213C188C0006C2C7 /* Seam3.framework */,
-				682CE172213C18EC0006C2C7 /* Seam3.framework */,
+				BBDE0CDA25CB57B100DAD8C8 /* Seam3.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -231,7 +229,7 @@
 			);
 			name = "Seam3 (tvOS)";
 			productName = Classes;
-			productReference = 682CE172213C18EC0006C2C7 /* Seam3.framework */;
+			productReference = BBDE0CDA25CB57B100DAD8C8 /* Seam3.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		68DB9AC4213B9779002E35C3 /* Seam3 (watchOS) */ = {
@@ -272,7 +270,7 @@
 		OBJ_1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1240;
 				TargetAttributes = {
 					682CE146213C188C0006C2C7 = {
 						ProvisioningStyle = Automatic;
@@ -484,7 +482,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TARGET_NAME = Seam3;
-				TVOS_DEPLOYMENT_TARGET = 10.0;
+				TVOS_DEPLOYMENT_TARGET = 12.0;
 				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Debug;
@@ -513,7 +511,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TARGET_NAME = Seam3;
-				TVOS_DEPLOYMENT_TARGET = 10.0;
+				TVOS_DEPLOYMENT_TARGET = 12.0;
 				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Release;
@@ -586,7 +584,7 @@
 				ENABLE_TESTABILITY = YES;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/Sources/Assets/Resources/iOS/Seam3-iOS Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -613,7 +611,7 @@
 				ENABLE_TESTABILITY = YES;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/Sources/Assets/Resources/iOS/Seam3-iOS Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -645,6 +643,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -665,7 +664,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-DXcode";
@@ -695,6 +694,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -713,7 +713,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				OTHER_SWIFT_FLAGS = "-DXcode";
 				PRODUCT_NAME = "$(TARGET_NAME)";
