@@ -219,15 +219,11 @@ class SMStoreSyncOperation: Operation {
         try self.localStoreMOC.saveIfHasChanges()
     }
     
-    func applyLocalChangesToServer(insertedOrUpdatedCKRecords: Array<CKRecord>? , deletedCKRecordIDs: Array<CKRecord.ID>?) throws {
-        
-        if insertedOrUpdatedCKRecords == nil && deletedCKRecordIDs == nil {
-            return
-        }
+    func applyLocalChangesToServer(insertedOrUpdatedCKRecords: Array<CKRecord> , deletedCKRecordIDs: Array<CKRecord.ID>) throws {
         
         var changedRecords = [String:CKRecord]()
         
-        for record in insertedOrUpdatedCKRecords ?? [] {
+        for record in insertedOrUpdatedCKRecords {
             let recordName = record.recordID.recordName
             if let currentRecord = changedRecords[recordName] {
                 if let currentDate = currentRecord.modificationDate,
@@ -241,7 +237,7 @@ class SMStoreSyncOperation: Operation {
             }
         }
         SMStore.logger?.debug("Will attempt saving (insert/update) to the cloud \(changedRecords.count) CKRecords \(changedRecords.keys) (zone=\(String(describing: changedRecords.randomElement()?.value.recordID.zoneID.zoneName)))\n\(changedRecords.map {return $0.value})")
-        SMStore.logger?.debug("Will attempt deleting from the cloud \(deletedCKRecordIDs?.count ?? 0) CKRecords \((deletedCKRecordIDs ?? []).map {$0.recordName}) (zone=\(String(describing: deletedCKRecordIDs?.first?.zoneID.zoneName)))")
+        SMStore.logger?.debug("Will attempt deleting from the cloud \(deletedCKRecordIDs.count) CKRecords \((deletedCKRecordIDs).map {$0.recordName}) (zone=\(String(describing: deletedCKRecordIDs.first?.zoneID.zoneName)))")
         
         var outerSavedRecords: [CKRecord] = []
         var outerDeletedRecordIDs: [CKRecord.ID] = []
@@ -252,7 +248,7 @@ class SMStoreSyncOperation: Operation {
         // Split the changed records and deleted record IDs into multiple batches of 400 elements each,
         // because this is the maximum number of items possible in a single modify request.
         if let splitChangedRecords = self.splitArray(Array(changedRecords.values), maximumNumberOfItems: 400) as? [[CKRecord]],
-           let splitDeletedRecordIDs = self.splitArray(deletedCKRecordIDs!, maximumNumberOfItems: 400) as? [[CKRecord.ID]] {
+           let splitDeletedRecordIDs = self.splitArray(deletedCKRecordIDs, maximumNumberOfItems: 400) as? [[CKRecord.ID]] {
             for index in 0...max(splitChangedRecords.count, splitDeletedRecordIDs.count) {
                 let changedRecords = splitChangedRecords.count > index ? splitChangedRecords[index] : nil
                 let deletedRecordIDs = splitDeletedRecordIDs.count > index ? splitDeletedRecordIDs[index] : nil
