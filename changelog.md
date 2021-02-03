@@ -1,5 +1,12 @@
 Seam3 Changelog
 ===============
+
+# [1.5.8]
+* Include batching for sync where there are more than 400 updates
+
+# [1.5.7]
+* Include fix for occasional crash
+
 # [1.5.6]
 * Deprecate old notification ini favour of new `Notification` extension
 * Address issues with "entity is from different context"
