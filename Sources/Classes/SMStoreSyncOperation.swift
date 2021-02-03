@@ -209,6 +209,7 @@ class SMStoreSyncOperation: Operation {
         }
         return objectsByType
     }
+    
     func applyServerChangesToLocalDatabase(_ insertedOrUpdatedCKRecords: [CKRecord], deletedCKRecordIDs:[CKRecord.ID]) throws {
         try self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
         try self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs)
@@ -217,8 +218,6 @@ class SMStoreSyncOperation: Operation {
         SMStore.logger?.info("OK SMStore will try to save to persistent store \(registeredObjects.count) objects\n\n\(objectsByType)")
         try self.localStoreMOC.saveIfHasChanges()
     }
-  
-  
     
     func applyLocalChangesToServer(insertedOrUpdatedCKRecords: Array<CKRecord>? , deletedCKRecordIDs: Array<CKRecord.ID>?) throws {
         
@@ -243,55 +242,72 @@ class SMStoreSyncOperation: Operation {
         }
         SMStore.logger?.debug("Will attempt saving (insert/update) to the cloud \(changedRecords.count) CKRecords \(changedRecords.keys) (zone=\(String(describing: changedRecords.randomElement()?.value.recordID.zoneID.zoneName)))\n\(changedRecords.map {return $0.value})")
         SMStore.logger?.debug("Will attempt deleting from the cloud \(deletedCKRecordIDs?.count ?? 0) CKRecords \((deletedCKRecordIDs ?? []).map {$0.recordName}) (zone=\(String(describing: deletedCKRecordIDs?.first?.zoneID.zoneName)))")
-
-        let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: Array(changedRecords.values), recordIDsToDelete: deletedCKRecordIDs)
-        ckModifyRecordsOperation.database = self.database
+        
         var outerSavedRecords: [CKRecord] = []
         var outerDeletedRecordIDs: [CKRecord.ID] = []
         var conflictedRecords = [SeamConflictedRecord]()
         var shouldResetZone = false
         var shouldRetry = false
-        ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
-            outerSavedRecords = savedRecords ?? []
-            outerDeletedRecordIDs = deletedRecordIDs ?? []
-        })
-        ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,operationError)->Void in
-            guard let error = operationError as? CKError else {
-                SMStore.logger?.debug("OK Completed CKRecord operation (change/insert or delete to the cloud) for \(ckRecord.recordID.recordName)")
-                return
-            }
-            
-            let underLyingerror = error.userInfo["NSUnderlyingError"] as? CKError ?? error
-            SMStore.logger?.error("Operation error: \(underLyingerror.localizedDescription)\n")
-            
-            if error.code == CKError.serverRecordChanged {
-                guard let serverRecord = error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord,
-                    let clientRecord = error.userInfo[CKRecordChangedErrorClientRecordKey] as? CKRecord,
-                    let ancestorRecord = error.userInfo[CKRecordChangedErrorAncestorRecordKey] as? CKRecord
-                    else {
-                        return
-                }
-                let conflict = SeamConflictedRecord(serverRecord: serverRecord, clientRecord: clientRecord, clientAncestorRecord: ancestorRecord)
-                conflictedRecords.append(conflict)
-            }
-            else if error.code == CKError.unknownItem {
-                SMStore.logger?.debug("Clearing iCloud encoded fields for record for retry: \(ckRecord.recordType) \(ckRecord.recordID.recordName)");
-                do {
-                    let mob = try ckRecord.managedObjectForRecord(context: self.backingMOC!)
-                    mob?.setValue(nil, forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName)
-                    shouldRetry = true
-                } catch {
-                    SMStore.logger?.error("Failed to fetch and clear CloudKit encoded values from matching ManagedObject for \(ckRecord.recordID.recordName)")
-                }
-            }
-            else if underLyingerror.code == .userDeletedZone ||
-                underLyingerror.code == .zoneNotFound {
-                shouldResetZone = true
-            }
-        })
         
-        self.operationQueue.addOperation(ckModifyRecordsOperation)
-        self.operationQueue.waitUntilAllOperationsAreFinished()
+        // Split the changed records and deleted record IDs into multiple batches of 400 elements each,
+        // because this is the maximum number of items possible in a single modify request.
+        if let splitChangedRecords = self.splitArray(Array(changedRecords.values), maximumNumberOfItems: 400) as? [[CKRecord]],
+           let splitDeletedRecordIDs = self.splitArray(deletedCKRecordIDs!, maximumNumberOfItems: 400) as? [[CKRecord.ID]] {
+            for index in 0...max(splitChangedRecords.count, splitDeletedRecordIDs.count) {
+                let changedRecords = splitChangedRecords.count > index ? splitChangedRecords[index] : nil
+                let deletedRecordIDs = splitDeletedRecordIDs.count > index ? splitDeletedRecordIDs[index] : nil
+                
+                let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: changedRecords, recordIDsToDelete: deletedRecordIDs)
+                ckModifyRecordsOperation.database = self.database
+                ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
+                    if let savedRecords = savedRecords {
+                        outerSavedRecords.append(contentsOf: savedRecords)
+                    }
+
+                    if let deletedRecordIDs = deletedRecordIDs {
+                        outerDeletedRecordIDs.append(contentsOf: deletedRecordIDs)
+                    }
+                })
+                ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,operationError)->Void in
+                    guard let error = operationError as? CKError else {
+                        SMStore.logger?.debug("OK Completed CKRecord operation (change/insert or delete to the cloud) for \(ckRecord.recordID.recordName)")
+                        return
+                    }
+                    
+                    let underLyingerror = error.userInfo["NSUnderlyingError"] as? CKError ?? error
+                    SMStore.logger?.error("Operation error: \(underLyingerror.localizedDescription)\n")
+                    
+                    if error.code == CKError.serverRecordChanged {
+                        guard let serverRecord = error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord,
+                            let clientRecord = error.userInfo[CKRecordChangedErrorClientRecordKey] as? CKRecord,
+                            let ancestorRecord = error.userInfo[CKRecordChangedErrorAncestorRecordKey] as? CKRecord
+                            else {
+                                return
+                        }
+                        let conflict = SeamConflictedRecord(serverRecord: serverRecord, clientRecord: clientRecord, clientAncestorRecord: ancestorRecord)
+                        conflictedRecords.append(conflict)
+                    }
+                    else if error.code == CKError.unknownItem {
+                        SMStore.logger?.debug("Clearing iCloud encoded fields for record for retry: \(ckRecord.recordType) \(ckRecord.recordID.recordName)");
+                        do {
+                            let mob = try ckRecord.managedObjectForRecord(context: self.backingMOC!)
+                            mob?.setValue(nil, forKey: SMStore.SMLocalStoreRecordEncodedValuesAttributeName)
+                            shouldRetry = true
+                        } catch {
+                            SMStore.logger?.error("Failed to fetch and clear CloudKit encoded values from matching ManagedObject for \(ckRecord.recordID.recordName)")
+                        }
+                    }
+                    else if underLyingerror.code == .userDeletedZone ||
+                        underLyingerror.code == .zoneNotFound {
+                        shouldResetZone = true
+                    }
+                })
+                
+                self.operationQueue.addOperation(ckModifyRecordsOperation)
+                self.operationQueue.waitUntilAllOperationsAreFinished()
+            }
+        }
+        
         if shouldResetZone {
             UserDefaults.standard.set(false, forKey:SMStore.SMStoreCloudStoreCustomZoneName)
             // TODO: should retry here after executing SMServerStoreSetupOperation, but that is tricky currently
@@ -458,16 +474,23 @@ class SMStoreSyncOperation: Operation {
                     }
                 }
                 insertedOrUpdatedCKRecords.removeAll()
-                let fetchRecordsOperation: CKFetchRecordsOperation = CKFetchRecordsOperation(recordIDs: recordIDs)
-                fetchRecordsOperation.desiredKeys = desiredKeys
-                fetchRecordsOperation.database = self.database
-                fetchRecordsOperation.fetchRecordsCompletionBlock =  { recordsByRecordID,operationError in
-                    if operationError == nil && recordsByRecordID != nil {
-                        insertedOrUpdatedCKRecords = Array(recordsByRecordID!.values)
+                
+                // Split the record IDs into multiple batches of 400 elements each, because
+                // this is the maximum number of items possible in a single fetch request.
+                if let splitRecordIDs = self.splitArray(recordIDs, maximumNumberOfItems: 400) as? [[CKRecord.ID]] {
+                    for recordIDs in splitRecordIDs {
+                        let fetchRecordsOperation: CKFetchRecordsOperation = CKFetchRecordsOperation(recordIDs: recordIDs)
+                        fetchRecordsOperation.desiredKeys = desiredKeys
+                        fetchRecordsOperation.database = self.database
+                        fetchRecordsOperation.fetchRecordsCompletionBlock =  { recordsByRecordID,operationError in
+                            if operationError == nil && recordsByRecordID != nil {
+                                insertedOrUpdatedCKRecords.append(contentsOf: recordsByRecordID!.values)
+                            }
+                        }
+                        self.operationQueue.addOperation(fetchRecordsOperation)
+                        self.operationQueue.waitUntilAllOperationsAreFinished()
                     }
                 }
-                self.operationQueue.addOperation(fetchRecordsOperation)
-                self.operationQueue.waitUntilAllOperationsAreFinished()
             }
             
         } else {
@@ -547,5 +570,12 @@ class SMStoreSyncOperation: Operation {
         }
         // Don't save the MOC here: rolling up all the saves into a single one will prevent saving data in an inconsistent save
         // All saves are now performed in 'applyServerChangesToLocalDatabase()'
+    }
+    
+    // MARK: Helpers
+    private func splitArray(_ array: Array<Any>, maximumNumberOfItems: Int) -> [[Any]] {
+        return stride(from: 0, to: array.count, by: maximumNumberOfItems).map {
+            Array(array[$0 ..< Swift.min($0 + maximumNumberOfItems, array.count)])
+        }
     }
 }
